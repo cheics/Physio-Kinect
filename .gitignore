@@ -13,3 +13,6 @@
 _ReSharper.*
 *.resharper
 Ankh.NoLoad
+
+## Ignore Test results VS
+TestResults*
