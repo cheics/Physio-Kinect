@@ -23,13 +23,15 @@ namespace BayesianLogic
 		public double Parzen_px(double testVal)
 		{
 
+			double kdeNormalize = this.kdeValues.Length;
+
 			double prob_testVal = 0.0;
-			double scaleFactor_h = parzen_K / Math.Sqrt(this.kdeValues.Length);
+			double scaleFactor_h = parzen_K / Math.Sqrt(kdeNormalize);
 
 
 			foreach (double i in this.kdeValues)
 			{
-				prob_testVal += Math.Pow(scaleFactor_h * this.kdeValues.Length, -1) * normTest(i, scaleFactor_h, testVal);
+				prob_testVal += Math.Pow(scaleFactor_h * kdeNormalize, -1) * normTest(i, scaleFactor_h, testVal);
 			}
 			return prob_testVal;
 		}
