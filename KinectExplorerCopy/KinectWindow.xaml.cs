@@ -11,11 +11,24 @@ namespace Microsoft.Samples.Kinect.KinectExplorer
     using System.Windows.Data;
     using System.Windows.Input;
     using Microsoft.Kinect;
+    using System.Linq;
     using Microsoft.Samples.Kinect.WpfViewers;
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using System.Windows.Documents;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
+    using System.Windows.Navigation;
+    using System.Windows.Shapes;
+    using Microsoft.Kinect;
+    using Microsoft.Kinect.Toolkit;
+    using Coding4Fun.Kinect.Wpf;
 
     /// <summary>
     /// Interaction logic for KinectWindow.xaml.
     /// </summary>
+   
     public partial class KinectWindow : Window
     {
         public static readonly DependencyProperty KinectSensorProperty =
@@ -31,6 +44,28 @@ namespace Microsoft.Samples.Kinect.KinectExplorer
         /// Initializes a new instance of the KinectWindow class, which provides access to many KinectSensor settings
         /// and output visualization.
         /// </summary>
+
+        Skeleton[] allSkeletons = new Skeleton[6];
+        Skeleton GetFirstSkeleton(AllFramesReadyEventArgs e)
+        {
+            using (SkeletonFrame SkeletonFrameData = e.OpenSkeletonFrame())
+            {
+
+                if (SkeletonFrameData == null)
+                {
+                    return null;
+                }
+
+                SkeletonFrameData.CopySkeletonDataTo(allSkeletons);
+                //get the first tracked selection
+                Skeleton first = (from s in allSkeletons
+                                  where s.TrackingState == SkeletonTrackingState.Tracked
+                                  select s).FirstOrDefault();
+                return first;
+            }
+
+        }       
+
         public KinectWindow()
         {
             this.viewModel = new KinectWindowViewModel();
@@ -39,17 +74,29 @@ namespace Microsoft.Samples.Kinect.KinectExplorer
             // state logic and property change/binding/etc support, and is the data model
             // for KinectDiagnosticViewer.
             this.viewModel.KinectSensorManager = new KinectSensorManager();
-
+            
             Binding sensorBinding = new Binding("KinectSensor");
             sensorBinding.Source = this;
             BindingOperations.SetBinding(this.viewModel.KinectSensorManager, KinectSensorManager.KinectSensorProperty, sensorBinding);
-
+            
             // Attempt to turn on Skeleton Tracking for each Kinect Sensor
             this.viewModel.KinectSensorManager.SkeletonStreamEnabled = true;
-
             this.DataContext = this.viewModel;
-            
             InitializeComponent();
+
+
+        }
+
+        void mehrad(object sender, AllFramesReadyEventArgs e)
+        {
+            Skeleton first = GetFirstSkeleton(e);
+
+
+            if (first == null)
+            {
+                return;
+            }
+
         }
 
         public KinectSensor KinectSensor
@@ -85,7 +132,7 @@ namespace Microsoft.Samples.Kinect.KinectExplorer
             depthFrom.Children.Insert(0, this.ColorVis);
         }
     }
-
+    
     /// <summary>
     /// A ViewModel for a KinectWindow.
     /// </summary>

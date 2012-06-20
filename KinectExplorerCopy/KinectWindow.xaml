@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Microsoft.Samples.Kinect.KinectExplorer"
         xmlns:kt="clr-namespace:Microsoft.Samples.Kinect.WpfViewers;assembly=Microsoft.Samples.Kinect.WpfViewers"
+        xmlns:mskt="clr-namespace:Microsoft.Kinect.Toolkit;assembly=Microsoft.Kinect.Toolkit"
         Title="Kinect Explorer" Width="839" Height="768">
     <Window.Resources>
         <ResourceDictionary>
@@ -122,8 +123,12 @@
                 </Grid>
             </Grid>
         </StackPanel>
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Grid.Row="2" Grid.ColumnSpan="2">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="left" Grid.Row="2" Grid.Column="0">
             <kt:KinectSettings KinectSensorManager="{Binding KinectSensorManager}" Margin="10,0,0,87" Height="346" VerticalAlignment="Bottom" />
+        </StackPanel>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="left" Grid.Row="2" Grid.Column="1">
+            <kt:KinectSkeletonViewer Name="KinectSkeletinViewr1" KinectSensorManager="{Binding KinectSensorManager}" Visibility="Visible" ImageType="Color" ShowBones="True" ShowCenter="True" Width="200" Height="200"/>
+            <mskt:KinectSensorChooserUI Name="KinectSensorChooser1" Width="200" Height="100"></mskt:KinectSensorChooserUI>
         </StackPanel>
     </Grid> 
 </Window>
