@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{35D624F4-9657-4D87-8FD3-6CE4E00CB9DA}</ProjectGuid>
+    <ProjectGuid>{A85A95F0-6947-4176-8237-B473E159D957}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.Samples.Kinect.KinectExplorer</RootNamespace>
@@ -99,12 +99,6 @@
     <Resource Include="Images\Logo.png" />
     <Resource Include="Images\Status.png" />
     <Resource Include="Images\swap.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\KinectWpfViewers\Microsoft.Samples.Kinect.WpfViewers.csproj">
-      <Project>{4DE23893-27E7-423F-9BB6-BA21DAC2C45E}</Project>
-      <Name>Microsoft.Samples.Kinect.WpfViewers</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
