@@ -7,7 +7,7 @@ namespace BayesianLogic
 {
 	class BayesClassifier 
 	{
-		private float training_Factor = training.Instance;
+		private Splitting split = Splitting.Instance;
 		
 		public void Initialize();
 		{
@@ -16,13 +16,22 @@ namespace BayesianLogic
 
 		protected void Dispose(bool disposing)
 	        {
-	            base.Dispose(disposing);
+	            	base.Dispose(disposing);
 	        }
 		
-		public int Bayesian(int n_dimensions) 
+		public [,] int Bayesian(float[,] Data) 
 		{
-			for (int i = 0; i <= n_dimensions; i++)
-			//TODO: calculate 
+		 	split.getTraining(Data, out t_Data, out e_Data, out num_Features);
+			
+			for (int i = 0; i <= t_Data.Rows ; i++)
+				train(t_Data,t_Data[i]); 
+				//TODO: train function
+
+			int[,] evaluate = new int [1,e_Data.Rows]
+
+			for (int i = 0; i <= t_Data.Rows ; i++)
+				evaluate[i] = Classify (e_Data[i],t_Data)
+				//TODO: implement classify function
 		}
 		
 	}
