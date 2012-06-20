@@ -8,9 +8,11 @@ namespace BayesianLogic
 	class BayesClassifier
 	{
 
-		public BayesClassifier(int n_dimensions) 
+		public Bayesian(int n_dimensions) 
 		{
-
+			for (int i = 0; i <= n_dimensions; i++)
+			//TODO: calculate 
 		}
+
 	}
 }
