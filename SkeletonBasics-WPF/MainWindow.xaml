@@ -74,14 +74,26 @@
             <Viewbox Grid.Column="0" Stretch="Uniform" HorizontalAlignment="Center">
                 <Image Name="ColorImage" Width="200" Height="200"/>
             </Viewbox>
-                <Viewbox Grid.Column="1" Stretch="Uniform" HorizontalAlignment="Center">
-                <Image Name="VBLiveData" Width="10" Height="10"/>
+            <Viewbox Grid.Column="1" Stretch="Uniform" HorizontalAlignment="Center">
+            <Grid Margin="10 0 10 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Label Name="X" Grid.Row="0" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">X: N/A</Label>
+                <Label Name="Y" Grid.Row="1" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">Y: N/A</Label>
+                <Label Name="Z" Grid.Row="2" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">Z: N/A</Label>
+                <ComboBox Grid.Row="3" Background="White" FontSize="24" Margin="0 10 0 0" Name="Joints" SelectionChanged="Joints_SelectionChanged" />
+            </Grid>
             </Viewbox>
+            
             <Viewbox Grid.Column="2" Stretch="Uniform" HorizontalAlignment="Center">
                 <Image Name="VBLiveSkeleton" Width="50" Height="50"/>
             </Viewbox>
             <Viewbox Grid.Column="3" Stretch="Uniform" HorizontalAlignment="Center">
-                
+                <Image Name="RecSkeleton" Width="50" Height="50"/>
             </Viewbox>
             
         </Grid>

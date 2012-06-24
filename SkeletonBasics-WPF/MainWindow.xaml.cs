@@ -18,12 +18,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using System;
     using System.Linq;
     using Coding4Fun;
+    using System.Text.RegularExpressions;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        private string selectedJoint;
+        private Dictionary<string, int> jointMapping;
         /// <summary>
         /// Width of output drawing
         /// </summary>
@@ -165,6 +169,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             this.imageSource = new DrawingImage(this.drawingGroup);
             // Display the drawing using our image control
             VBLiveSkeleton.Source = this.imageSource;
+            RecSkeleton.Source = this.imageSource;
 
             // Look through all sensors and start the first connected one.
             // This requires that a Kinect is connected at the time of app startup.
@@ -202,6 +207,17 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             if (null == this.sensor)
             {
                 this.statusBarText.Text = Properties.Resources.NoKinectReady;
+            }
+            Skeleton skeleton = new Skeleton();
+            int i = 0;
+            jointMapping = new Dictionary<string, int>();
+            foreach (Joint joint in skeleton.Joints)
+            {
+                string name = joint.JointType.ToString();
+                name = Regex.Replace(name, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
+                this.Joints.Items.Add(name);
+                this.jointMapping.Add(name, i);
+                i++;
             }
         }
 
@@ -430,6 +446,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     drawingContext.DrawEllipse(drawBrush, null, this.SkeletonPointToScreen(joint.Position), JointThickness, JointThickness);
                 }
             }
+            // get x, y, z for selected joint
+            if (selectedJoint != null)
+            {
+                JointType key = (JointType)jointMapping[selectedJoint];
+                X.Content = "X: " + System.Math.Round(skeleton.Joints[key].Position.X, 2).ToString();
+                Y.Content = "Y: " + System.Math.Round(skeleton.Joints[key].Position.Y, 2).ToString();
+                Z.Content = "Z: " + System.Math.Round(skeleton.Joints[key].Position.Z, 2).ToString();
+            }
         }
 
         /// <summary>
@@ -501,6 +525,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     this.sensor.SkeletonStream.TrackingMode = SkeletonTrackingMode.Default;
                 }
             }
+        }
+        private void Joints_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            selectedJoint = this.Joints.SelectedValue.ToString();
         }
     }
     public class KinectWindowViewModel : DependencyObject
