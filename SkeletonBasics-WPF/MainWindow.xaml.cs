@@ -8,8 +8,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
     using System.IO;
     using System.Windows;
+    using System.Windows.Data;
     using System.Windows.Media;
+    using System.Windows.Media.Imaging;
+    using System.Windows.Controls;
     using Microsoft.Kinect;
+    using Microsoft.Samples.Kinect.WpfViewers;
+    using Microsoft.Samples.Kinect.SkeletonBasics;
+    using System;
+    using System.Linq;
+    using Coding4Fun;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -80,14 +88,29 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// Drawing image that we will display
         /// </summary>
         private DrawingImage imageSource;
+        private readonly KinectWindowViewModel viewModel;
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
         public MainWindow()
         {
+            this.viewModel = new KinectWindowViewModel();
+
+            // The KinectSensorManager class is a wrapper for a KinectSensor that adds
+            // state logic and property change/binding/etc support, and is the data model
+            // for KinectDiagnosticViewer.
+            this.viewModel.KinectSensorManager = new KinectSensorManager();
+
+            Binding sensorBinding = new Binding("KinectSensor");
+            sensorBinding.Source = this;
+            BindingOperations.SetBinding(this.viewModel.KinectSensorManager, KinectSensorManager.KinectSensorProperty, sensorBinding);
+            // Create the drawing group we'll use for drawing
+
             InitializeComponent();
         }
+        const int skeletonCount = 6; 
+        Skeleton[] allSkeletons = new Skeleton[skeletonCount];
 
         /// <summary>
         /// Draws indicators to show which edges are clipping skeleton data
@@ -136,14 +159,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="e">event arguments</param>
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
-            // Create the drawing group we'll use for drawing
             this.drawingGroup = new DrawingGroup();
 
             // Create an image source that we can use in our image control
             this.imageSource = new DrawingImage(this.drawingGroup);
-
             // Display the drawing using our image control
-            Image.Source = this.imageSource;
+            VBLiveSkeleton.Source = this.imageSource;
 
             // Look through all sensors and start the first connected one.
             // This requires that a Kinect is connected at the time of app startup.
@@ -162,10 +183,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 // Turn on the skeleton stream to receive skeleton frames
                 this.sensor.SkeletonStream.Enable();
-
+                this.sensor.DepthStream.Enable();
+                this.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+                this.sensor.AllFramesReady += new System.EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
                 // Add an event handler to be called whenever there is new color frame data
                 this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
-
                 // Start the sensor!
                 try
                 {
@@ -182,6 +204,113 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.statusBarText.Text = Properties.Resources.NoKinectReady;
             }
         }
+
+        void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
+        {
+            
+           using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
+            {
+                if (colorFrame == null)
+                {
+                    return;
+                }
+                byte[] pixels = new byte[colorFrame.PixelDataLength];
+                colorFrame.CopyPixelDataTo(pixels);
+                int stride = colorFrame.Width * 4;
+                ColorImage.Source = BitmapSource.Create(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
+ 
+            }
+           Skeleton first = GetFirstSkeleton(e);
+           if (first == null)
+           {
+               return;
+           }
+            //throw new System.NotImplementedException();
+           GetCameraPoint(first, e); 
+            
+       }
+
+        Skeleton GetFirstSkeleton(AllFramesReadyEventArgs e)
+        {
+            using (SkeletonFrame skeletonFrameData = e.OpenSkeletonFrame())
+            {
+                if (skeletonFrameData == null)
+                {
+                    return null;
+                }
+
+
+                skeletonFrameData.CopySkeletonDataTo(allSkeletons);
+
+                //get the first tracked skeleton
+                Skeleton first = (from s in allSkeletons
+                                  where s.TrackingState == SkeletonTrackingState.Tracked
+                                  select s).FirstOrDefault();
+
+                return first;
+
+            }
+        }
+        void GetCameraPoint(Skeleton first, AllFramesReadyEventArgs e)
+        {
+
+            using (DepthImageFrame depth = e.OpenDepthImageFrame())
+            {
+
+                //Map a joint location to a point on the depth map
+                //head
+                DepthImagePoint headDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.Head].Position);
+                
+                //left hand
+                DepthImagePoint leftDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.HandLeft].Position);
+                //right hand
+                DepthImagePoint rightDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.HandRight].Position);
+
+
+                //Map a depth point to a point on the color image
+                //head
+                ColorImagePoint headColorPoint =
+                    depth.MapToColorImagePoint(headDepthPoint.X, headDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+                //left hand
+                ColorImagePoint leftColorPoint =
+                    depth.MapToColorImagePoint(leftDepthPoint.X, leftDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+                //right hand
+                ColorImagePoint rightColorPoint =
+                    depth.MapToColorImagePoint(rightDepthPoint.X, rightDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+
+                //Set location
+                //CameraPosition(headImage, headColorPoint);
+               // CameraPosition(leftEllipse, leftColorPoint);
+               // CameraPosition(rightEllipse, rightColorPoint);
+            }
+        }
+        private void CameraPosition(FrameworkElement element, ColorImagePoint point)
+        {
+            //Divide by 2 for width and height so point is right in the middle 
+            // instead of in top/left corner
+            
+            Canvas.SetLeft(element, point.X - element.Width / 2);
+            Canvas.SetTop(element, point.Y - element.Height / 2);
+
+        }
+        private void ScalePosition(FrameworkElement element, Joint joint)
+        {
+            //convert the value to X/Y
+            //Joint scaledJoint = joint.ScaleTo(1280, 720); 
+
+            //convert & scale (.3 = means 1/3 of joint distance)
+            //oint scaledJoint = joint.ScaleTo(1280, 720, .3f, .3f);
+            //Canvas.SetLeft(element, scaledJoint.Position.X);
+            //Canvas.SetTop(element, scaledJoint.Position.Y);
+
+        }           
 
         /// <summary>
         /// Execute shutdown tasks
@@ -372,6 +501,21 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     this.sensor.SkeletonStream.TrackingMode = SkeletonTrackingMode.Default;
                 }
             }
+        }
+    }
+    public class KinectWindowViewModel : DependencyObject
+    {
+        public static readonly DependencyProperty KinectSensorManagerProperty =
+            DependencyProperty.Register(
+                "KinectSensorManager",
+                typeof(KinectSensorManager),
+                typeof(KinectWindowViewModel),
+                new PropertyMetadata(null));
+
+        public KinectSensorManager KinectSensorManager
+        {
+            get { return (KinectSensorManager)GetValue(KinectSensorManagerProperty); }
+            set { SetValue(KinectSensorManagerProperty, value); }
         }
     }
 }

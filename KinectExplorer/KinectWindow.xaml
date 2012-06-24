@@ -71,7 +71,7 @@
                             <TextBlock FontSize="{StaticResource FPSFontSize}" HorizontalAlignment="Center" Margin="-2">FPS</TextBlock>
                         </StackPanel>
                     </Border>                   
-                    <Rectangle Fill="#7777" Visibility="{Binding KinectSensorManager.ColorStreamEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True}"/>
+                    <Rectangle Fill="#7777" Visibility="{Binding KinectSensorManager.ColorStreamEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True}" SnapsToDevicePixels="True"/>
                 </Grid>
             </Grid>
         </Grid>
@@ -83,7 +83,8 @@
             <kt:KinectAudioViewer 
                 x:Name="kinectAudioViewer" 
                 HorizontalAlignment="Stretch" 
-                VerticalAlignment="Stretch"                 
+                VerticalAlignment="Stretch"
+                SnapsToDevicePixels="True"
                 KinectSensorManager="{Binding KinectSensorManager}"/>
         </Grid>
         
@@ -125,7 +126,7 @@
                             <TextBlock FontSize="{StaticResource FPSFontSize}" HorizontalAlignment="Center" Margin="-2">FPS</TextBlock>
                         </StackPanel>
                     </Border>
-                    <Rectangle Fill="#7777" Visibility="{Binding KinectSensorManager.DepthStreamEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True}"/>
+                    <Rectangle Fill="#7777" Visibility="{Binding KinectSensorManager.DepthStreamEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True}" SnapsToDevicePixels="True"/>
                 </Grid>
                 <Button HorizontalAlignment="Left" VerticalAlignment="Top" Command="{StaticResource SwapCommand}">
                     <Button.Template>
@@ -150,7 +151,7 @@
                 </Button>                
             </Grid>
 
-            <kt:KinectSettings KinectSensorManager="{Binding KinectSensorManager}" Margin="0 20 0 0" />
+            <kt:KinectSettings KinectSensorManager="{Binding KinectSensorManager}" Margin="0 20 0 0" SnapsToDevicePixels="True"/>
 
         </StackPanel>
 

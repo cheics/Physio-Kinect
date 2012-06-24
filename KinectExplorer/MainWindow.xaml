@@ -16,6 +16,10 @@
         <SolidColorBrush x:Key="DarkNeutralBrush">#505050</SolidColorBrush>
         <FontFamily x:Key="KinectFont">Segoe UI</FontFamily>
 
+        <Style TargetType="{x:Type Image}">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+        </Style>
+
         <sys:Double x:Key="HeaderFontSize">24.0</sys:Double>        
         <sys:Double x:Key="LabelFontSize">18.0</sys:Double>
         <sys:Double x:Key="ItemFontSize">12.0</sys:Double>
@@ -82,6 +86,7 @@
                 <TextBlock DockPanel.Dock="Right" 
                        HorizontalAlignment="Right" 
                        VerticalAlignment="Bottom" 
+                       Margin="0 0 -1 0"
                        Foreground="{StaticResource DarkNeutralBrush}" FontSize="{StaticResource LabelFontSize}">Explorer Connected Devices</TextBlock>
             </DockPanel>            
             <ItemsControl Background="White" Name="kinectSensors" Grid.Row="1"/>            
@@ -96,7 +101,7 @@
             Visibility="{Binding ElementName=kinectSensors,Path=Items.Count, Converter={StaticResource VisibilityConverter}}">
                 <!-- IMPORTANT: KinectSensorChooserUI component in Microsoft.Kinect.Toolkit is better to use or copy from
                  than KinectExplorers user experience for device and discovery. -->
-                <TextBlock Foreground="{StaticResource DarkNeutralBrush}" FontSize="{StaticResource LabelFontSize}" FontFamily="{StaticResource KinectFont}" >Kinect Sensor Required</TextBlock>
+                <TextBlock Foreground="{StaticResource DarkNeutralBrush}" FontSize="{StaticResource LabelFontSize}" FontFamily="{StaticResource KinectFont}" Margin="-1 0 0 0">Kinect Sensor Required</TextBlock>
                 <TextBlock Foreground="{StaticResource DarkNeutralBrush}" FontSize="{StaticResource ItemFontSize}"  FontFamily="{StaticResource KinectFont}" TextWrapping="Wrap">
                     <LineBreak/>
                     There are current no Kinect Sensors connected.  Please plug in a sensor to begin using this application
