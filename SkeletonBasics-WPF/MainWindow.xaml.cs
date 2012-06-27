@@ -20,6 +20,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using Coding4Fun;
     using System.Text.RegularExpressions;
     using System.Collections.Generic;
+    using Microsoft.Research.DynamicDataDisplay.DataSources;
+    using Microsoft.Research.DynamicDataDisplay;
+    using Microsoft.Research.DynamicDataDisplay.PointMarkers;
+    using MySql.Data.MySqlClient;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -27,6 +31,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     public partial class MainWindow : Window
     {
         private string selectedJoint;
+        private string MyConString = "SERVER=localhost;" +
+            "DATABASE=dbkinect;" +
+            "UID=root;" +
+            "PASSWORD=Karamlou;";
         private Dictionary<string, int> jointMapping;
         /// <summary>
         /// Width of output drawing
@@ -109,7 +117,25 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             Binding sensorBinding = new Binding("KinectSensor");
             sensorBinding.Source = this;
             BindingOperations.SetBinding(this.viewModel.KinectSensorManager, KinectSensorManager.KinectSensorProperty, sensorBinding);
+           /*
             // Create the drawing group we'll use for drawing
+            var x = Enumerable.Range(0, 1001).Select(i => i / 10.0).ToArray();
+            var y = x.Select(v => Math.Abs(v) < 1e-10 ? 1 : Math.Sin(v) / v).ToArray();
+            ObservableDataSource<Point>[] sources = null;
+            sources = new ObservableDataSource<Point>[2];
+                sources[1] = new ObservableDataSource<Point>();
+                sources[1].SetXYMapping(p => p);
+               
+            F1Graph.AddLineGraph(sources[1], 1, "Channel " + (1+1).ToString());
+                            sources[2] = new ObservableDataSource<Point>();
+                sources[2].SetXYMapping(p => p);
+                F1Graph.AddLineGraph(sources[2], 1, "Channel " + (2+1).ToString());
+            */
+            /*
+            CompositeDataSource compositeDataSource1 = new CompositeDataSource CompositeDataSource(x, y);
+            CompositeDataSource compositeDataSource2 = new
+              CompositeDataSource(datesDataSource, numberClosedDataSource);
+             * */
 
             InitializeComponent();
         }
@@ -219,7 +245,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.jointMapping.Add(name, i);
                 i++;
             }
+
         }
+
 
         void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
@@ -241,65 +269,204 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
            {
                return;
            }
+           else {
+               //GetCameraPoint(first, e); 
+               }
             //throw new System.NotImplementedException();
-           GetCameraPoint(first, e); 
-            
        }
 
         Skeleton GetFirstSkeleton(AllFramesReadyEventArgs e)
         {
+            
             using (SkeletonFrame skeletonFrameData = e.OpenSkeletonFrame())
             {
                 if (skeletonFrameData == null)
                 {
                     return null;
                 }
-
-
+                
                 skeletonFrameData.CopySkeletonDataTo(allSkeletons);
 
                 //get the first tracked skeleton
                 Skeleton first = (from s in allSkeletons
                                   where s.TrackingState == SkeletonTrackingState.Tracked
                                   select s).FirstOrDefault();
-
                 return first;
+               
 
             }
         }
         void GetCameraPoint(Skeleton first, AllFramesReadyEventArgs e)
         {
+            MySqlConnection connection = new MySqlConnection(MyConString);
+            MySqlCommand command = connection.CreateCommand();
+            MySqlDataReader Reader;
+            connection.Open();
+            String values = null;
 
             using (DepthImageFrame depth = e.OpenDepthImageFrame())
             {
 
                 //Map a joint location to a point on the depth map
                 //head
-                DepthImagePoint headDepthPoint =
-                    depth.MapFromSkeletonPoint(first.Joints[JointType.Head].Position);
-                
-                //left hand
-                DepthImagePoint leftDepthPoint =
+                DepthImagePoint AnkleLeftDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.AnkleLeft].Position);
+                DepthImagePoint AnkleRightDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.AnkleRight].Position);
+                DepthImagePoint ElbowLeftDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.ElbowLeft].Position);
+                DepthImagePoint ElbowRightDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.ElbowRight].Position);
+                DepthImagePoint FootLeftDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.FootLeft].Position);
+                DepthImagePoint FootRightDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.FootRight].Position);
+                DepthImagePoint HandLeftDepthPoint =
                     depth.MapFromSkeletonPoint(first.Joints[JointType.HandLeft].Position);
-                //right hand
-                DepthImagePoint rightDepthPoint =
+                DepthImagePoint HandRightDepthPoint =
                     depth.MapFromSkeletonPoint(first.Joints[JointType.HandRight].Position);
-
+                DepthImagePoint HeadDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.Head].Position);
+                DepthImagePoint HipCenterDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.HipCenter].Position);
+                DepthImagePoint HipLeftDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.HipLeft].Position);
+                DepthImagePoint HipRightDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.HipRight].Position);
+                DepthImagePoint KneeLeftDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.KneeLeft].Position);
+                DepthImagePoint KneeRightDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.KneeRight].Position);
+                DepthImagePoint ShoulderCenterDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.ShoulderCenter].Position);
+                DepthImagePoint ShoulderLeftDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.ShoulderLeft].Position);
+                DepthImagePoint ShoulderRightDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.ShoulderRight].Position);
+                DepthImagePoint SpineDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.Spine].Position);
+                DepthImagePoint WristLeftDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.WristLeft].Position);
+                DepthImagePoint WristRightDepthPoint =
+                    depth.MapFromSkeletonPoint(first.Joints[JointType.WristRight].Position);
 
                 //Map a depth point to a point on the color image
                 //head
-                ColorImagePoint headColorPoint =
-                    depth.MapToColorImagePoint(headDepthPoint.X, headDepthPoint.Y,
-                    ColorImageFormat.RgbResolution640x480Fps30);
-                //left hand
-                ColorImagePoint leftColorPoint =
-                    depth.MapToColorImagePoint(leftDepthPoint.X, leftDepthPoint.Y,
-                    ColorImageFormat.RgbResolution640x480Fps30);
-                //right hand
-                ColorImagePoint rightColorPoint =
-                    depth.MapToColorImagePoint(rightDepthPoint.X, rightDepthPoint.Y,
+                ColorImagePoint AnkleLeftColorPoint =
+                    depth.MapToColorImagePoint(AnkleLeftDepthPoint.X, AnkleLeftDepthPoint.Y,
                     ColorImageFormat.RgbResolution640x480Fps30);
 
+                ColorImagePoint AnkleRightColorPoint =
+                    depth.MapToColorImagePoint(AnkleRightDepthPoint.X, AnkleRightDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint ElbowLeftColorPoint =
+                    depth.MapToColorImagePoint(ElbowLeftDepthPoint.X, ElbowLeftDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint ElbowRightColorPoint =
+                    depth.MapToColorImagePoint(ElbowRightDepthPoint.X, ElbowRightDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint FootLeftColorPoint =
+                    depth.MapToColorImagePoint(FootLeftDepthPoint.X, FootLeftDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint FootRightColorPoint =
+                    depth.MapToColorImagePoint(FootRightDepthPoint.X, FootRightDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint HandLeftColorPoint =
+                    depth.MapToColorImagePoint(HandLeftDepthPoint.X, HandLeftDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint HandRightColorPoint =
+                    depth.MapToColorImagePoint(HandRightDepthPoint.X, HandRightDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint HeadColorPoint =
+                    depth.MapToColorImagePoint(HeadDepthPoint.X, HeadDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint ShoulderCenterColorPoint =
+                    depth.MapToColorImagePoint(ShoulderCenterDepthPoint.X, ShoulderCenterDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint HipCenterColorPoint =
+                    depth.MapToColorImagePoint(HipCenterDepthPoint.X, HipCenterDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);           
+    
+                ColorImagePoint HipLeftColorPoint =
+                    depth.MapToColorImagePoint(HipLeftDepthPoint.X, HipLeftDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint HipRightColorPoint =
+                    depth.MapToColorImagePoint(HipRightDepthPoint.X, HipRightDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint KneeLeftDepthColorPoint =
+                    depth.MapToColorImagePoint(KneeLeftDepthPoint.X, KneeLeftDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint KneeRightColorPoint =
+                    depth.MapToColorImagePoint(KneeRightDepthPoint.X, KneeRightDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint ShoulderLeftColorPoint =
+                    depth.MapToColorImagePoint(ShoulderLeftDepthPoint.X, ShoulderLeftDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint ShoulderRightColorPoint =
+                    depth.MapToColorImagePoint(ShoulderRightDepthPoint.X, ShoulderRightDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint SpineColorPoint =
+                    depth.MapToColorImagePoint(SpineDepthPoint.X, SpineDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint WristLeftColorPoint =
+                    depth.MapToColorImagePoint(WristLeftDepthPoint.X, WristLeftDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                ColorImagePoint WristRightColorPoint =
+                    depth.MapToColorImagePoint(WristRightDepthPoint.X, WristRightDepthPoint.Y,
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
+                
+                foreach (Joint joint in first.Joints)
+                       {
+                           command.CommandText = command.CommandText + "," +
+                               joint.JointType.ToString() + "X" + "," +
+                               joint.JointType.ToString() + "Y";
+                       }
+
+                values = depth.FrameNumber.ToString()+ "," + 
+                    HipCenterColorPoint.X.ToString() + "," + HipCenterColorPoint.Y.ToString() + "," +
+                    SpineColorPoint.X.ToString() + "," + SpineColorPoint.Y.ToString() + "," +
+                    ShoulderCenterColorPoint.X.ToString() + "," + ShoulderCenterColorPoint.Y.ToString() + "," +
+                    HeadColorPoint.X.ToString() + "," + HeadColorPoint.Y.ToString() + "," +
+                    ShoulderLeftColorPoint.X.ToString() + "," + ShoulderLeftColorPoint.Y.ToString() + "," +
+                    ElbowLeftColorPoint.X.ToString() + "," + ElbowLeftColorPoint.Y.ToString() + "," +
+                    WristLeftColorPoint.X.ToString() + "," + WristLeftColorPoint.Y.ToString() + "," +
+                    HandLeftColorPoint.X.ToString() + "," + HandLeftColorPoint.Y.ToString() + "," +
+                    ShoulderRightColorPoint.X.ToString() + "," + ShoulderRightColorPoint.Y.ToString() + "," +
+                    ElbowRightColorPoint.X.ToString() + "," + ElbowRightColorPoint.Y.ToString() + "," +
+                    WristRightColorPoint.X.ToString() + "," + WristRightColorPoint.Y.ToString() + "," +
+                    HandRightColorPoint.X.ToString() + "," + HandRightColorPoint.Y.ToString() + "," +
+                    HipLeftColorPoint.X.ToString() + "," + HipLeftColorPoint.Y.ToString() + "," +
+                    KneeLeftDepthColorPoint.X.ToString() + "," + KneeLeftDepthColorPoint.Y.ToString() + "," +
+                    AnkleLeftColorPoint.X.ToString() + "," + AnkleLeftColorPoint.Y.ToString()+"," +
+                    FootLeftColorPoint.X.ToString() +"," + FootLeftColorPoint.Y.ToString() + ","+
+                    HipRightColorPoint.X.ToString() +"," + HipRightColorPoint.Y.ToString() +","+
+                    KneeRightColorPoint.X.ToString() + "," + KneeRightColorPoint.Y.ToString() + "," +
+                    AnkleRightColorPoint.X.ToString() + "," + AnkleRightColorPoint.Y.ToString() + ","+
+                    FootRightColorPoint.X.ToString() + "," + FootRightColorPoint.Y.ToString();
+
+                command.CommandText = "INSERT INTO dbkinect.kinectcolorimagedata (Timestamp " + command.CommandText + ") VALUE ("
+                       + values+")";
+                    Reader = command.ExecuteReader();
+                    Reader.Close();
+                
 
                 //Set location
                 //CameraPosition(headImage, headColorPoint);
@@ -350,14 +517,72 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             Skeleton[] skeletons = new Skeleton[0];
 
+            // SQL connection to record skeleton data
+            MySqlConnection connection = new MySqlConnection(MyConString);
+            MySqlCommand command = connection.CreateCommand();
+            MySqlDataReader Reader;
+            connection.Open();
+            string values =null;
+
+
+             
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
             {
                 if (skeletonFrame != null)
                 {
                     skeletons = new Skeleton[skeletonFrame.SkeletonArrayLength];
                     skeletonFrame.CopySkeletonDataTo(skeletons);
+
+                    //get the first tracked skeleton
+                    Skeleton first = (from s in skeletons
+                                      where s.TrackingState == SkeletonTrackingState.Tracked
+                                      select s).FirstOrDefault();
+
+                    // creating commands for MySQL
+                    //Skeleton firts = Skeleton first = GetFirstSkeleton(e);
+                    if (first != null)
+                    {
+                        foreach (Joint joint in first.Joints)
+                        {
+                            command.CommandText = command.CommandText + "," +
+                                joint.JointType.ToString() + "X" + "," +
+                                joint.JointType.ToString() + "Y" + "," +
+                                joint.JointType.ToString() + "Z";
+
+
+                            values = values + "," +
+                                joint.Position.X.ToString() + "," +
+                                joint.Position.Y.ToString() + "," +
+                                joint.Position.Z.ToString();
+
+                        }
+                        // Storing skeleton info into db
+
+
+                        if (baseline.IsChecked == true)
+                        {
+                            values = ",1" + values;
+                        }
+                        else
+                        {
+                            values = ",0" + values;
+                        }
+
+                        values = skeletonFrame.FrameNumber.ToString() + values;
+                        command.CommandText = "INSERT INTO dbkinect.kinectdata (Timestamp,Type " + command.CommandText + ") VALUE ("
+                           + values + ")";
+                        Reader = command.ExecuteReader();
+                        Reader.Close();
+                        if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 15) == 0)
+                        {
+                            Make_Graph();
+                        }
+                    }
                 }
+
             }
+
+            connection.Close();
 
             using (DrawingContext dc = this.drawingGroup.Open())
             {
@@ -389,6 +614,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 // prevent drawing outside of our render area
                 this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
             }
+            //call the graph maker function
+
+            //Make_Graph();
         }
 
         /// <summary>
@@ -446,7 +674,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     drawingContext.DrawEllipse(drawBrush, null, this.SkeletonPointToScreen(joint.Position), JointThickness, JointThickness);
                 }
             }
-            // get x, y, z for selected joint
+            
+            // get x, y, z for selected joint to show in live data
             if (selectedJoint != null)
             {
                 JointType key = (JointType)jointMapping[selectedJoint];
@@ -454,6 +683,41 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 Y.Content = "Y: " + System.Math.Round(skeleton.Joints[key].Position.Y, 2).ToString();
                 Z.Content = "Z: " + System.Math.Round(skeleton.Joints[key].Position.Z, 2).ToString();
             }
+
+            //some code to test mySQL connection and creation of kinectdata table with proper columns
+
+            //int testing = 0;
+            /*foreach (Joint joint in skeleton.Joints)
+            {
+                testing = testing +1;
+                command.CommandText = "insert testtable (idTestTable, joint1, joint2) Values (" + (12+testing).ToString() + ", 5,5)";
+                Reader = command.ExecuteReader();
+                Reader.Close();
+            }
+             */
+            /*
+            MySqlConnection connection = new MySqlConnection(MyConString);
+            MySqlCommand command = connection.CreateCommand();
+            MySqlDataReader Reader;
+            connection.Open();
+            
+            foreach (Joint joint in skeleton.Joints)
+            {
+                command.CommandText = command.CommandText + "," + joint.JointType.ToString() + "X" + " VARCHAR(30) " + ","+
+                    joint.JointType.ToString() + "Y" + " VARCHAR(30) ";
+
+                //jointnames = jointnames+ 
+            }
+            
+            MySqlCommand command2 = connection.CreateCommand();
+            command2.CommandText = "CREATE TABLE dbkinect.kinectColorImageData(id INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), Timestamp VARCHAR(30) " + command.CommandText + ")";
+            Reader = command2.ExecuteReader();
+            
+            Reader.Close();          
+            connection.Close();
+            
+             */ 
+
         }
 
         /// <summary>
@@ -529,6 +793,221 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void Joints_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             selectedJoint = this.Joints.SelectedValue.ToString();
+        }
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            MySqlConnection connection = new MySqlConnection(MyConString);
+            MySqlCommand command = connection.CreateCommand();
+            MySqlDataReader Reader;
+            connection.Open();
+
+            int numberofentries = 0;
+
+            //command.CommandText = "select Timestamp,WristRightX from dbkinect.kinectdata where WristRightX <> '0'";
+            command.CommandText = "select Count(*) from dbkinect.kinectdata where WristRightX <> '0'";
+            Reader = command.ExecuteReader();
+            while (Reader.Read())
+            {
+                numberofentries = Convert.ToInt32(Reader[0].ToString());
+
+            }
+            Reader.Close();
+            command.CommandText = "select Timestamp,WristRightX from dbkinect.kinectdata where WristRightX <> '0' and Type = '1'";
+            Reader = command.ExecuteReader();
+            
+            int[] dates = new int[numberofentries];
+            double[] jointxvalue = new double[numberofentries];
+            double[] jointtyvalue = new double[numberofentries];
+
+            int j = 0;
+            while (Reader.Read())
+            {
+                
+                for (int ii = 0; ii < Reader.FieldCount; ii++)
+                {
+                    if (ii==1)
+                    jointxvalue[j] = Convert.ToDouble(Reader[ii]);
+                    if (ii == 0)
+                        dates[j] = Convert.ToInt32(Reader[ii]);
+                }
+                j++;
+            }
+            
+
+            //testing code to generate the graphs
+            /*
+            int[] dates = new int[5];
+            int[] numberOpen = new int[5];
+            int[] numberClosed = new int[5];
+            Random random = new Random();
+            for (int test = 0; test < 5; ++test)
+            {
+
+                dates[test] = random.Next(10);
+                numberOpen[test] = random.Next(10);
+                numberClosed[test] = random.Next(10);
+            }
+             */ 
+
+            var datesDataSource = new EnumerableDataSource<int>(dates);
+            datesDataSource.SetXMapping(x => x);
+
+            var numberOpenDataSource = new EnumerableDataSource<Double>(jointxvalue);
+            numberOpenDataSource.SetYMapping(y => y);
+
+            var numberClosedDataSource = new EnumerableDataSource<Double>(jointtyvalue);
+            numberClosedDataSource.SetYMapping(y => y);
+
+            CompositeDataSource compositeDataSource1 = new
+              CompositeDataSource(datesDataSource, numberOpenDataSource);
+            CompositeDataSource compositeDataSource2 = new
+              CompositeDataSource(datesDataSource, numberClosedDataSource);
+
+            F1Graph.AddLineGraph(compositeDataSource1,
+              new Pen(Brushes.Blue, 2),
+              new CirclePointMarker { Size = 1.0, Fill = Brushes.Red },
+              new PenDescription("."));
+
+            F1Graph.AddLineGraph(compositeDataSource2,
+              new Pen(Brushes.Green, 2),
+              new TrianglePointMarker
+              {
+                  Size = 1.0,
+                  Pen = new Pen(Brushes.Black, 2.0),
+                  Fill = Brushes.GreenYellow
+              },
+              new PenDescription("."));
+
+            F1Graph.Viewport.FitToView();
+            
+
+
+        }
+        private void Make_Graph()
+        {
+            MySqlConnection connection = new MySqlConnection(MyConString);
+            MySqlCommand command = connection.CreateCommand();
+            MySqlDataReader Reader;
+            connection.Open();
+            int numTrain = 0;
+            int numTest = 0;
+            
+            List<IPlotterElement> removeList = new List<IPlotterElement>();
+            foreach (var item in F1Graph.Children)
+            {
+                if (item is LineGraph || item is MarkerPointsGraph)
+                {
+                    removeList.Add(item);
+                }
+            }
+            foreach (var item in removeList)
+            {
+                F1Graph.Children.Remove(item);
+            }
+
+
+            command.CommandText = "select Count(*) from dbkinect.kinectdata where WristRightX <> '0' and Type = '1'";
+            Reader = command.ExecuteReader();
+            while (Reader.Read())
+            {
+                numTrain = Convert.ToInt32(Reader[0].ToString());
+
+            }
+            Reader.Close();
+            command.CommandText = "select Count(*) from dbkinect.kinectdata where WristRightX <> '0' and Type = '0'";
+            Reader = command.ExecuteReader();
+            while (Reader.Read())
+            {
+                numTest = Convert.ToInt32(Reader[0].ToString());
+
+            }
+            Reader.Close();
+
+
+            // sizes
+            int[] frameTest = new int[numTest];
+            int[] frameTrain = new int[numTrain];
+            double[] jointtrain = new double[numTrain];
+            double[] jointtest = new double[numTest];
+
+            command.CommandText = "select Timestamp,Type,WristRightX from dbkinect.kinectdata where WristRightX <> '0'";
+            Reader = command.ExecuteReader();
+            int test = 0;
+            int train = 0;
+            while (Reader.Read())
+            {
+                for (int ii = 0; ii < Reader.FieldCount; ii++)
+                {
+                    if (ii == 1)
+                    {
+                        if (Convert.ToInt32(Reader[ii]) == 0)
+                        {
+                            frameTest[test] = Convert.ToInt32(Reader[0]);
+                            jointtest[test] = Convert.ToDouble(Reader[2]);
+                            test++;
+                        }
+                        else
+                        {
+                            frameTrain[train] = Convert.ToInt32(Reader[0]);
+                            jointtrain[train] = Convert.ToDouble(Reader[2]);
+                            train++;
+                        }
+                    }
+
+                }
+            }
+            connection.Close();
+
+            //testing code to generate the graphs
+            /*
+            int[] dates = new int[5];
+            int[] numberOpen = new int[5];
+            int[] numberClosed = new int[5];
+            Random random = new Random();
+            for (int test = 0; test < 5; ++test)
+            {
+
+                dates[test] = random.Next(10);
+                numberOpen[test] = random.Next(10);
+                numberClosed[test] = random.Next(10);
+            }
+             */
+
+            var FrameTestDataSource = new EnumerableDataSource<int>(frameTest);
+            FrameTestDataSource.SetXMapping(x => x);
+
+            var FrameTrainDataSource = new EnumerableDataSource<int>(frameTrain);
+            FrameTrainDataSource.SetXMapping(x => x);
+
+            var JointTrainDataSource = new EnumerableDataSource<Double>(jointtrain);
+            JointTrainDataSource.SetYMapping(y => y);
+
+            var JointTestDataSource = new EnumerableDataSource<Double>(jointtest);
+            JointTestDataSource.SetYMapping(y => y);
+
+            CompositeDataSource compTestDataSource = new
+              CompositeDataSource(FrameTestDataSource, JointTestDataSource);
+            CompositeDataSource compTrainDataSource = new
+              CompositeDataSource(FrameTrainDataSource, JointTrainDataSource);
+
+            F1Graph.AddLineGraph(compTestDataSource);
+            F1Graph.AddLineGraph(compTrainDataSource);
+            F1Graph.LegendVisible.Equals(false);
+
+
+
+            /*,
+              new Pen(Brushes.Green, 2),
+              new TrianglePointMarker
+              {
+                  Size = 1.0,
+                  Pen = new Pen(Brushes.Black, 2.0),
+                  Fill = Brushes.GreenYellow
+              },
+              new PenDescription("."));
+             */
+            F1Graph.Viewport.FitToView();
         }
     }
     public class KinectWindowViewModel : DependencyObject
