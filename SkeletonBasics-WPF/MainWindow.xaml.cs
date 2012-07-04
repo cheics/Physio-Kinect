@@ -6,24 +6,31 @@
 
 namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
+    using System;
     using System.IO;
+    using System.Linq;
     using System.Windows;
     using System.Windows.Data;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
     using System.Windows.Controls;
+   // using System.Drawing.Imaging;
+   // using System.Drawing;
+    
+    using System.Text.RegularExpressions;
+    using System.Collections.Generic;
+    
+    
     using Microsoft.Kinect;
     using Microsoft.Samples.Kinect.WpfViewers;
     using Microsoft.Samples.Kinect.SkeletonBasics;
-    using System;
-    using System.Linq;
-    using Coding4Fun;
-    using System.Text.RegularExpressions;
-    using System.Collections.Generic;
     using Microsoft.Research.DynamicDataDisplay.DataSources;
     using Microsoft.Research.DynamicDataDisplay;
     using Microsoft.Research.DynamicDataDisplay.PointMarkers;
+
+    using Coding4Fun;
     using MySql.Data.MySqlClient;
+    //using AviFile;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -35,11 +42,24 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             "DATABASE=dbkinect;" +
             "UID=root;" +
             "PASSWORD=Karamlou;";
+        private string activeDir = @"C:\testdir2";
+        public string newPath = "test";
+
+        public static readonly DependencyProperty KinectSensorProperty =
+    DependencyProperty.Register(
+        "KinectSensor",
+        typeof(KinectSensor),
+        typeof(MainWindow),
+        new PropertyMetadata(null));
+
+        private readonly MainWindowViewModel viewModel;
+
         private Dictionary<string, int> jointMapping;
         /// <summary>
         /// Width of output drawing
         /// </summary>
         private const float RenderWidth = 640.0f;
+
 
         /// <summary>
         /// Height of our output drawing
@@ -100,14 +120,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// Drawing image that we will display
         /// </summary>
         private DrawingImage imageSource;
-        private readonly KinectWindowViewModel viewModel;
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
         public MainWindow()
         {
-            this.viewModel = new KinectWindowViewModel();
+            
+            this.viewModel = new MainWindowViewModel();
 
             // The KinectSensorManager class is a wrapper for a KinectSensor that adds
             // state logic and property change/binding/etc support, and is the data model
@@ -117,25 +137,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             Binding sensorBinding = new Binding("KinectSensor");
             sensorBinding.Source = this;
             BindingOperations.SetBinding(this.viewModel.KinectSensorManager, KinectSensorManager.KinectSensorProperty, sensorBinding);
-           /*
-            // Create the drawing group we'll use for drawing
-            var x = Enumerable.Range(0, 1001).Select(i => i / 10.0).ToArray();
-            var y = x.Select(v => Math.Abs(v) < 1e-10 ? 1 : Math.Sin(v) / v).ToArray();
-            ObservableDataSource<Point>[] sources = null;
-            sources = new ObservableDataSource<Point>[2];
-                sources[1] = new ObservableDataSource<Point>();
-                sources[1].SetXYMapping(p => p);
-               
-            F1Graph.AddLineGraph(sources[1], 1, "Channel " + (1+1).ToString());
-                            sources[2] = new ObservableDataSource<Point>();
-                sources[2].SetXYMapping(p => p);
-                F1Graph.AddLineGraph(sources[2], 1, "Channel " + (2+1).ToString());
-            */
-            /*
-            CompositeDataSource compositeDataSource1 = new CompositeDataSource CompositeDataSource(x, y);
-            CompositeDataSource compositeDataSource2 = new
-              CompositeDataSource(datesDataSource, numberClosedDataSource);
-             * */
+
+            // Attempt to turn on Skeleton Tracking for each Kinect Sensor
+            this.viewModel.KinectSensorManager.SkeletonStreamEnabled = true;
+            this.DataContext = this.viewModel;
+            
+            newPath = System.IO.Path.Combine(activeDir, "mehrad");
+            System.IO.Directory.CreateDirectory(newPath);
+            string newFileName = "colorStream.avi";
+            newPath = System.IO.Path.Combine(newPath, newFileName);
 
             InitializeComponent();
         }
@@ -213,10 +223,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             if (null != this.sensor)
             {
                 // Turn on the skeleton stream to receive skeleton frames
+
                 this.sensor.SkeletonStream.Enable();
                 this.sensor.DepthStream.Enable();
                 this.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
                 this.sensor.AllFramesReady += new System.EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
+                
+
                 // Add an event handler to be called whenever there is new color frame data
                 this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
                 // Start the sensor!
@@ -234,6 +247,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 this.statusBarText.Text = Properties.Resources.NoKinectReady;
             }
+
             Skeleton skeleton = new Skeleton();
             int i = 0;
             jointMapping = new Dictionary<string, int>();
@@ -251,6 +265,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
+            //AviManager avimanager = null;
+            //VideoStream stream = null;
+           // avimanager = new AviManager(newPath,false);
+            //stream = avimanager.AddVideoStream(true,30,BitmapSource.Create(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null, pixels, stride)
+            
             
            using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
@@ -260,9 +279,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 }
                 byte[] pixels = new byte[colorFrame.PixelDataLength];
                 colorFrame.CopyPixelDataTo(pixels);
+               
                 int stride = colorFrame.Width * 4;
                 ColorImage.Source = BitmapSource.Create(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
- 
+
             }
            Skeleton first = GetFirstSkeleton(e);
            if (first == null)
@@ -274,6 +294,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                }
             //throw new System.NotImplementedException();
        }
+
+        public KinectSensor KinectSensor
+        {
+            get { return (KinectSensor)GetValue(KinectSensorProperty); }
+            set { SetValue(KinectSensorProperty, value); }
+        }
 
         Skeleton GetFirstSkeleton(AllFramesReadyEventArgs e)
         {
@@ -309,6 +335,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                 //Map a joint location to a point on the depth map
                 //head
+                //if(first.Joints[JointType.AnkleLeft].Position != null)
                 DepthImagePoint AnkleLeftDepthPoint =
                     depth.MapFromSkeletonPoint(first.Joints[JointType.AnkleLeft].Position);
                 DepthImagePoint AnkleRightDepthPoint =
@@ -516,6 +543,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void SensorSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
             Skeleton[] skeletons = new Skeleton[0];
+            Skeleton[] Testskeletons = new Skeleton[1];
 
             // SQL connection to record skeleton data
             MySqlConnection connection = new MySqlConnection(MyConString);
@@ -523,8 +551,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             MySqlDataReader Reader;
             connection.Open();
             string values =null;
-
-
              
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
             {
@@ -532,6 +558,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 {
                     skeletons = new Skeleton[skeletonFrame.SkeletonArrayLength];
                     skeletonFrame.CopySkeletonDataTo(skeletons);
+                   // skeletonFrame.CopySkeletonDataTo(Testskeletons);
 
                     //get the first tracked skeleton
                     Skeleton first = (from s in skeletons
@@ -568,14 +595,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             values = ",0" + values;
                         }
 
-                        values = skeletonFrame.FrameNumber.ToString() + values;
+                        values = skeletonFrame.Timestamp.ToString() + values;
                         command.CommandText = "INSERT INTO dbkinect.kinectdata (Timestamp,Type " + command.CommandText + ") VALUE ("
                            + values + ")";
                         Reader = command.ExecuteReader();
                         Reader.Close();
                         if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 15) == 0)
                         {
-                            Make_Graph();
+                           Make_Graph();
                         }
                     }
                 }
@@ -614,9 +641,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 // prevent drawing outside of our render area
                 this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
             }
-            //call the graph maker function
-
-            //Make_Graph();
         }
 
         /// <summary>
@@ -994,6 +1018,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             F1Graph.AddLineGraph(compTestDataSource);
             F1Graph.AddLineGraph(compTrainDataSource);
             F1Graph.LegendVisible.Equals(false);
+            //Mehrad.Content = "testing mehrad";
 
 
 
@@ -1010,13 +1035,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             F1Graph.Viewport.FitToView();
         }
     }
-    public class KinectWindowViewModel : DependencyObject
+    public class MainWindowViewModel : DependencyObject
     {
         public static readonly DependencyProperty KinectSensorManagerProperty =
             DependencyProperty.Register(
                 "KinectSensorManager",
                 typeof(KinectSensorManager),
-                typeof(KinectWindowViewModel),
+                typeof(MainWindowViewModel),
                 new PropertyMetadata(null));
 
         public KinectSensorManager KinectSensorManager
