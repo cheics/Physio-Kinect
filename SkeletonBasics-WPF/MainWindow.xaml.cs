@@ -716,27 +716,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             MySqlCommand command = connection.CreateCommand();
             MySqlDataReader Reader;
             connection.Open();
-
-            int testing = 0;
-            foreach (Joint joint in skeleton.Joints)
-            {
-                testing = testing +1;
-                command.CommandText = "insert testtable (idTestTable, joint1, joint2) Values (" + (12+testing).ToString() + ", 5,5)";
-                Reader = command.ExecuteReader();
-                Reader.Close();
-            }
-
             
             foreach (Joint joint in skeleton.Joints)
             {
                 command.CommandText = command.CommandText + "," + joint.JointType.ToString() + "X" + " VARCHAR(30) " + ","+
-                    joint.JointType.ToString() + "Y" + " VARCHAR(30) ";
-
-                //jointnames = jointnames+ 
+                    joint.JointType.ToString() + "Y" + " VARCHAR(30) "+
+                    joint.JointType.ToString() + "Z" + " VARCHAR(30) ";
             }
             
             MySqlCommand command2 = connection.CreateCommand();
-            command2.CommandText = "CREATE TABLE dbkinect.kinectColorImageData(id INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), Framenumber VARCHAR(30), Created_at DATETIME DEAFAULT NULL, UserFirst VARCHAR(30), UserLast VARCHAR(30) " 
+            command2.CommandText = "CREATE TABLE dbkinect.kinectdata(id INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), Framenumber VARCHAR(30), Created_at DATETIME DEFAULT NULL, UserFirst VARCHAR(30), UserLast VARCHAR(30) " 
                 + command.CommandText + ")";
             Reader = command2.ExecuteReader();
             
