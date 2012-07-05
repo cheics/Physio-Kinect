@@ -262,7 +262,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         }
 
-
         void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
             //AviManager avimanager = null;
@@ -322,6 +321,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             }
         }
+
         void GetCameraPoint(Skeleton first, AllFramesReadyEventArgs e)
         {
             MySqlConnection connection = new MySqlConnection(MyConString);
@@ -501,6 +501,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                // CameraPosition(rightEllipse, rightColorPoint);
             }
         }
+
         private void CameraPosition(FrameworkElement element, ColorImagePoint point)
         {
             //Divide by 2 for width and height so point is right in the middle 
@@ -510,6 +511,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             Canvas.SetTop(element, point.Y - element.Height / 2);
 
         }
+
         private void ScalePosition(FrameworkElement element, Joint joint)
         {
             //convert the value to X/Y
@@ -709,21 +711,21 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
 
             //some code to test mySQL connection and creation of kinectdata table with proper columns
+            // SQL connection to record skeleton data
+            MySqlConnection connection = new MySqlConnection(MyConString);
+            MySqlCommand command = connection.CreateCommand();
+            MySqlDataReader Reader;
+            connection.Open();
 
-            //int testing = 0;
-            /*foreach (Joint joint in skeleton.Joints)
+            int testing = 0;
+            foreach (Joint joint in skeleton.Joints)
             {
                 testing = testing +1;
                 command.CommandText = "insert testtable (idTestTable, joint1, joint2) Values (" + (12+testing).ToString() + ", 5,5)";
                 Reader = command.ExecuteReader();
                 Reader.Close();
             }
-             */
-            /*
-            MySqlConnection connection = new MySqlConnection(MyConString);
-            MySqlCommand command = connection.CreateCommand();
-            MySqlDataReader Reader;
-            connection.Open();
+
             
             foreach (Joint joint in skeleton.Joints)
             {
@@ -734,13 +736,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
             
             MySqlCommand command2 = connection.CreateCommand();
-            command2.CommandText = "CREATE TABLE dbkinect.kinectColorImageData(id INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), Timestamp VARCHAR(30) " + command.CommandText + ")";
+            command2.CommandText = "CREATE TABLE dbkinect.kinectColorImageData(id INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), Framenumber VARCHAR(30), Created_at DATETIME DEAFAULT NULL, UserFirst VARCHAR(30), UserLast VARCHAR(30) " 
+                + command.CommandText + ")";
             Reader = command2.ExecuteReader();
             
             Reader.Close();          
             connection.Close();
             
-             */ 
+             
 
         }
 
@@ -814,6 +817,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 }
             }
         }
+
         private void Joints_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             selectedJoint = this.Joints.SelectedValue.ToString();
@@ -908,6 +912,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
         }
+
         private void Make_Graph()
         {
             MySqlConnection connection = new MySqlConnection(MyConString);
