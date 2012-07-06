@@ -5,30 +5,33 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;	
 
-namespace FeatureSelection : 
-
-public class FeatureHelper 
+namespace FeatureSelection
 {
-    public FeatureHelper
+
+    public class FeatureHelper 
     {
+        public FeatureHelper()
+        {
 
-    }
+        }
 
-    public void Initilizating()
-    {
+        public void Initilizating()
+        {
 
-    }
+        }
 
-    public void Disposing()
-    {
+        public void Disposing()
+        {
 
-    }
+        }
 
-	public void ExtractFeatures()
-	{
-        struct ExerciseSet =  new struct;
-        struct DataSet=  new struct;
+	    public void ExtractFeatures()
+	    {
+            struct[] ExerciseSet =  new struct(,);
+            struct[] DataSet =  new struct(,);
 
         
-	}
+	    }
+    }
+
 }

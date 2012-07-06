@@ -39,8 +39,8 @@ namespace FeatureSelection
                 // traversing each joint in each feature calculating the gradient between each dimesion and another
                 for (int f = 0; f < featureNames.GetLength(1); f++)
                 {
-                    string[] MetaData = featurehelper.MetaData.getJoints(featureNames[f]);
-                    int[,] jointDim = featureHelper.SkeletalTags.get(MetaData); 
+                    string[] jointData = featurehelper.MetaData.getJoints(featureNames[f]);
+                    int[,] jointDim = featureHelper.SkeletalTags.get(jointData); 
 
                     for (j = 0; j < jointDim.Length; i++)
                     {
@@ -65,18 +65,6 @@ namespace FeatureSelection
                     }
                 }
             }
-
         }
-
     }
 }
-
-
-//string[] MetaData = featurehelper.MetaData.getJoints(featureName); // { "rightHand", "rightElbow", "rightShoulder" };
-//float[,,] dataFloat = new float(dataSet.GetLength(1),featureNames.Length,3);
-
-
-//for (i = 0; i < dataSet.GetLegnth(1); i++)
-//    for (j = 0; j < featureNames.Length; j++)
-//        for (k = 0; k < dataSet.GetLength(3); k++)
-//            dataFloat[i, j] = DataSet(i,featureDcim[j],k) ;
