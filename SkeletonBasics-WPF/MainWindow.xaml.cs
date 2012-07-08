@@ -13,6 +13,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using System.Windows.Data;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
+    //using System.Windows.Forms;
     using System.Windows.Controls;
    // using System.Drawing.Imaging;
    // using System.Drawing;
@@ -146,7 +147,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             System.IO.Directory.CreateDirectory(newPath);
             string newFileName = "colorStream.avi";
             newPath = System.IO.Path.Combine(newPath, newFileName);
-
+            
             InitializeComponent();
         }
         const int skeletonCount = 6; 
@@ -259,6 +260,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.jointMapping.Add(name, i);
                 i++;
             }
+            cmbExer.Items.Add("Squat");
+            cmbExer.Items.Add("Hip Abduction");
+            cmbExer.Items.Add("Arm Raise");
+            cmbExer.Items.Add("Leg Raise");
+            cmbExer.Items.Add("Knee Bend");
+            cmbExer.Items.Add("Arm Abduction");
 
         }
 
@@ -596,9 +603,25 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         {
                             values = ",0" + values;
                         }
+                        DateTime now = DateTime.Now;
+                        string date = "'" + now.Year.ToString() + "-" + now.Month.ToString() + "-" + now.Day.ToString() + " " +
+                            now.Hour.ToString() + ":" +
+                            now.Minute.ToString() + ":" +
+                            now.Second.ToString()+"'";
+                        
+                        string SelectedItem = null;
+                        if (cmbExer.SelectedItem == null)
+                        {
+                            SelectedItem = "null";
+                        }
+                        else
+                            SelectedItem = cmbExer.SelectedItem.ToString();
 
-                        values = skeletonFrame.Timestamp.ToString() + values;
-                        command.CommandText = "INSERT INTO dbkinect.kinectdata (Timestamp,Type " + command.CommandText + ") VALUE ("
+                        values = skeletonFrame.FrameNumber.ToString() +" ,"
+                            + date +","
+                            + "'Mehrad' , 'Karamlou' ,'" + SelectedItem + "'"
+                            + values;
+                        command.CommandText = "INSERT INTO dbkinect.kinectdata (Framenumber,Created_at,UserFirst, UserLast , Exercise ,Type " + command.CommandText + ") VALUE ("
                            + values + ")";
                         Reader = command.ExecuteReader();
                         Reader.Close();
@@ -712,6 +735,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             //some code to test mySQL connection and creation of kinectdata table with proper columns
             // SQL connection to record skeleton data
+            /*
             MySqlConnection connection = new MySqlConnection(MyConString);
             MySqlCommand command = connection.CreateCommand();
             MySqlDataReader Reader;
@@ -720,21 +744,22 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             foreach (Joint joint in skeleton.Joints)
             {
                 command.CommandText = command.CommandText + "," + joint.JointType.ToString() + "X" + " VARCHAR(30) " + ","+
-                    joint.JointType.ToString() + "Y" + " VARCHAR(30) "+
+                    joint.JointType.ToString() + "Y" + " VARCHAR(30) "+ "," +
                     joint.JointType.ToString() + "Z" + " VARCHAR(30) ";
             }
             
             MySqlCommand command2 = connection.CreateCommand();
-            command2.CommandText = "CREATE TABLE dbkinect.kinectdata(id INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), Framenumber VARCHAR(30), Created_at DATETIME DEFAULT NULL, UserFirst VARCHAR(30), UserLast VARCHAR(30) " 
+            command2.CommandText = "CREATE TABLE dbkinect.kinectdata(id INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), Framenumber VARCHAR(30), Created_at DATETIME DEFAULT NULL, UserFirst VARCHAR(30), UserLast VARCHAR(30), Type VARCHAR(30), Exercise VARCHAR(30) " 
                 + command.CommandText + ")";
             Reader = command2.ExecuteReader();
             
             Reader.Close();          
             connection.Close();
-            
-             
+            */
+
 
         }
+        
 
         /// <summary>
         /// Maps a SkeletonPoint to lie within our render space and converts to Point
@@ -925,7 +950,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
 
 
-            command.CommandText = "select Count(*) from dbkinect.kinectdata where WristRightX <> '0' and Type = '1'";
+            command.CommandText = "select Count(*) from dbkinect.kinectdata where Exercise = 'null' and WristRightX <> '0' and Type = '1'";
             Reader = command.ExecuteReader();
             while (Reader.Read())
             {
@@ -933,7 +958,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             }
             Reader.Close();
-            command.CommandText = "select Count(*) from dbkinect.kinectdata where WristRightX <> '0' and Type = '0'";
+            command.CommandText = "select Count(*) from dbkinect.kinectdata where Exercise = 'null' and WristRightX <> '0' and Type = '0'";
             Reader = command.ExecuteReader();
             while (Reader.Read())
             {
@@ -949,7 +974,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             double[] jointtrain = new double[numTrain];
             double[] jointtest = new double[numTest];
 
-            command.CommandText = "select Timestamp,Type,WristRightX from dbkinect.kinectdata where WristRightX <> '0'";
+            command.CommandText = "select Framenumber,Type,WristRightX from dbkinect.kinectdata where Exercise = 'null' and WristRightX <> '0'";
             Reader = command.ExecuteReader();
             int test = 0;
             int train = 0;
@@ -1027,6 +1052,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
               new PenDescription("."));
              */
             F1Graph.Viewport.FitToView();
+        }
+
+
+        private void cmbExer_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
     public class MainWindowViewModel : DependencyObject
