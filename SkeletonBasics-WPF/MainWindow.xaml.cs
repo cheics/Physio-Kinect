@@ -936,6 +936,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             int numTrain = 0;
             int numTest = 0;
             
+            // Clean the graph
             List<IPlotterElement> removeList = new List<IPlotterElement>();
             foreach (var item in F1Graph.Children)
             {
@@ -949,8 +950,37 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 F1Graph.Children.Remove(item);
             }
 
+            // get the total number of baseline instrances
+            // Generate commands based on the selected exercise
 
-            command.CommandText = "select Count(*) from dbkinect.kinectdata where Exercise = 'null' and WristRightX <> '0' and Type = '1'";
+            /*cmbExer.Items.Add("Squat");
+            cmbExer.Items.Add("Hip Abduction");
+            cmbExer.Items.Add("Arm Raise");
+            cmbExer.Items.Add("Leg Raise");
+            cmbExer.Items.Add("Knee Bend");
+            cmbExer.Items.Add("Arm Abduction");
+            */
+           // string TempCommand = null;
+            /*
+            switch (cmbExer.SelectedIndex)
+            {
+                case 0:
+                    TempCommand = "Squat";
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4 :
+                    break;
+                case 5:
+                    break;
+            }
+            */
+
+            command.CommandText = "select Count(*) from dbkinect.kinectdata where Exercise = 'Arm Abduction' and WristRightX <> '0' and WristRightY <> '0' and ShoulderRightX <> '0' and Type = '1'";
             Reader = command.ExecuteReader();
             while (Reader.Read())
             {
@@ -958,7 +988,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             }
             Reader.Close();
-            command.CommandText = "select Count(*) from dbkinect.kinectdata where Exercise = 'null' and WristRightX <> '0' and Type = '0'";
+            // get the total number of testing instrances
+            command.CommandText = "select Count(*) from dbkinect.kinectdata where Exercise = 'Arm Abduction' and WristRightX <> '0' and WristRightY <> '0' and ShoulderRightX <> '0' and Type = '0'";
             Reader = command.ExecuteReader();
             while (Reader.Read())
             {
@@ -971,51 +1002,43 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // sizes
             int[] frameTest = new int[numTest];
             int[] frameTrain = new int[numTrain];
-            double[] jointtrain = new double[numTrain];
-            double[] jointtest = new double[numTest];
+            
+            double[] joint1train = new double[numTrain];
+            double[] joint1test = new double[numTest];
 
-            command.CommandText = "select Framenumber,Type,WristRightX from dbkinect.kinectdata where Exercise = 'null' and WristRightX <> '0'";
+            double[] joint2train = new double[numTrain];
+            double[] joint2test = new double[numTest];
+
+            double[] joint3train = new double[numTrain];
+            double[] joint3test = new double[numTest];
+
+            command.CommandText = "select Framenumber,Type,WristRightX,WristRightX,ShoulderRightX from dbkinect.kinectdata where Exercise = 'Arm Abduction' and WristRightX <> '0'";
             Reader = command.ExecuteReader();
             int test = 0;
             int train = 0;
             while (Reader.Read())
             {
-                for (int ii = 0; ii < Reader.FieldCount; ii++)
-                {
-                    if (ii == 1)
-                    {
-                        if (Convert.ToInt32(Reader[ii]) == 0)
-                        {
-                            frameTest[test] = Convert.ToInt32(Reader[0]);
-                            jointtest[test] = Convert.ToDouble(Reader[2]);
-                            test++;
-                        }
-                        else
-                        {
-                            frameTrain[train] = Convert.ToInt32(Reader[0]);
-                            jointtrain[train] = Convert.ToDouble(Reader[2]);
-                            train++;
-                        }
-                    }
 
+                if (Convert.ToInt32(Reader[1]) == 0)
+                {
+                    frameTest[test] = Convert.ToInt32(Reader[0]);
+                            
+                    joint1test[test] = Convert.ToDouble(Reader[2]);
+                    joint2test[test] = Convert.ToDouble(Reader[3]);
+                    joint3test[test] = Convert.ToDouble(Reader[4]);
+                    test++;
+                }
+                else if(Convert.ToInt32(Reader[1]) == 1)
+                {
+                    frameTrain[train] = Convert.ToInt32(Reader[0]);
+                            
+                    joint1train[train] = Convert.ToDouble(Reader[2]);
+                    joint2train[train] = Convert.ToDouble(Reader[3]);
+                    joint3train[train] = Convert.ToDouble(Reader[4]);
+                    train++;
                 }
             }
             connection.Close();
-
-            //testing code to generate the graphs
-            /*
-            int[] dates = new int[5];
-            int[] numberOpen = new int[5];
-            int[] numberClosed = new int[5];
-            Random random = new Random();
-            for (int test = 0; test < 5; ++test)
-            {
-
-                dates[test] = random.Next(10);
-                numberOpen[test] = random.Next(10);
-                numberClosed[test] = random.Next(10);
-            }
-             */
 
             var FrameTestDataSource = new EnumerableDataSource<int>(frameTest);
             FrameTestDataSource.SetXMapping(x => x);
@@ -1023,20 +1046,51 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             var FrameTrainDataSource = new EnumerableDataSource<int>(frameTrain);
             FrameTrainDataSource.SetXMapping(x => x);
 
-            var JointTrainDataSource = new EnumerableDataSource<Double>(jointtrain);
-            JointTrainDataSource.SetYMapping(y => y);
+            var Joint1TrainDataSource = new EnumerableDataSource<Double>(joint1train);
+            Joint1TrainDataSource.SetYMapping(y => y);
 
-            var JointTestDataSource = new EnumerableDataSource<Double>(jointtest);
-            JointTestDataSource.SetYMapping(y => y);
+            var Joint1TestDataSource = new EnumerableDataSource<Double>(joint1test);
+            Joint1TestDataSource.SetYMapping(y => y);
 
-            CompositeDataSource compTestDataSource = new
-              CompositeDataSource(FrameTestDataSource, JointTestDataSource);
-            CompositeDataSource compTrainDataSource = new
-              CompositeDataSource(FrameTrainDataSource, JointTrainDataSource);
+            var Joint2TrainDataSource = new EnumerableDataSource<Double>(joint2train);
+            Joint2TrainDataSource.SetYMapping(y => y);
 
-            F1Graph.AddLineGraph(compTestDataSource);
-            F1Graph.AddLineGraph(compTrainDataSource);
-            F1Graph.LegendVisible.Equals(false);
+            var Joint2TestDataSource = new EnumerableDataSource<Double>(joint2test);
+            Joint2TestDataSource.SetYMapping(y => y);
+
+            var Joint3TrainDataSource = new EnumerableDataSource<Double>(joint3train);
+            Joint3TrainDataSource.SetYMapping(y => y);
+
+            var Joint3TestDataSource = new EnumerableDataSource<Double>(joint3test);
+            Joint3TestDataSource.SetYMapping(y => y);
+
+            CompositeDataSource compTest1DataSource = new
+              CompositeDataSource(FrameTestDataSource, Joint1TestDataSource);
+
+            CompositeDataSource compTrain1DataSource = new
+              CompositeDataSource(FrameTrainDataSource, Joint1TrainDataSource);
+
+            CompositeDataSource compTest2DataSource = new
+                CompositeDataSource(FrameTestDataSource, Joint2TestDataSource);
+            
+            CompositeDataSource compTrain2DataSource = new
+              CompositeDataSource(FrameTrainDataSource, Joint2TrainDataSource);
+
+            CompositeDataSource compTest3DataSource = new
+                CompositeDataSource(FrameTestDataSource, Joint3TestDataSource);
+
+            CompositeDataSource compTrain3DataSource = new
+              CompositeDataSource(FrameTrainDataSource, Joint3TrainDataSource);
+
+            F1Graph.AddLineGraph(compTest1DataSource);
+            F1Graph.AddLineGraph(compTrain1DataSource);
+
+            F2Graph.AddLineGraph(compTest2DataSource);
+            F2Graph.AddLineGraph(compTrain2DataSource);
+
+            F3Graph.AddLineGraph(compTest3DataSource);
+            F3Graph.AddLineGraph(compTrain3DataSource);
+
             //Mehrad.Content = "testing mehrad";
 
 
