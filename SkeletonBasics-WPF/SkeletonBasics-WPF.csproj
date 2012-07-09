@@ -43,7 +43,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Coding4Fun.Kinect.Wpf">
-      <HintPath>..\..\..\..\Downloads\KinectforWindowsSDKV1\Dependencies\Coding4Fun.Kinect.Wpf.dll</HintPath>
+      <HintPath>Dependencies\Coding4Fun.Kinect.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="DynamicDataDisplay">
       <HintPath>DynamicDataDisplay\DynamicDataDisplay.dll</HintPath>
@@ -52,9 +52,11 @@
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="Microsoft.Samples.Kinect.WpfViewers">
-      <HintPath>..\..\..\..\..\..\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.5.1\Samples\bin\Microsoft.Samples.Kinect.WpfViewers.dll</HintPath>
+      <HintPath>..\ExtraLibs\Microsoft.Samples.Kinect.WpfViewers.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Data, Version=6.5.4.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
+    <Reference Include="MySql.Data, Version=6.5.4.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>Dependencies\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
@@ -137,12 +139,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Downloads\AviFile\AviFile.csproj">
-      <Project>{ABB32A29-AF50-47FA-B243-5FD75A5ABA54}</Project>
-      <Name>AviFile</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

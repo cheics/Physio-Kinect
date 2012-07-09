@@ -14,6 +14,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
     using System.Windows.Controls;
+    using System.Data;
    // using System.Drawing.Imaging;
    // using System.Drawing;
     
@@ -37,11 +38,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     /// </summary>
     public partial class MainWindow : Window
     {
+        DataTable dt = new DataTable();
+        int tableCounter = 1;
         private string selectedJoint;
         private string MyConString = "SERVER=localhost;" +
             "DATABASE=dbkinect;" +
             "UID=root;" +
-            "PASSWORD=Karamlou;";
+            "PASSWORD=base456;";
         private string activeDir = @"C:\testdir2";
         public string newPath = "test";
 
@@ -55,6 +58,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private readonly MainWindowViewModel viewModel;
 
         private Dictionary<string, int> jointMapping;
+        private Dictionary<string, Joint> jointMapping1;
         /// <summary>
         /// Width of output drawing
         /// </summary>
@@ -115,11 +119,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// Drawing group for skeleton rendering output
         /// </summary>
         private DrawingGroup drawingGroup;
+        private DrawingGroup drawingGroup1;
 
         /// <summary>
         /// Drawing image that we will display
         /// </summary>
         private DrawingImage imageSource;
+        private DrawingImage imageSource1;
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
@@ -200,12 +206,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
             this.drawingGroup = new DrawingGroup();
+            this.drawingGroup1 = new DrawingGroup();
 
             // Create an image source that we can use in our image control
             this.imageSource = new DrawingImage(this.drawingGroup);
+            this.imageSource1 = new DrawingImage(this.drawingGroup1);
             // Display the drawing using our image control
             VBLiveSkeleton.Source = this.imageSource;
-            RecSkeleton.Source = this.imageSource;
+            RecSkeleton.Source = this.imageSource1;
 
             // Look through all sensors and start the first connected one.
             // This requires that a Kinect is connected at the time of app startup.
@@ -248,17 +256,45 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.statusBarText.Text = Properties.Resources.NoKinectReady;
             }
 
+            
+
             Skeleton skeleton = new Skeleton();
             int i = 0;
             jointMapping = new Dictionary<string, int>();
+            jointMapping1 = new Dictionary<string, Joint>();
             foreach (Joint joint in skeleton.Joints)
             {
+                Joint refJoint = new Joint();
                 string name = joint.JointType.ToString();
+                jointMapping1.Add(name, refJoint);
+                dt.Columns.Add(name+"X", typeof(Decimal));
+                dt.Columns.Add(name+"Y", typeof(Decimal));
+                dt.Columns.Add(name+"Z", typeof(Decimal));
                 name = Regex.Replace(name, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
                 this.Joints.Items.Add(name);
                 this.jointMapping.Add(name, i);
                 i++;
             }
+
+            // get skeleton data from database
+            MySqlConnection con = new MySqlConnection(MyConString);
+            MySqlCommand cmd = con.CreateCommand();
+            cmd.CommandText = "select * from dbkinect.kinectdata";
+
+            con.Open();
+            MySqlDataReader dr = cmd.ExecuteReader();
+
+            while (dr.Read())
+            {
+                DataRow newRow = dt.NewRow();
+                for(int j=0; j<dt.Columns.Count;j++)
+                {
+                    string columnName = dt.Columns[j].ColumnName;
+                    newRow[columnName] = Convert.ToDecimal(dr[columnName]);
+                }
+                dt.Rows.Add(newRow);
+            }
+            dr.Close();
 
         }
 
@@ -600,8 +636,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         values = skeletonFrame.Timestamp.ToString() + values;
                         command.CommandText = "INSERT INTO dbkinect.kinectdata (Timestamp,Type " + command.CommandText + ") VALUE ("
                            + values + ")";
-                        Reader = command.ExecuteReader();
-                        Reader.Close();
+                        //Reader = command.ExecuteReader();
+                        //Reader.Close();
                         if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 15) == 0)
                         {
                            Make_Graph();
@@ -612,6 +648,38 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
 
             connection.Close();
+
+            using (DrawingContext dc = this.drawingGroup1.Open())
+            {
+                 //Draw a transparent background to set the render size
+                dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, RenderWidth, RenderHeight));
+
+                if (skeletons.Length != 0)
+                {
+                    foreach (Skeleton skel in skeletons)
+                    {
+                        RenderClippedEdges(skel, dc);
+
+                        if (skel.TrackingState == SkeletonTrackingState.Tracked)
+                        {
+                            this.DrawBonesAndJoints1(dc);
+                            break;
+                        }
+                        else if (skel.TrackingState == SkeletonTrackingState.PositionOnly)
+                        {
+                            //dc.DrawEllipse(
+                            //this.centerPointBrush,
+                            //null,
+                            //this.SkeletonPointToScreen(skel.Position),
+                            //BodyCenterThickness,
+                            //BodyCenterThickness);
+                        }
+                    }
+                }
+
+                //prevent drawing outside of our render area
+                this.drawingGroup1.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
+            }
 
             using (DrawingContext dc = this.drawingGroup.Open())
             {
@@ -642,6 +710,106 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                 // prevent drawing outside of our render area
                 this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
+            }
+        }
+
+        private void DrawBonesAndJoints1(DrawingContext drawingContext)
+        {
+            SkeletonPoint sp = new SkeletonPoint();
+            Dictionary<string, Joint> jointMappingFinal = new Dictionary<string,Joint>();
+
+            foreach(KeyValuePair<string, Joint> entry in jointMapping1)
+            {
+                sp.X = (float)Convert.ToDecimal(dt.Rows[tableCounter][entry.Key+"X"]);
+                sp.Y = (float)Convert.ToDecimal(dt.Rows[tableCounter][entry.Key+"Y"]);
+                sp.Z = (float)Convert.ToDecimal(dt.Rows[tableCounter][entry.Key+"Z"]);
+                Joint joint = new Joint();
+                joint = entry.Value;
+                joint.Position = sp;
+                jointMappingFinal.Add(entry.Key, joint);
+            }
+
+            Joint Head = new Joint();
+            if(jointMappingFinal.TryGetValue("Head", out Head)){}
+            Joint ShoulderCenter = new Joint();
+            if(jointMappingFinal.TryGetValue("ShoulderCenter", out ShoulderCenter)){}
+            Joint ShoulderLeft = new Joint();
+            if (jointMappingFinal.TryGetValue("ShoulderLeft", out ShoulderLeft)) { }
+            Joint ShoulderRight = new Joint();
+            if (jointMappingFinal.TryGetValue("ShoulderRight", out ShoulderRight)) { }
+            Joint Spine = new Joint();
+            if (jointMappingFinal.TryGetValue("Spine", out Spine)) { }
+            Joint HipCenter = new Joint();
+            if (jointMappingFinal.TryGetValue("HipCenter", out HipCenter)) { }
+            Joint HipLeft = new Joint();
+            if (jointMappingFinal.TryGetValue("HipLeft", out HipLeft)) { }
+            Joint HipRight = new Joint();
+            if (jointMappingFinal.TryGetValue("HipRight", out HipRight)) { }
+            Joint ElbowLeft = new Joint();
+            if (jointMappingFinal.TryGetValue("ElbowLeft", out ElbowLeft)) { }
+            Joint WristLeft = new Joint();
+            if (jointMappingFinal.TryGetValue("WristLeft", out WristLeft)) { }
+            Joint HandLeft = new Joint();
+            if (jointMappingFinal.TryGetValue("HandLeft", out HandLeft)) { }
+            Joint ElbowRight = new Joint();
+            if (jointMappingFinal.TryGetValue("ElbowRight", out ElbowRight)) { }
+            Joint WristRight = new Joint();
+            if (jointMappingFinal.TryGetValue("WristRight", out WristRight)) { }
+            Joint HandRight = new Joint();
+            if (jointMappingFinal.TryGetValue("HandRight", out HandRight)) { }
+            Joint KneeLeft = new Joint();
+            if (jointMappingFinal.TryGetValue("KneeLeft", out KneeLeft)) { }
+            Joint AnkleLeft = new Joint();
+            if (jointMappingFinal.TryGetValue("AnkleLeft", out AnkleLeft)) { }
+            Joint FootLeft = new Joint();
+            if (jointMappingFinal.TryGetValue("FootLeft", out FootLeft)) { }
+            Joint KneeRight = new Joint();
+            if (jointMappingFinal.TryGetValue("KneeRight", out KneeRight)) { }
+            Joint AnkleRight = new Joint();
+            if (jointMappingFinal.TryGetValue("AnkleRight", out AnkleRight)) { }
+            Joint FootRight = new Joint();
+            if (jointMappingFinal.TryGetValue("FootRight", out FootRight)) { }
+
+            // Render Torso
+            this.DrawBone1(drawingContext, Head, ShoulderCenter);
+            this.DrawBone1(drawingContext, ShoulderCenter, ShoulderLeft);
+            this.DrawBone1(drawingContext, ShoulderCenter, ShoulderRight);
+            this.DrawBone1(drawingContext, ShoulderCenter, Spine);
+            this.DrawBone1(drawingContext, Spine, HipCenter);
+            this.DrawBone1(drawingContext, HipCenter, HipLeft);
+            this.DrawBone1(drawingContext, HipCenter, HipRight);
+
+            // Left Arm
+            this.DrawBone1(drawingContext, ShoulderLeft, ElbowLeft);
+            this.DrawBone1(drawingContext, ElbowLeft, WristLeft);
+            this.DrawBone1(drawingContext, WristLeft, HandLeft);
+
+            // Right Arm
+            this.DrawBone1(drawingContext, ShoulderRight, ElbowRight);
+            this.DrawBone1(drawingContext, ElbowRight, WristRight);
+            this.DrawBone1(drawingContext, WristRight, HandRight);
+
+            // Left Leg
+            this.DrawBone1(drawingContext, HipLeft, KneeLeft);
+            this.DrawBone1(drawingContext, KneeLeft, AnkleLeft);
+            this.DrawBone1(drawingContext, AnkleLeft, FootLeft);
+
+            // Right Leg
+            this.DrawBone1(drawingContext, HipRight, KneeRight);
+            this.DrawBone1(drawingContext, KneeRight, AnkleRight);
+            this.DrawBone1(drawingContext, AnkleRight, FootRight);
+
+            // Render Joints
+            foreach (KeyValuePair<string, Joint> entry in jointMappingFinal)
+            {
+                Brush drawBrush = this.trackedJointBrush;
+                drawingContext.DrawEllipse(drawBrush, null, this.SkeletonPointToScreen(entry.Value.Position), JointThickness, JointThickness);
+            }
+
+            tableCounter = tableCounter +1;
+            if (tableCounter == dt.Rows.Count)
+            {
+                tableCounter = 1;
             }
         }
 
@@ -727,9 +895,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             MySqlCommand command2 = connection.CreateCommand();
             command2.CommandText = "CREATE TABLE dbkinect.kinectdata(id INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), Framenumber VARCHAR(30), Created_at DATETIME DEFAULT NULL, UserFirst VARCHAR(30), UserLast VARCHAR(30) " 
                 + command.CommandText + ")";
-            Reader = command2.ExecuteReader();
+            //Reader = command2.ExecuteReader();
             
-            Reader.Close();          
+            //Reader.Close();          
             connection.Close();
             
              
@@ -749,6 +917,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                                                              skelpoint,
                                                                              DepthImageFormat.Resolution640x480Fps30);
             return new Point(depthPoint.X, depthPoint.Y);
+        }
+
+        private void DrawBone1(DrawingContext drawingContext, Joint joint0, Joint joint1)
+        {
+            Pen drawPen = this.trackedBonePen;
+            drawingContext.DrawLine(drawPen, this.SkeletonPointToScreen(joint0.Position), this.SkeletonPointToScreen(joint1.Position));
         }
 
         /// <summary>
