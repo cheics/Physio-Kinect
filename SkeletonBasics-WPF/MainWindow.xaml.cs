@@ -42,20 +42,22 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     {
         DataTable dt = new DataTable();
         int tableCounter = 1;
-        int ArraySize = 30;
+        int ArraySize = 400;
 
         ArrayList Feature1Data=new ArrayList();
         ArrayList Feature2Data = new ArrayList();
         ArrayList Feature3Data = new ArrayList();       
         ArrayList TimeData = new ArrayList();
-
+        
+        // Database connection strings
         private string selectedJoint;
         private string MyConString = "SERVER=localhost;" +
             "DATABASE=dbkinect;" +
             "UID=root;" +
-            "PASSWORD=base456;";
+            "PASSWORD=Karamlou;";
         private string activeDir = @"C:\testdir2";
         public string newPath = "test";
+
 
         public static readonly DependencyProperty KinectSensorProperty =
     DependencyProperty.Register(
@@ -217,15 +219,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             this.drawingGroup = new DrawingGroup();
             this.drawingGroup1 = new DrawingGroup();
             //initialize
-            //for (int i = 0; i < ArraySize; i++)
-            //{
-              //  Feature1Data.Add(0);
-              //  Feature2Data.Add(0);
-               // Feature3Data.Add(0);
-               // TimeData.Add(i);
-            //}
+            for (int ii = 0; ii < ArraySize; ii++)
+            {
+                Feature1Data.Add(0.0);
+                Feature2Data.Add(0.0);
+                Feature3Data.Add(0.0);
+                TimeData.Add(ii);
+            }
 
             this.drawingGroup = new DrawingGroup();
+
             // Create an image source that we can use in our image control
             this.imageSource = new DrawingImage(this.drawingGroup);
             this.imageSource1 = new DrawingImage(this.drawingGroup1);
@@ -274,12 +277,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.statusBarText.Text = Properties.Resources.NoKinectReady;
             }
 
-            
-
             Skeleton skeleton = new Skeleton();
+            
             int i = 0;
             jointMapping = new Dictionary<string, int>();
             jointMapping1 = new Dictionary<string, Joint>();
+            
             foreach (Joint joint in skeleton.Joints)
             {
                 Joint refJoint = new Joint();
@@ -293,6 +296,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.jointMapping.Add(name, i);
                 i++;
             }
+
             cmbExer.Items.Add("Squat");
             cmbExer.Items.Add("Hip Abduction");
             cmbExer.Items.Add("Arm Raise");
@@ -323,19 +327,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
 
         void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
-        {
-            //AviManager avimanager = null;
-            //VideoStream stream = null;
-           // avimanager = new AviManager(newPath,false);
-            //stream = avimanager.AddVideoStream(true,30,BitmapSource.Create(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null, pixels, stride)
-            
-            
+        {     
            using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
                 if (colorFrame == null)
                 {
                     return;
                 }
+
                 byte[] pixels = new byte[colorFrame.PixelDataLength];
                 colorFrame.CopyPixelDataTo(pixels);
                
@@ -343,14 +342,17 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 ColorImage.Source = BitmapSource.Create(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
 
             }
+
            Skeleton first = GetFirstSkeleton(e);
+
            if (first == null)
            {
                return;
            }
-           else {
-               //GetCameraPoint(first, e); 
-               }
+           else 
+           {
+            //GetCameraPoint(first, e); 
+           }
             //throw new System.NotImplementedException();
        }
 
@@ -362,7 +364,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         Skeleton GetFirstSkeleton(AllFramesReadyEventArgs e)
         {
-            
             using (SkeletonFrame skeletonFrameData = e.OpenSkeletonFrame())
             {
                 if (skeletonFrameData == null)
@@ -377,8 +378,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                   where s.TrackingState == SkeletonTrackingState.Tracked
                                   select s).FirstOrDefault();
                 return first;
-               
-
             }
         }
 
@@ -605,7 +604,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void SensorSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
             Skeleton[] skeletons = new Skeleton[0];
-            Skeleton[] Testskeletons = new Skeleton[1];
 
             // SQL connection to record skeleton data
             MySqlConnection connection = new MySqlConnection(MyConString);
@@ -618,32 +616,40 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 if (skeletonFrame != null)
                 {
-                    double[] TempF1Data = new double[ArraySize];
-                    double[] TempF2Data = new double[ArraySize];
-                    double[] TempF3Data = new double[ArraySize];
+                    double[] TempF1Data = new double[ArraySize+1];
+                    double[] TempF2Data = new double[ArraySize+1];
+                    double[] TempF3Data = new double[ArraySize+1];
 
-                    Feature1Data.CopyTo(TempF1Data, 1);
-                    Feature2Data.CopyTo(TempF2Data, 1);
-                    Feature3Data.CopyTo(TempF3Data, 1);
+                    //Feature1Data.CopyTo(TempF1Data, 1);
+                    //Feature2Data.CopyTo(TempF2Data, 1);
+                    //Feature3Data.CopyTo(TempF3Data, 1);
 
                     skeletons = new Skeleton[skeletonFrame.SkeletonArrayLength];
                     skeletonFrame.CopySkeletonDataTo(skeletons);
-                   // skeletonFrame.CopySkeletonDataTo(Testskeletons);
 
                     //get the first tracked skeleton
                     Skeleton first = (from s in skeletons
                                       where s.TrackingState == SkeletonTrackingState.Tracked
                                       select s).FirstOrDefault();
 
-                    // creating commands for MySQL
-                    //Skeleton firts = Skeleton first = GetFirstSkeleton(e);
+                    // creating commands for MySQL                  
                     if (first != null)
                     {
                         foreach (Joint joint in first.Joints)
                         {
-                            if (joint.JointType.ToString() == "WristRightX")
+                            if (joint.JointType.ToString() == "WristRight")
                             {
+                                Feature1Data.RemoveAt(0);
+                                Feature2Data.RemoveAt(0);
 
+                                Feature1Data.Add(Convert.ToDouble(joint.Position.X));
+                                Feature2Data.Add(Convert.ToDouble(joint.Position.Z));
+                            }
+                            else if (joint.JointType.ToString() == "Head")
+                            {
+                                Feature3Data.RemoveAt(0);
+
+                                Feature3Data.Add(Convert.ToDouble(joint.Position.X));
                             }
 
                             command.CommandText = command.CommandText + "," +
@@ -659,7 +665,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             
                         }
                         // Storing skeleton info into db
-
 
                         if (baseline.IsChecked == true)
                         {
@@ -689,9 +694,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             + values;
                         command.CommandText = "INSERT INTO dbkinect.kinectdata (Framenumber,Created_at,UserFirst, UserLast , Exercise ,Type " + command.CommandText + ") VALUE ("
                            + values + ")";
-                        //Reader = command.ExecuteReader();
-                        //Reader.Close();
-                        if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 15) == 0)
+                        Reader = command.ExecuteReader();
+                        Reader.Close();
+
+                        if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 5) == 0)
                         {
                            Make_Graph();
                         }
@@ -1045,18 +1051,21 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
         private void Make_Graph()
         {
-            MySqlConnection connection = new MySqlConnection(MyConString);
-            MySqlCommand command = connection.CreateCommand();
-            MySqlDataReader Reader;
-            connection.Open();
-            int numTrain = 0;
-            int numTest = 0;
-            string ExerName = null;
-            string time = null;
-            DateTime now = DateTime.Now;
-            DateTime start = new DateTime();
+            //MySqlConnection connection = new MySqlConnection(MyConString);
+            //MySqlCommand command = connection.CreateCommand();
+            //MySqlDataReader Reader;
+            //connection.Open();
+
+            //int numTrain = 0;
+            //int numTest = 0;
+            //string ExerName = null;
+            //string time = null;
+
+            //DateTime now = DateTime.Now;
+            //DateTime start = new DateTime();
 
             // Clean the graphs
+
             List<IPlotterElement> removeList1 = new List<IPlotterElement>();
             List<IPlotterElement> removeList2 = new List<IPlotterElement>();
             List<IPlotterElement> removeList3 = new List<IPlotterElement>();
@@ -1098,18 +1107,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 F3Graph.Children.Remove(item);
             }
 
-
-            // get the total number of baseline instrances
-            // Generate commands based on the selected exercise
-
-            /*cmbExer.Items.Add("Squat");
-            cmbExer.Items.Add("Hip Abduction");
-            cmbExer.Items.Add("Arm Raise");
-            cmbExer.Items.Add("Leg Raise");
-            cmbExer.Items.Add("Knee Bend");
-            cmbExer.Items.Add("Arm Abduction");
-            */
-           // string TempCommand = null;
+            // string TempCommand = null;
             /*
             switch (cmbExer.SelectedIndex)
             {
@@ -1128,123 +1126,131 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     break;
             }
             */
-            if (cmbExer.SelectedValue == null)
-                ExerName = "'null'";
-            else
-                ExerName ="'" + cmbExer.SelectedValue.ToString() +"'";
+            //if (cmbExer.SelectedValue == null)
+            //    ExerName = "'null'";
+            //else
+            //    ExerName ="'" + cmbExer.SelectedValue.ToString() +"'";
 
-            start = now.AddSeconds(-30);
-            time = "'" + start.Year.ToString() + "-" + start.Month.ToString() + "-" + start.Day.ToString() + " " +
-                start.Hour.ToString() + ":" +
-                start.Minute.ToString() + ":" +
-                start.Second.ToString() + "'";
+            //start = now.AddSeconds(-30);
+            //time = "'" + start.Year.ToString() + "-" + start.Month.ToString() + "-" + start.Day.ToString() + " " +
+            //    start.Hour.ToString() + ":" +
+            //    start.Minute.ToString() + ":" +
+            //    start.Second.ToString() + "'";
 
-            command.CommandText = "select Count(*) from dbkinect.kinectdata where Exercise = " +
-            ExerName +
-            " and WristRightX <> '0' and WristRightZ <> '0' and ShoulderRightX <> '0' and Type = '1' and Created_at >= " +
-            time;
+            //command.CommandText = "select Count(*) from dbkinect.kinectdata where Exercise = " +
+            //ExerName +
+            //" and WristRightX <> '0' and WristRightZ <> '0' and ShoulderRightX <> '0' and Type = '1' and Created_at >= " +
+            //time;
 
-            Reader = command.ExecuteReader();
-            while (Reader.Read())
-            {
-                numTrain = Convert.ToInt32(Reader[0].ToString());
+            //Reader = command.ExecuteReader();
+            //while (Reader.Read())
+            //{
+            //    numTrain = Convert.ToInt32(Reader[0].ToString());
 
-            }
-            Reader.Close();
-            // get the total number of testing instrances
+            //}
+            //Reader.Close();
+            //// get the total number of testing instrances
             
-            command.CommandText = "select Count(*) from dbkinect.kinectdata where Exercise = "+
-                ExerName +
-                " and WristRightX <> '0' and WristRightZ <> '0' and ShoulderRightX <> '0' and Type = '0' and Created_at >= " +
-                time;
+            //command.CommandText = "select Count(*) from dbkinect.kinectdata where Exercise = "+
+            //    ExerName +
+            //    " and WristRightX <> '0' and WristRightZ <> '0' and ShoulderRightX <> '0' and Type = '0' and Created_at >= " +
+            //    time;
 
-            Reader = command.ExecuteReader();
-            while (Reader.Read())
-            {
-                numTest = Convert.ToInt32(Reader[0].ToString());
+            //Reader = command.ExecuteReader();
+            //while (Reader.Read())
+            //{
+            //    numTest = Convert.ToInt32(Reader[0].ToString());
 
-            }
-            Reader.Close();
+            //}
+            //Reader.Close();
 
 
             // sizes
-            int[] frameTest = new int[numTest];
-            int[] frameTrain = new int[numTrain];
+            int[] frameTest = new int[ArraySize];
+            int[] frameTrain = new int[ArraySize];
 
-            DateTime[] timetest = new DateTime[numTest];
-            DateTime[] timetrain = new DateTime[numTrain];
+            //DateTime[] timetest = new DateTime[numTest];
+            //DateTime[] timetrain = new DateTime[numTrain];
 
             
-            double[] joint1train = new double[numTrain];
-            double[] joint1test = new double[numTest];
+            double[] joint1train = new double[ArraySize];
+            double[] joint1test = new double[ArraySize];
 
-            double[] joint2train = new double[numTrain];
-            double[] joint2test = new double[numTest];
+            double[] joint2train = new double[ArraySize];
+            double[] joint2test = new double[ArraySize];
 
-            double[] joint3train = new double[numTrain];
-            double[] joint3test = new double[numTest];
+            double[] joint3train = new double[ArraySize];
+            double[] joint3test = new double[ArraySize];
 
-            command.CommandText = "select Framenumber,Type,WristRightX,WristRightY,ShoulderRightX from dbkinect.kinectdata where Exercise = "
-            + ExerName + " and WristRightX <> '0' and WristRightZ <> '0' and ShoulderRightX <> '0' and Created_at >=" + 
-            time ;
+            //command.CommandText = "select Framenumber,Type,WristRightX,WristRightY,ShoulderRightX from dbkinect.kinectdata where Exercise = "
+            //+ ExerName + " and WristRightX <> '0' and WristRightZ <> '0' and ShoulderRightX <> '0' and Created_at >=" + 
+            //time ;
 
-            Reader = command.ExecuteReader();
-            int test = 0;
-            int train = 0;
-            while (Reader.Read())
-            {
+            //Reader = command.ExecuteReader();
+            //int test = 0;
+            //int train = 0;
 
-                if (Convert.ToInt32(Reader[1]) == 0)
-                {
-                    frameTest[test] = Convert.ToInt32(Reader[0]);
-                    //timetest[test] = Convert.ToDateTime(Reader[0]);
+            //while (Reader.Read())
+            //{
+
+            //    if (Convert.ToInt32(Reader[1]) == 0)
+            //    {
+            //        //frameTest[test] = Convert.ToInt32(Reader[0]);
+            //        //timetest[test] = Convert.ToDateTime(Reader[0]);
 
                             
-                    joint1test[test] = Convert.ToDouble(Reader[2]);
-                    joint2test[test] = Convert.ToDouble(Reader[3]);
-                    joint3test[test] = Convert.ToDouble(Reader[4]);
-                    test++;
-                }
-                else if(Convert.ToInt32(Reader[1]) == 1)
-                {
-                    frameTrain[train] = Convert.ToInt32(Reader[0]);
-                    //timetrain[train] = Convert.ToDateTime(Reader[0]);
+            //        //joint1test[test] = Convert.ToDouble(Reader[2]);
+            //        joint2test[test] = Convert.ToDouble(Reader[3]);
+            //        joint3test[test] = Convert.ToDouble(Reader[4]);
+            //        test++;
+            //    }
+            //    else if(Convert.ToInt32(Reader[1]) == 1)
+            //    {
+            //        //frameTrain[train] = Convert.ToInt32(Reader[0]);
+            //        //timetrain[train] = Convert.ToDateTime(Reader[0]);
                             
-                    joint1train[train] = Convert.ToDouble(Reader[2]);
-                    joint2train[train] = Convert.ToDouble(Reader[3]);
-                    joint3train[train] = Convert.ToDouble(Reader[4]);
-                    train++;
-                }
-            }
-            connection.Close();
+            //        joint1train[train] = Convert.ToDouble(Reader[2]);
+            //        joint2train[train] = Convert.ToDouble(Reader[3]);
+            //        joint3train[train] = Convert.ToDouble(Reader[4]);
+            //        train++;
+            //    }
+            //}
+            //connection.Close();
 
             //var FrameTestDataSource = new EnumerableDataSource<DateTime>(timetest);
             //FrameTestDataSource.SetXMapping(x =>Time1.ConvertToDouble(x));
 
             //var FrameTrainDataSource = new EnumerableDataSource<DateTime>(timetrain);
             //FrameTrainDataSource.SetXMapping(x =>Time1.ConvertToDouble(x));
+            TimeData.CopyTo(frameTest);
+            Feature1Data.CopyTo(joint1test);
+            Feature2Data.CopyTo(joint2test);
+            Feature3Data.CopyTo(joint3test);
 
 
             var FrameTestDataSource = new EnumerableDataSource<int>(frameTest);
             FrameTestDataSource.SetXMapping(x => x);
 
-            var FrameTrainDataSource = new EnumerableDataSource<int>(frameTrain);
-            FrameTrainDataSource.SetXMapping(x => x);
+            ////var FrameTrainDataSource = new EnumerableDataSource<int>(frameTrain);
+            ////FrameTrainDataSource.SetXMapping(x => x);
 
-            var Joint1TrainDataSource = new EnumerableDataSource<Double>(joint1train);
-            Joint1TrainDataSource.SetYMapping(y => y);
+            //var Joint1TrainDataSource = new EnumerableDataSource<Double>(joint1train);
+            //Joint1TrainDataSource.SetYMapping(y => y);
+
+            ////var Joint1TrainDataSource = new EnumerableDataSource<Double>(Feature1Data);
+            ////Joint1TrainDataSource.SetYMapping(y => y);
 
             var Joint1TestDataSource = new EnumerableDataSource<Double>(joint1test);
             Joint1TestDataSource.SetYMapping(y => y);
 
-            var Joint2TrainDataSource = new EnumerableDataSource<Double>(joint2train);
-            Joint2TrainDataSource.SetYMapping(y => y);
+            ////var Joint2TrainDataSource = new EnumerableDataSource<Double>(joint2train);
+            ////Joint2TrainDataSource.SetYMapping(y => y);
 
             var Joint2TestDataSource = new EnumerableDataSource<Double>(joint2test);
             Joint2TestDataSource.SetYMapping(y => y);
 
-            var Joint3TrainDataSource = new EnumerableDataSource<Double>(joint3train);
-            Joint3TrainDataSource.SetYMapping(y => y);
+            ////var Joint3TrainDataSource = new EnumerableDataSource<Double>(joint3train);
+            ////Joint3TrainDataSource.SetYMapping(y => y);
 
             var Joint3TestDataSource = new EnumerableDataSource<Double>(joint3test);
             Joint3TestDataSource.SetYMapping(y => y);
@@ -1252,33 +1258,40 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             CompositeDataSource compTest1DataSource = new
               CompositeDataSource(FrameTestDataSource, Joint1TestDataSource);
 
-            CompositeDataSource compTrain1DataSource = new
-              CompositeDataSource(FrameTrainDataSource, Joint1TrainDataSource);
+            ////CompositeDataSource compTrain1DataSource = new
+            ////  CompositeDataSource(FrameTrainDataSource, Joint1TrainDataSource);
 
             CompositeDataSource compTest2DataSource = new
                 CompositeDataSource(FrameTestDataSource, Joint2TestDataSource);
 
-            CompositeDataSource compTrain2DataSource = new
-              CompositeDataSource(FrameTrainDataSource, Joint2TrainDataSource);
+            ////CompositeDataSource compTrain2DataSource = new
+            ////  CompositeDataSource(FrameTrainDataSource, Joint2TrainDataSource);
 
             CompositeDataSource compTest3DataSource = new
                 CompositeDataSource(FrameTestDataSource, Joint3TestDataSource);
 
-            CompositeDataSource compTrain3DataSource = new
-              CompositeDataSource(FrameTrainDataSource, Joint3TrainDataSource);
+            ////CompositeDataSource compTrain3DataSource = new
+            ////  CompositeDataSource(FrameTrainDataSource, Joint3TrainDataSource);
 
-            F1Graph.AddLineGraph(compTest1DataSource);
-            F1Graph.AddLineGraph(compTrain1DataSource);
+            F1Graph.AddLineGraph(compTest1DataSource, Colors.Blue, 3,"live");
+            ////F1Graph.AddLineGraph(compTrain1DataSource);
+            F1Graph.LegendVisible = false;
 
-            F2Graph.AddLineGraph(compTest2DataSource);
-            F2Graph.AddLineGraph(compTrain2DataSource);
+            F2Graph.AddLineGraph(compTest2DataSource ,Colors.Blue, 3, "Live");
+            ////F2Graph.AddLineGraph(compTrain2DataSource);
+            F2Graph.LegendVisible = false;
 
-            F3Graph.AddLineGraph(compTest3DataSource);
-            F3Graph.AddLineGraph(compTrain3DataSource);
+            F3Graph.AddLineGraph(compTest3DataSource,Colors.Blue,4,"Live");
+            F3Graph.LegendVisible = false;
+            //F3Graph.Visible = new DataRect(3, 3);
+            
+            
+            ////F3Graph.AddLineGraph(compTrain3DataSource);
+            
 
-            F1Graph.Viewport.FitToView();
-            F2Graph.Viewport.FitToView();
-            F3Graph.Viewport.FitToView();
+            //F1Graph.Viewport.FitToView();
+            
+            //F3Graph.Viewport.FitToView();
         }
     }
     public class MainWindowViewModel : DependencyObject
