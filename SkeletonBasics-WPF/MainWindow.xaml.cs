@@ -58,6 +58,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private string activeDir = @"C:\testdir2";
         public string newPath = "test";
 
+        private FeatureDefinition featureDefinition = new FeatureDefinition();
+        private FeatureHelper featureHelper = new FeatureHelper();
+
 
         public static readonly DependencyProperty KinectSensorProperty =
     DependencyProperty.Register(
@@ -66,7 +69,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         typeof(MainWindow),
         new PropertyMetadata(null));
 
-        private FeatureHelper featureHelper = new FeatureHelper();
         private readonly MainWindowViewModel viewModel;
 
         private Dictionary<string, int> jointMapping;
@@ -636,6 +638,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     // creating commands for MySQL                  
                     if (first != null)
                     {
+                        
+                       float[,] Test =  featureDefinition.defineFSpace("Arm Abduction", first);
+
+
                         foreach (Joint joint in first.Joints)
                         {
                             if (joint.JointType.ToString() == "WristRight")

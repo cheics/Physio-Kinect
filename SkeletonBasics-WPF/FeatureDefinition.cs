@@ -3,37 +3,37 @@
 //     Copyright (c) Microsoft Corporation.  All rights reserved.
 // </copyright>
 //------------------------------------------------------------------------------
-using System;
-using System.IO;
-using System.Linq;
-using System.Collections;
-using System.Windows;
-using System.Windows.Data;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-//using System.Windows.Forms;
-using System.Windows.Controls;
-using System.Data;
-// using System.Drawing.Imaging;
-// using System.Drawing;
-
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-
-
-using Microsoft.Kinect;
-using Microsoft.Samples.Kinect.WpfViewers;
-using Microsoft.Samples.Kinect.SkeletonBasics;
-using Microsoft.Research.DynamicDataDisplay.DataSources;
-using Microsoft.Research.DynamicDataDisplay;
-using Microsoft.Research.DynamicDataDisplay.PointMarkers;
-
-using Coding4Fun;
-using MySql.Data.MySqlClient;
-
 namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
-    public class featureDefinition
+    using System;
+    using System.IO;
+    using System.Linq;
+    using System.Collections;
+    using System.Windows;
+    using System.Windows.Data;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
+    //using System.Windows.Forms;
+    using System.Windows.Controls;
+    using System.Data;
+    // using System.Drawing.Imaging;
+    // using System.Drawing;
+
+    using System.Text.RegularExpressions;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+
+    using Microsoft.Kinect;
+    using Microsoft.Samples.Kinect.WpfViewers;
+    using Microsoft.Samples.Kinect.SkeletonBasics;
+    using Microsoft.Research.DynamicDataDisplay.DataSources;
+    using Microsoft.Research.DynamicDataDisplay;
+    using Microsoft.Research.DynamicDataDisplay.PointMarkers;
+
+    using Coding4Fun;
+    using MySql.Data.MySqlClient;
+
+    public class FeatureDefinition
     {
         private FeatureHelper featureHelper = new FeatureHelper();
 
@@ -49,19 +49,17 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         public float[,] defineFSpace(string exerciseName, Skeleton first)
         {
-            float[,,] dataSet = featureHelper.getDataSet(exerciseName, first);
-            //float reps = featurHelper.reptition.get();
-            string[] featureNames = featureHelper.featureNames;
-            //int numDim = featureHelper.numberDimensions.get();
-            int numfeat = featureNames.Length;
+            Collection<string> featureNames = featureHelper.getFeatures(exerciseName);
+            int numfeat = featureNames.Count;
+            Collection<Collection<SkeletonPoint>> dataSet = featureHelper.getDataSet(exerciseName, first);
 
-            float[,] featureSpace = new float[dataSet.GetLength(2), numfeat];
+            float[,] featureSpace = new float[dataSet[1].Count, numfeat];
 
             //for (int i = 0; i < dataSet.GetLength(0); i++)
             //{
                 int l = -1; int p = -1;
                 // traversing each joint in each feature calculating the gradient between each dimesion and another
-                for (int f = 0; f < featureNames.GetLength(0); f++)
+                for (int f = 0; f < featureNames.Count; f++)
                 {
                     //string[] jointData = featurehelper.getJoints(featureNames[f]);
                     //int[,] jointDim = featureHelper.SkeletalTags.get(jointData);
