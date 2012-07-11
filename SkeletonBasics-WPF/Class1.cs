@@ -19,6 +19,7 @@ using System.Data;
 
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 using Microsoft.Kinect;
 using Microsoft.Samples.Kinect.WpfViewers;
@@ -41,7 +42,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         public float[, ,] dataSet;
         public FeatureHelper()
         {
-
             exerciseNames[0] = ("Squat");
             exerciseNames[1] = ("Hip Abduction");
             exerciseNames[2] = ("Arm Raise");
@@ -60,20 +60,23 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         }
 
-        public void getDataSet(string Ex, Skeleton first)
+        public float[,,] getDataSet(string Ex, Skeleton first)
         {
             if (Ex == exerciseNames[5])
-            { 
+            {
                 for (int i = 0; i < featureNames.Length; i++)
                 {
-                    Collection <JointType> joints = getJoints(featureNames[i]);
-                    for (int j; j < getJoints(featureNames[i]); i++)
-                        dataSet[i,1] = first.Joints[joints[i]].Position.X;
-                        dataSet[i,2] = first.Joints[joints[i]].Position.Y;
-                        dataSet[i,3] = first.Joints[joints[i]].Position.Z;
-            }   
+                    Collection<JointType> joints = getJoints(featureNames[i]);
 
-
+                    for (int j = 0; j < joints.Count; i++)
+                    {
+                        dataSet[i, j, 1] = first.Joints[joints[i]].Position.X;
+                        dataSet[i, j, 2] = first.Joints[joints[i]].Position.Y;
+                        dataSet[i, j, 3] = first.Joints[joints[i]].Position.Z;
+                    }
+                }
+            }
+            return dataSet;
 
         }
 
@@ -98,8 +101,62 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         public Collection<JointType> getJoints(string feature)
         {
-            new Collection<JointType> joints = new Collection<JointType>();
+            Collection<JointType> joints = new Collection<JointType>();
 
+            if (feature == "SpineStability" )
+            {
+                joints.Add(JointType.HipCenter);
+                joints.Add(JointType.Spine);
+                joints.Add(JointType.ShoulderCenter);
+            }
+            else if (feature == "ElbowFlare" )
+            {
+                joints.Add(JointType.HipCenter);
+                joints.Add(JointType.Spine);
+                joints.Add(JointType.ShoulderRight);
+                joints.Add(JointType.ElbowRight);
+            }
+            else if (feature == "HandFalling" )
+            {
+                joints.Add(JointType.HandRight);
+                joints.Add(JointType.ShoulderRight);
+                joints.Add(JointType.ElbowRight);
+
+            }
+            else if (feature == "wristCompenstation" )
+            {
+                joints.Add(JointType.HandRight);
+                joints.Add(JointType.ShoulderRight);
+                joints.Add(JointType.ElbowRight);
+            }
+            else if (feature == "HipLevel" )
+            {
+                joints.Add(JointType.HipRight);
+                joints.Add(JointType.HipLeft);
+                joints.Add(JointType.HipCenter);
+            }
+            else if (feature == "KneeAbduction" )
+            {
+                joints.Add(JointType.HipRight);
+                joints.Add(JointType.KneeRight);
+                joints.Add(JointType.FootRight);
+            }
+            else if (feature == "KneeAngle" )
+            {
+                joints.Add(JointType.HipRight);
+                joints.Add(JointType.KneeRight);
+                joints.Add(JointType.FootRight);
+            }
+            else if (feature == "SquatDepth" )
+            {
+                joints.Add(JointType.HipCenter);
+                joints.Add(JointType.KneeRight);
+                joints.Add(JointType.KneeLeft);
+                joints.Add(JointType.FootRight);
+                joints.Add(JointType.FootLeft);
+            }
+
+            return joints;
         }
     }
 

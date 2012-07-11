@@ -47,9 +47,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         }
 
-        public float[] defineFSpace(string[] exerciseName)
+        public float[,] defineFSpace(string exerciseName, Skeleton first)
         {
-            float[,,] dataSet = featureHelper.getJoints(exerciseName);
+            float[,,] dataSet = featureHelper.getDataSet(exerciseName, first);
             //float reps = featurHelper.reptition.get();
             string[] featureNames = featureHelper.featureNames;
             //int numDim = featureHelper.numberDimensions.get();
@@ -64,23 +64,23 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 for (int f = 0; f < featureNames.GetLength(0); f++)
                 {
                     //string[] jointData = featurehelper.getJoints(featureNames[f]);
-                    int[,] jointDim = featureHelper.SkeletalTags.get(jointData);
+                    //int[,] jointDim = featureHelper.SkeletalTags.get(jointData);
 
-                    for (int j = 0; j < jointDim.Length; i++)
+                    for (int j = 0; j < dataSet.GetLength(1); j++)
                     {
-                        for (int k = 0; k < jointDim.Length; k++)
+                        for (int k = 0; k < dataSet.GetLength(1); k++)
                         {
-                            if (i = !k)
+                            if (j != k)
                             {
-                                for (int m = 0; m < numDim; m++)
+                                for (int m = 0; m < dataSet.GetLength(2); m++)
                                 {
-                                    for (omt n = 0; n < numDim; n++)
+                                    for (int n = 0; n < dataSet.GetLength(2); n++)
                                     {
-                                        if (m = !n)
+                                        if (m != n)
                                         {
                                             l++;
-                                            featureSpace[l] = (dataSet[jointDim[j], m] - dataSet[jointDim[k], m]) /
-                                                                    (dataSet[jointDim[j], r] - dataSet[ jointDim[k], r]);
+                                            featureSpace[f,l] = (dataSet[f, j, m] - dataSet[f, k, m]) /
+                                                                    (dataSet[f, j, n] - dataSet[f, k, n]);
                                         }
                                     }
                                 }
@@ -89,6 +89,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     }
                 }
            // }
+                return featureSpace;
         }
     }
 }
