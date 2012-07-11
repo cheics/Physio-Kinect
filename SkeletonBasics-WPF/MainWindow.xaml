@@ -106,46 +106,40 @@
             </Grid.ColumnDefinitions>
             <Viewbox Grid.Column="0" Stretch="Uniform" HorizontalAlignment="Center">
                 
-                <d3:ChartPlotter Name="F1Graph" Margin="0,0,0,0" LegendVisible="False" >
+                <d3:ChartPlotter Name="F1Graph" Margin="5,0,0,5" LegendVisible="False" Visible="0,-1,400,2">
                     <d3:ChartPlotter.HorizontalAxis>
-                        <d3:HorizontalIntegerAxis Name="Time1"/>
+                        <d3:HorizontalAxis Name="Time1"/>
                     </d3:ChartPlotter.HorizontalAxis>
                     <d3:ChartPlotter.VerticalAxis >
                         <d3:VerticalIntegerAxis Name="Feature1"/>
                     </d3:ChartPlotter.VerticalAxis>
-
-                    <d3:Header FontFamily="Arial" Content="Performance"/>
-                    <d3:VerticalAxisTitle FontFamily="Arial" Content="Right Hand X"/>
-                    <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time"/>
+                    <d3:VerticalAxisTitle FontFamily="Arial" Content="Right Hand X" FontSize="14"/>
+                    <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="14"/>
                 </d3:ChartPlotter>
                 
             </Viewbox>
             <Viewbox Grid.Column="1" Stretch="Uniform" HorizontalAlignment="Center">
-    <d3:ChartPlotter Name="F2Graph" Margin="0,0,0,0" LegendVisible="False" >
+                <d3:ChartPlotter Name="F2Graph" Margin="5,0,0,5" LegendVisible="False" >
                         <d3:ChartPlotter.HorizontalAxis>
                             <d3:HorizontalIntegerAxis Name="Time2"/>
                         </d3:ChartPlotter.HorizontalAxis>
                         <d3:ChartPlotter.VerticalAxis >
                             <d3:VerticalIntegerAxis Name="Feature2"/>
                         </d3:ChartPlotter.VerticalAxis>
-
-                        <d3:Header FontFamily="Arial" Content="Performance"/>
-                        <d3:VerticalAxisTitle FontFamily="Arial" Content="Right Hand Y"/>
-                        <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time"/>
+                        <d3:VerticalAxisTitle FontFamily="Arial" Content="Right Hand Y" FontSize="14"/>
+                        <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="14"/>
                     </d3:ChartPlotter>
             </Viewbox>
             <Viewbox Grid.Column="2" Stretch="Uniform" HorizontalAlignment="Center">
-                <d3:ChartPlotter Name="F3Graph" Margin="0,0,0,0" LegendVisible="False" >
+                <d3:ChartPlotter Name="F3Graph" Margin="5,0,0,5" LegendVisible="False" >
                     <d3:ChartPlotter.HorizontalAxis>
                         <d3:HorizontalIntegerAxis Name="Time3"/>
                     </d3:ChartPlotter.HorizontalAxis>
                     <d3:ChartPlotter.VerticalAxis >
                         <d3:VerticalIntegerAxis Name="Feature3"/>
                     </d3:ChartPlotter.VerticalAxis>
-
-                    <d3:Header FontFamily="Arial" Content="Performance"/>
-                    <d3:VerticalAxisTitle FontFamily="Arial" Content="Right Shoulder X"/>
-                    <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time"/>
+                    <d3:VerticalAxisTitle FontFamily="Arial" Content="Right Shoulder X" FontSize="14"/>
+                    <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="14"/>
                 </d3:ChartPlotter>
             </Viewbox>
         </Grid>
