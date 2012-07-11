@@ -64,6 +64,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         typeof(MainWindow),
         new PropertyMetadata(null));
 
+        private FeatureHelper featureHelper = new FeatureHelper();
         private readonly MainWindowViewModel viewModel;
 
         private Dictionary<string, int> jointMapping;
