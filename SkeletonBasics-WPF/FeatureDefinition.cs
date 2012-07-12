@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+﻿﻿//------------------------------------------------------------------------------
 // <copyright file="MainWindow.xaml.cs" company="Microsoft">
 //     Copyright (c) Microsoft Corporation.  All rights reserved.
 // </copyright>
@@ -53,35 +53,27 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             int numfeat = featureNames.Count;
             Collection<Collection<SkeletonPoint>> dataSet = featureHelper.getDataSet(exerciseName, first);
 
-            float[,] featureSpace = new float[dataSet[1].Count, numfeat];
+            float[,] featureSpace = new float[dataSet.Count, numfeat];
 
             //for (int i = 0; i < dataSet.GetLength(0); i++)
             //{
                 int l = -1; int p = -1;
                 // traversing each joint in each feature calculating the gradient between each dimesion and another
-                for (int f = 0; f < featureNames.Count; f++)
+                for (int f = 0; f < numfeat; f++)
                 {
                     //string[] jointData = featurehelper.getJoints(featureNames[f]);
                     //int[,] jointDim = featureHelper.SkeletalTags.get(jointData);
 
-                    for (int j = 0; j < dataSet.GetLength(1); j++)
+                    for (int j = 0; j < dataSet[f].Count; j++)
                     {
-                        for (int k = 0; k < dataSet.GetLength(1); k++)
+                        for (int k = 0; k < dataSet[f].Count; k++)
                         {
                             if (j != k)
                             {
-                                for (int m = 0; m < dataSet.GetLength(2); m++)
-                                {
-                                    for (int n = 0; n < dataSet.GetLength(2); n++)
-                                    {
-                                        if (m != n)
-                                        {
-                                            l++;
-                                            featureSpace[f,l] = (dataSet[f, j, m] - dataSet[f, k, m]) /
-                                                                    (dataSet[f, j, n] - dataSet[f, k, n]);
-                                        }
-                                    }
-                                }
+                               l++;
+                               featureSpace[f,l] = (dataSet[f][j].Y - dataSet[f][k].Y) /
+                                                   (dataSet[f][j].X - dataSet[f][k].X);
+
                             }
                         }
                     }
