@@ -1,85 +1,74 @@
-﻿﻿//------------------------------------------------------------------------------
-// <copyright file="MainWindow.xaml.cs" company="Microsoft">
-//     Copyright (c) Microsoft Corporation.  All rights reserved.
-// </copyright>
-//------------------------------------------------------------------------------
-namespace Microsoft.Samples.Kinect.SkeletonBasics
+﻿namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Collections;
-    using System.Windows;
-    using System.Windows.Data;
-    using System.Windows.Media;
-    using System.Windows.Media.Imaging;
-    //using System.Windows.Forms;
-    using System.Windows.Controls;
-    using System.Data;
-    // using System.Drawing.Imaging;
-    // using System.Drawing;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Windows.Media.Media3D;
 
-    using System.Text.RegularExpressions;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
+	using Microsoft.Kinect;
 
-    using Microsoft.Kinect;
-    using Microsoft.Samples.Kinect.WpfViewers;
-    using Microsoft.Samples.Kinect.SkeletonBasics;
-    using Microsoft.Research.DynamicDataDisplay.DataSources;
-    using Microsoft.Research.DynamicDataDisplay;
-    using Microsoft.Research.DynamicDataDisplay.PointMarkers;
+	public struct FeatureData 
+	{
+		public string exName;
+		public string[] bestFeatures;
+		public Dictionary<String, Double> featureValues;
+		private FeatureHelper featureHelper = new FeatureHelper();
 
-    using Coding4Fun;
-    using MySql.Data.MySqlClient;
+		public FeatureData(String exName, String[] bestFeatures, Dictionary<String, Double> featureValues) 
+		{
+			this.exName=exName;
+			this.bestFeatures = bestFeatures;
+			this.featureValues = featureValues;
+		}
+	}
 
-    public class FeatureDefinition
+	public struct ExersizeType
+	{
+		public string exName;
+		public ExersizeType(String exName)
+		{
+			this.exName = exName;
+		}
+	}
+
+    public partial class FeatureDefinition
     {
         private FeatureHelper featureHelper = new FeatureHelper();
+		private Skeleton skelData;
 
-        public void Initializing()
-        {
+		private ExersizeType SQUAT_TYPE= new ExersizeType("squats");
+		private ExersizeType SHOULDERRAISE_TYPE=new ExersizeType("shoudlerRaise");
 
-        }
 
-        public void Disposing()
-        {
+		public FeatureDefinition()
+		{
+			
+		}
 
-        }
+		public void StoreSkeletonFrame(Skeleton skelData){
+			this.skelData = skelData;
+		}
 
-        public float[,] defineFSpace(string exerciseName, Skeleton first)
-        {
-            Collection<string> featureNames = featureHelper.getFeatures(exerciseName);
-            int numfeat = featureNames.Count;
-            Collection<Collection<SkeletonPoint>> dataSet = featureHelper.getDataSet(exerciseName, first);
+		public Vector3D GetJointData(JointType jointName)
+		{
+			return new Vector3D(skelData.Joints[jointName].Position.X, skelData.Joints[jointName].Position.Y, skelData.Joints[jointName].Position.Z);
+		}
 
-            float[,] featureSpace = new float[dataSet.Count, numfeat];
+		public FeatureData GetFeatures(ExersizeType exersizeName)
+		{
+			return new FeatureData(exersizeName.exName, featureHelper.BestFeatures(exersizeName), AllFeatures());
+		}
 
-            //for (int i = 0; i < dataSet.GetLength(0); i++)
-            //{
-                int l = -1; int p = -1;
-                // traversing each joint in each feature calculating the gradient between each dimesion and another
-                for (int f = 0; f < numfeat; f++)
-                {
-                    //string[] jointData = featurehelper.getJoints(featureNames[f]);
-                    //int[,] jointDim = featureHelper.SkeletalTags.get(jointData);
-
-                    for (int j = 0; j < dataSet[f].Count; j++)
-                    {
-                        for (int k = 0; k < dataSet[f].Count; k++)
-                        {
-                            if (j != k)
-                            {
-                               l++;
-                               featureSpace[f,l] = (dataSet[f][j].Y - dataSet[f][k].Y) /
-                                                   (dataSet[f][j].X - dataSet[f][k].X);
-
-                            }
-                        }
-                    }
-                }
-           // }
-                return featureSpace;
-        }
+		private Dictionary<String, double> AllFeatures()
+		{
+			return new Dictionary<String, double>(){
+				{"squatDepth",  f_squatDepth()}
+			};
+		}
+	
     }
+		 
+
+
 }
