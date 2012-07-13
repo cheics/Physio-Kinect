@@ -87,7 +87,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SkeletonHelper.cs" />
+    <Compile Include="f_FeatureDefinition.cs" />
     <Compile Include="FeatureHelper.cs" />
     <Compile Include="FeatureDefinition.cs" />
     <Compile Include="kinect.designer.cs">
