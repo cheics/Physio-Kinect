@@ -5,6 +5,7 @@
 	using System.Linq;
 	using System.Text;
 	using System.Windows.Media.Media3D;
+	using Microsoft.Samples.Kinect.SkeletonBasics.ExerciseClass;
 
 	using Microsoft.Kinect;
 
@@ -22,27 +23,11 @@
 		}
 	}
 
-	public struct ExersizeType
-	{
-		public string exName;
-		public ExersizeType(String exName)
-		{
-			this.exName = exName;
-		}
-	}
 
     public partial class FeatureDefinition
     {
         private FeatureHelper featureHelper = new FeatureHelper();
         private Skeleton skelData;
-
-        private ExersizeType SQUAT_TYPE = new ExersizeType("squats");
-        private ExersizeType SHOULDERRAISE_TYPE = new ExersizeType("shoudlerRaise");
-        private ExersizeType HIPABDUCTION_TYPE_ = new ExersizeType("hipAbduction");
-        private ExersizeType ARMRAISE_TYPE = new ExersizeType("armRaise");
-        private ExersizeType LEGRAISE_TYPE = new ExersizeType("legraise");
-        private ExersizeType KNEERAISE_TYPE = new ExersizeType("kneeRaise");
-        private ExersizeType ARMABUDCTION_TYPE = new ExersizeType("armAbduction");
 
         public FeatureDefinition()
         {
@@ -68,7 +53,7 @@
         {
             return new Dictionary<String, double>()
             {
-			    {"squatDepth",  f_squatDepth()},
+			    {"Squat Depth",  f_squatDepth()},
                 {"Spine Angle Coronal", f_spineAngle_C()},
                 {"Spine Angle Sagittal",f_spineAngle_S()},
                 {"Knee Angle Right",f_kneeAngle_R()},

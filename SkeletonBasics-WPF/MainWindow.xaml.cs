@@ -54,12 +54,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private string MyConString = "SERVER=localhost;" +
             "DATABASE=dbkinect;" +
             "UID=root;" +
-            "PASSWORD=Karamlou;";
+            "PASSWORD=kinectdb;";
         private string activeDir = @"C:\testdir2";
         public string newPath = "test";
 
         private FeatureDefinition featureDefinition = new FeatureDefinition();
-        private FeatureHelper featureHelper = new FeatureHelper();
 
 
         public static readonly DependencyProperty KinectSensorProperty =
@@ -619,6 +618,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 if (skeletonFrame != null)
                 {
+					
                     double[] TempF1Data = new double[ArraySize+1];
                     double[] TempF2Data = new double[ArraySize+1];
                     double[] TempF3Data = new double[ArraySize+1];
@@ -631,35 +631,31 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     skeletonFrame.CopySkeletonDataTo(skeletons);
 
                     //get the first tracked skeleton
-                    Skeleton first = (from s in skeletons
+                    Skeleton skel_1 = (from s in skeletons
                                       where s.TrackingState == SkeletonTrackingState.Tracked
                                       select s).FirstOrDefault();
 
                     // creating commands for MySQL                  
-                    if (first != null)
+					if (skel_1 != null)
                     {
-                        
-                       float[,] Test =  featureDefinition.defineFSpace("Arm Abduction", first);
+						// Colin Code
+						featureDefinition.StoreSkeletonFrame(skel_1);
+						ExerciseClass.EX_ShoulderRaise shoulderRaise = new ExerciseClass.EX_ShoulderRaise();
+						FeatureData featureFrame = featureDefinition.GetFeatures(shoulderRaise);
 
+						Feature1Data.RemoveAt(0);
+						Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
 
-                        foreach (Joint joint in first.Joints)
+						Feature2Data.RemoveAt(1);
+						Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+						Feature3Data.RemoveAt(0);
+						Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+
+						foreach (Joint joint in skel_1.Joints)
                         {
-                            if (joint.JointType.ToString() == "WristRight")
-                            {
-                                Feature1Data.RemoveAt(0);
-                                Feature2Data.RemoveAt(0);
-
-                                Feature1Data.Add(Convert.ToDouble(joint.Position.X));
-                                Feature2Data.Add(Convert.ToDouble(joint.Position.Z));
-                            }
-                            else if (joint.JointType.ToString() == "Head")
-                            {
-                                Feature3Data.RemoveAt(0);
-
-                                Feature3Data.Add(Convert.ToDouble(joint.Position.X));
-                            }
-
-                            command.CommandText = command.CommandText + "," +
+                            
+								command.CommandText = command.CommandText + "," +
                                 joint.JointType.ToString() + "X" + "," +
                                 joint.JointType.ToString() + "Y" + "," +
                                 joint.JointType.ToString() + "Z";
@@ -701,7 +697,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             + values;
                         command.CommandText = "INSERT INTO dbkinect.kinectdata (Framenumber,Created_at,UserFirst, UserLast , Exercise ,Type " + command.CommandText + ") VALUE ("
                            + values + ")";
-                        Reader = command.ExecuteReader();
+                        
+						Reader = command.ExecuteReader();
                         Reader.Close();
 
                         if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 5) == 0)

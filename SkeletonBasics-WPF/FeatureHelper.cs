@@ -19,17 +19,18 @@ using Microsoft.Samples.Kinect.SkeletonBasics;
 using Microsoft.Research.DynamicDataDisplay.DataSources;
 using Microsoft.Research.DynamicDataDisplay;
 using Microsoft.Research.DynamicDataDisplay.PointMarkers;
+using Microsoft.Samples.Kinect.SkeletonBasics.ExerciseClass;
 
 using Coding4Fun;
 using MySql.Data.MySqlClient;
 
 namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
-    public class FeatureHelper
-    {
-        //private JointType featureNames;
+	public class FeatureHelper
+	{
+		//private JointType featureNames;
 
-        public string[] featureNames = new string[] 
+		public string[] featureNames = new string[] 
         {
             "Squat Depth",
             "Spine Angle Coronal",
@@ -48,7 +49,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             "Wrist Angle Left"                                          
         };
 
-        public string[] exerciseNames = new string[] 
+		public string[] exerciseNames = new string[] 
         { 
             "Squat", 
             "Hip Abduction",
@@ -58,7 +59,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             "Arm Abduction" 
         };
 
-        Dictionary<string, string> featurePrettyNames = new Dictionary<string, string>()
+		Dictionary<string, string> featurePrettyNames = new Dictionary<string, string>()
 		{
 			{"f_squatDepth", "Squat Depth"},
             {"f_kneeAngle_R", "Right Knee Angle"},
@@ -79,25 +80,25 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {"f_elbowFlare_L", "Left Elbow Flare"}
 		};
 
-        public string[] BestFeatures(ExersizeType exType)
-        {
-            switch (exType.exName)
-            {
-                case ("SQUATS"):
-                    return new string[] { "f_squatDepth", "f_kneeAngle_L", "f_kneeAngle_R" };
-                case ("SHOULDER_RAISE"):
-                    return new string[] { "f_elbowAngle_R", "f_elbowAngle_L", "f_shoulderRange_R", "f_shoulderRange_L" };
-                case ("HIP_ABDUCTTION"):
-                    return new string[] { "f_hipAngle_R", "f_spineAngle_C", "f_spineAngle_S" };
-                case ("LEG_RAISE"):
-                    return new string[] { "f_kneeAngle_R", "f_kneeAngle_L", "f_spineAngle_S" };
-                case ("ARM_ABDUCTION"):
-                    return new string[] { "f_elbowAngle_R", "f_wristAngle_R", "f_elbowFlare_R" };
-                case ("KNEE_BEND"):
-                    return new string[] { "f_kneeAngle_R", "f_kneeAngle_L", "f_spineAngle_S" };
-            }
-            return new String[0];
-        }
-
+		public string[] BestFeatures(ExersizeType exType)
+		{
+			Console.WriteLine(exType.exName);
+			if(exType.exName.Equals(EX_Squat.defaultExName)) {
+					return new string[] { "f_squatDepth", "f_kneeAngle_L", "f_kneeAngle_R" };
+			} else if(exType.exName.Equals(EX_ShoulderRaise.defaultExName)) {
+				return new string[] { "Elbow Angle Right", "Elbow Angle Left", "Shoulder Angle Right", "Shoulder Angle Left" };
+			} else if(exType.exName.Equals(EX_HipAbduction.defaultExName)) {
+					return new string[] { "f_hipAngle_R", "f_spineAngle_C", "f_spineAngle_S" };
+			} else if(exType.exName.Equals(EX_LegRaise.defaultExName)) {
+					return new string[] { "f_kneeAngle_R", "f_kneeAngle_L", "f_spineAngle_S" };
+			} else if(exType.exName.Equals(EX_ArmAbduction.defaultExName)) {
+					return new string[] { "f_elbowAngle_R", "f_wristAngle_R", "f_elbowFlare_R" };
+			} else if (exType.exName.Equals(EX_KneeBend.defaultExName)) {
+				return new string[] { "f_kneeAngle_R", "f_kneeAngle_L", "f_spineAngle_S" };
+			} else {
+				throw new Exception();
+			}
+		}
+	}
 }
 
