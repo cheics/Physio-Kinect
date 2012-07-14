@@ -13,7 +13,6 @@
 		public string exName;
 		public string[] bestFeatures;
 		public Dictionary<String, Double> featureValues;
-		private FeatureHelper featureHelper = new FeatureHelper();
 
 		public FeatureData(String exName, String[] bestFeatures, Dictionary<String, Double> featureValues) 
 		{
@@ -35,40 +34,56 @@
     public partial class FeatureDefinition
     {
         private FeatureHelper featureHelper = new FeatureHelper();
-		private Skeleton skelData;
+        private Skeleton skelData;
 
-		private ExersizeType SQUAT_TYPE= new ExersizeType("squats");
-		private ExersizeType SHOULDERRAISE_TYPE=new ExersizeType("shoudlerRaise");
+        private ExersizeType SQUAT_TYPE = new ExersizeType("squats");
+        private ExersizeType SHOULDERRAISE_TYPE = new ExersizeType("shoudlerRaise");
+        private ExersizeType HIPABDUCTION_TYPE_ = new ExersizeType("hipAbduction");
+        private ExersizeType ARMRAISE_TYPE = new ExersizeType("armRaise");
+        private ExersizeType LEGRAISE_TYPE = new ExersizeType("legraise");
+        private ExersizeType KNEERAISE_TYPE = new ExersizeType("kneeRaise");
+        private ExersizeType ARMABUDCTION_TYPE = new ExersizeType("armAbduction");
 
+        public FeatureDefinition()
+        {
 
-		public FeatureDefinition()
-		{
-			
-		}
+        }
 
-		public void StoreSkeletonFrame(Skeleton skelData){
-			this.skelData = skelData;
-		}
+        public void StoreSkeletonFrame(Skeleton skelData)
+        {
+            this.skelData = skelData;
+        }
 
-		public Vector3D GetJointData(JointType jointName)
-		{
-			return new Vector3D(skelData.Joints[jointName].Position.X, skelData.Joints[jointName].Position.Y, skelData.Joints[jointName].Position.Z);
-		}
+        public Vector3D GetJointData(JointType jointName)
+        {
+            return new Vector3D(skelData.Joints[jointName].Position.X, skelData.Joints[jointName].Position.Y, skelData.Joints[jointName].Position.Z);
+        }
 
-		public FeatureData GetFeatures(ExersizeType exersizeName)
-		{
-			return new FeatureData(exersizeName.exName, featureHelper.BestFeatures(exersizeName), AllFeatures());
-		}
+        public FeatureData GetFeatures(ExersizeType exersizeName)
+        {
+            return new FeatureData(exersizeName.exName, featureHelper.BestFeatures(exersizeName), AllFeatures());
+        }
 
-		private Dictionary<String, double> AllFeatures()
-		{
-			return new Dictionary<String, double>(){
-				{"squatDepth",  f_squatDepth()}
-			};
-		}
-	
+        private Dictionary<String, double> AllFeatures()
+        {
+            return new Dictionary<String, double>()
+            {
+			    {"squatDepth",  f_squatDepth()},
+                {"Spine Angle Coronal", f_spineAngle_C()},
+                {"Spine Angle Sagittal",f_spineAngle_S()},
+                {"Knee Angle Right",f_kneeAngle_R()},
+                {"Knee Angle Left",f_kneeAngle_L()},
+                {"Elbow Angle Right",f_elbowAngle_R()},
+                {"Elbow Angle Left",f_elbowAngle_L()},
+                {"Elbow Flare Right",f_elbowFlare_R()},
+                {"Elbow Flare Left",f_elbowFlare_L()},
+                {"Hip Angle Right",f_hipAngle_R()},
+                {"Hip Angle Left",f_hipAngle_L()},
+                {"Shoulder Angle Right",f_shoulderAngle_R()},
+                {"Shoulder Angle Left",f_shoulderAngle_L()},
+                {"Wrist Angle Right",f_wristAngle_R()},
+                {"Wrist Angle Left",f_wristAngle_L()}
+		    };
+        }
     }
-		 
-
-
 }

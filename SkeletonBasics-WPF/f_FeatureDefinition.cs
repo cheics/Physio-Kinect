@@ -1,9 +1,4 @@
-﻿﻿//------------------------------------------------------------------------------
-// <copyright file="MainWindow.xaml.cs" company="Microsoft">
-//     Copyright (c) Microsoft Corporation.  All rights reserved.
-// </copyright>
-//------------------------------------------------------------------------------
-namespace Microsoft.Samples.Kinect.SkeletonBasics
+﻿namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
 	using System;
 	using System.Collections.Generic;
@@ -21,6 +16,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			{"initial_hip_height", 1.5f}
 		};
 
+
 		public double f_squatDepth()
 		{
 			Vector3D j_foot_L = GetJointData(JointType.FootLeft);
@@ -31,18 +27,105 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			return hip_depthPercent;
 		}
 
+        public double f_spineAngle_C()
+        {
+            Vector3D v_upperSpine = GetJointData(JointType.Spine) - GetJointData(JointType.ShoulderCenter);
+            Vector3D v_lowerSpine = GetJointData(JointType.HipCenter) - GetJointData(JointType.Spine);
+            return Vector3D.AngleBetween(v_upperSpine, v_lowerSpine);
+        }
+
+        public double f_spineAngle_S()
+        {
+            Vector3D v_upperSpine = GetJointData(JointType.Spine) - GetJointData(JointType.ShoulderCenter);
+            Vector3D v_lowerSpine = GetJointData(JointType.HipCenter) - GetJointData(JointType.Spine);
+            return Vector3D.AngleBetween(v_upperSpine, v_lowerSpine);
+        }
+
+        public double f_kneeAngle_R()
+        {
+            Vector3D v_upperLeg = GetJointData(JointType.KneeRight) - GetJointData(JointType.HipRight);
+            Vector3D v_lowerLeg = GetJointData(JointType.FootRight) - GetJointData(JointType.KneeRight);
+            return Vector3D.AngleBetween(v_upperLeg, v_lowerLeg);
+        }
+
+        public double f_kneeAngle_L()
+        {
+            Vector3D v_upperLeg = GetJointData(JointType.KneeLeft) - GetJointData(JointType.HipLeft);
+            Vector3D v_lowerLeg = GetJointData(JointType.FootLeft) - GetJointData(JointType.KneeLeft);
+            return Vector3D.AngleBetween(v_upperLeg, v_lowerLeg);
+        }
+
+        public double f_elbowAngle_R()
+		{
+			Vector3D v_upperArm = GetJointData(JointType.ElbowRight) - GetJointData(JointType.ShoulderRight);
+			Vector3D v_lowerArm = GetJointData(JointType.WristRight) - GetJointData(JointType.ElbowRight);
+			return Vector3D.AngleBetween(v_upperArm, v_lowerArm);
+		}
+
 		public double f_elbowAngle_L()
 		{
 			Vector3D v_upperArm = GetJointData(JointType.ElbowLeft) - GetJointData(JointType.ShoulderLeft);
 			Vector3D v_lowerArm = GetJointData(JointType.WristLeft) - GetJointData(JointType.ElbowLeft);
 			return Vector3D.AngleBetween(v_upperArm, v_lowerArm);
 		}
-		public double f_elbowAngle_R()
-		{
-			Vector3D v_upperArm = GetJointData(JointType.ElbowRight) - GetJointData(JointType.ShoulderRight);
-			Vector3D v_lowerArm = GetJointData(JointType.WristRight) - GetJointData(JointType.ElbowRight);
-			return Vector3D.AngleBetween(v_upperArm, v_lowerArm);
-		}
+
+        public double f_elbowFlare_R()
+        {
+            Vector3D v_upperArm = GetJointData(JointType.ShoulderRight) - GetJointData(JointType.ElbowRight);
+            Vector3D v_rightShoulder = GetJointData(JointType.ShoulderCenter) - GetJointData(JointType.ShoulderRight);
+            return Vector3D.AngleBetween(v_upperArm, v_rightShoulder);
+        }
+
+        public double f_elbowFlare_L()
+        {
+            Vector3D v_upperArm = GetJointData(JointType.ShoulderLeft) - GetJointData(JointType.ElbowLeft);
+            Vector3D v_leftShoulder = GetJointData(JointType.ShoulderCenter) - GetJointData(JointType.ShoulderLeft);
+            return Vector3D.AngleBetween(v_upperArm, v_leftShoulder);
+        }
+
+        public double f_hipAngle_R()
+        {
+            Vector3D v_centerBody = GetJointData(JointType.HipCenter) - GetJointData(JointType.Spine);
+            Vector3D v_rightHip = GetJointData(JointType.HipRight) - GetJointData(JointType.HipCenter);
+            return Vector3D.AngleBetween(v_centerBody, v_rightHip);
+        }
+
+        public double f_hipAngle_L()
+        {
+            Vector3D v_centerBody = GetJointData(JointType.HipCenter) - GetJointData(JointType.Spine);
+            Vector3D v_leftHip = GetJointData(JointType.HipLeft) - GetJointData(JointType.HipCenter);
+            return Vector3D.AngleBetween(v_centerBody, v_leftHip);
+        }
+
+        public double f_shoulderAngle_R()
+        {
+            Vector3D v_upperArm = GetJointData(JointType.ShoulderRight) - GetJointData(JointType.ElbowRight);
+            Vector3D v_Spine = GetJointData(JointType.Spine) - GetJointData(JointType.ShoulderRight);
+            return Vector3D.AngleBetween(v_upperArm, v_Spine);
+        }
+
+        public double f_shoulderAngle_L()
+        {
+            Vector3D v_upperArm = GetJointData(JointType.ShoulderLeft) - GetJointData(JointType.ElbowLeft);
+            Vector3D v_Spine = GetJointData(JointType.Spine) - GetJointData(JointType.ShoulderLeft);
+            return Vector3D.AngleBetween(v_upperArm, v_Spine);
+        }
+
+
+        public double f_wristAngle_R()
+        {
+            Vector3D v_Hand = GetJointData(JointType.WristRight) - GetJointData(JointType.ElbowRight);
+			Vector3D v_foreArm = GetJointData(JointType.HandRight) - GetJointData(JointType.WristRight);
+            return Vector3D.AngleBetween(v_Hand, v_foreArm);
+        }
+
+        public double f_wristAngle_L()
+        {
+            Vector3D v_Hand = GetJointData(JointType.WristLeft) - GetJointData(JointType.ElbowLeft);
+            Vector3D v_foreArm = GetJointData(JointType.HandLeft) - GetJointData(JointType.WristLeft);
+            return Vector3D.AngleBetween(v_Hand, v_foreArm);
+        }
+    
     }
 
 
