@@ -54,7 +54,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private string MyConString = "SERVER=localhost;" +
             "DATABASE=dbkinect;" +
             "UID=root;" +
-            "PASSWORD=kinectdb;";
+            "PASSWORD=Karamlou;";
         private string activeDir = @"C:\testdir2";
         public string newPath = "test";
 
@@ -647,7 +647,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 						Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
 
 						Feature2Data.RemoveAt(1);
-						Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+						Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
 
 						Feature3Data.RemoveAt(0);
 						Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
@@ -701,7 +701,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 						Reader = command.ExecuteReader();
                         Reader.Close();
 
-                        if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 5) == 0)
+                        if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 15) == 0)
                         {
                            Make_Graph();
                         }
@@ -1227,6 +1227,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             //var FrameTrainDataSource = new EnumerableDataSource<DateTime>(timetrain);
             //FrameTrainDataSource.SetXMapping(x =>Time1.ConvertToDouble(x));
             TimeData.CopyTo(frameTest);
+
             Feature1Data.CopyTo(joint1test);
             Feature2Data.CopyTo(joint2test);
             Feature3Data.CopyTo(joint3test);

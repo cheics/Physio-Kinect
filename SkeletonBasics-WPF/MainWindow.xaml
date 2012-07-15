@@ -106,7 +106,7 @@
             </Grid.ColumnDefinitions>
             <Viewbox Grid.Column="0" Stretch="Uniform" HorizontalAlignment="Center">
                 
-                <d3:ChartPlotter Name="F1Graph" Margin="5,0,0,5" LegendVisible="False" Visible="0,-1,400,2">
+                <d3:ChartPlotter Name="F1Graph" Margin="5,0,0,5" LegendVisible="False">
                     <d3:ChartPlotter.HorizontalAxis>
                         <d3:HorizontalAxis Name="Time1"/>
                     </d3:ChartPlotter.HorizontalAxis>
