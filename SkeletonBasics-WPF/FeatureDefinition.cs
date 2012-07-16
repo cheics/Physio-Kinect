@@ -67,7 +67,8 @@
                 {"Shoulder Angle Right",f_shoulderAngle_R()},
                 {"Shoulder Angle Left",f_shoulderAngle_L()},
                 {"Wrist Angle Right",f_wristAngle_R()},
-                {"Wrist Angle Left",f_wristAngle_L()}
+                {"Wrist Angle Left",f_wristAngle_L()},
+                {"Forearm Abduciton Right", f_forearmAbduction_R()}
 		    };
         }
     }

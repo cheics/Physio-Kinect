@@ -7,18 +7,17 @@
 namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
     using System;
+    
     using System.IO;
     using System.Linq;
     using System.Collections;
     using System.Windows;
     using System.Windows.Data;
     using System.Windows.Media;
+    using System.Windows.Shapes;
     using System.Windows.Media.Imaging;
-    //using System.Windows.Forms;
     using System.Windows.Controls;
     using System.Data;
-   // using System.Drawing.Imaging;
-   // using System.Drawing;
     
     using System.Text.RegularExpressions;
     using System.Collections.Generic;
@@ -305,6 +304,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             cmbExer.Items.Add("Leg Raise");
             cmbExer.Items.Add("Knee Bend");
             cmbExer.Items.Add("Arm Abduction");
+            cmbExer.SelectedIndex = 5;
 
             // get skeleton data from database
             MySqlConnection con = new MySqlConnection(MyConString);
@@ -638,19 +638,131 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     // creating commands for MySQL                  
 					if (skel_1 != null)
                     {
-						// Colin Code
-						featureDefinition.StoreSkeletonFrame(skel_1);
-						ExerciseClass.EX_ShoulderRaise shoulderRaise = new ExerciseClass.EX_ShoulderRaise();
-						FeatureData featureFrame = featureDefinition.GetFeatures(shoulderRaise);
+						// Colin Code // Mehrad code now! 
 
-						Feature1Data.RemoveAt(0);
-						Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+            featureDefinition.StoreSkeletonFrame(skel_1);
+            FeatureData featureFrame;
+            Rectangle graphRange = new Rectangle();
 
-						Feature2Data.RemoveAt(1);
-						Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                        switch(cmbExer.SelectedIndex)
+                        {
+                            case 0:
+                                ExerciseClass.EX_Squat squat = new ExerciseClass.EX_Squat();
+                                featureFrame = featureDefinition.GetFeatures(squat);
+                                Feature1Data.RemoveAt(0);
+						        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+                                
+						        Feature2Data.RemoveAt(0);
+						        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+                                
 
-						Feature3Data.RemoveAt(0);
-						Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+						        Feature3Data.RemoveAt(0);
+						        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+
+
+                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
+                                G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
+                                G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
+                                break;
+                            case 1:
+                                ExerciseClass.EX_HipAbduction hipAbduction = new ExerciseClass.EX_HipAbduction();
+                                featureFrame = featureDefinition.GetFeatures(hipAbduction);
+                                Feature1Data.RemoveAt(0);
+						        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+						        Feature2Data.RemoveAt(0);
+						        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+						        Feature3Data.RemoveAt(0);
+						        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
+                                G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
+                                G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
+                                break;
+                            case 2:
+                                ExerciseClass.EX_ShoulderRaise shoulderRaise = new ExerciseClass.EX_ShoulderRaise();
+                                featureFrame = featureDefinition.GetFeatures(shoulderRaise);
+
+                                Feature1Data.RemoveAt(0);
+						        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+						        Feature2Data.RemoveAt(0);
+						        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+
+						        Feature3Data.RemoveAt(0);
+						        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[3]]);
+                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
+                                G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
+                                G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
+                                break;
+                            case 3:
+                                ExerciseClass.EX_LegRaise legRaise = new ExerciseClass.EX_LegRaise();
+                                featureFrame = featureDefinition.GetFeatures(legRaise);
+                                Feature1Data.RemoveAt(0);
+						        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+						        Feature2Data.RemoveAt(0);
+						        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+						        Feature3Data.RemoveAt(0);
+						        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
+                                G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
+                                G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
+                                break;
+                            case 4:
+                                ExerciseClass.EX_KneeBend kneeBend = new ExerciseClass.EX_KneeBend();
+                                featureFrame = featureDefinition.GetFeatures(kneeBend);
+                                Feature1Data.RemoveAt(0);
+						        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+						        Feature2Data.RemoveAt(0);
+						        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+						        Feature3Data.RemoveAt(0);
+						        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
+                                G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
+                                G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
+                                break;
+                            case 5:
+                                ExerciseClass.EX_ArmAbduction armAbduciton = new ExerciseClass.EX_ArmAbduction();
+                                featureFrame = featureDefinition.GetFeatures(armAbduciton);
+                                
+                                Feature1Data.RemoveAt(0);
+						        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+                                
+						        Feature2Data.RemoveAt(0);
+						        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+						        Feature3Data.RemoveAt(0);
+						        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+
+                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
+                                G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
+                                G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
+                                break;
+                            default:
+                                armAbduciton = new ExerciseClass.EX_ArmAbduction();
+                                featureFrame = featureDefinition.GetFeatures(armAbduciton);
+                                Feature1Data.RemoveAt(0);
+						        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+						        Feature2Data.RemoveAt(0);
+						        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+						        Feature3Data.RemoveAt(0);
+						        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
+                                G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
+                                G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
+                                break;
+                        }
+
+                        F1Graph.Visible.X.Equals(0);
+                        F1Graph.Visible.Y.Equals(0);
+                        F1Graph.Width.Equals(400);
+                        F1Graph.Height.Equals(100);
 
 						foreach (Joint joint in skel_1.Joints)
                         {
@@ -1055,19 +1167,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
         private void Make_Graph()
         {
-            //MySqlConnection connection = new MySqlConnection(MyConString);
-            //MySqlCommand command = connection.CreateCommand();
-            //MySqlDataReader Reader;
-            //connection.Open();
-
-            //int numTrain = 0;
-            //int numTest = 0;
-            //string ExerName = null;
-            //string time = null;
-
-            //DateTime now = DateTime.Now;
-            //DateTime start = new DateTime();
-
             // Clean the graphs
 
             List<IPlotterElement> removeList1 = new List<IPlotterElement>();
@@ -1111,71 +1210,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 F3Graph.Children.Remove(item);
             }
 
-            // string TempCommand = null;
-            /*
-            switch (cmbExer.SelectedIndex)
-            {
-                case 0:
-                    TempCommand = "Squat";
-                    break;
-                case 1:
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
-                case 4 :
-                    break;
-                case 5:
-                    break;
-            }
-            */
-            //if (cmbExer.SelectedValue == null)
-            //    ExerName = "'null'";
-            //else
-            //    ExerName ="'" + cmbExer.SelectedValue.ToString() +"'";
-
-            //start = now.AddSeconds(-30);
-            //time = "'" + start.Year.ToString() + "-" + start.Month.ToString() + "-" + start.Day.ToString() + " " +
-            //    start.Hour.ToString() + ":" +
-            //    start.Minute.ToString() + ":" +
-            //    start.Second.ToString() + "'";
-
-            //command.CommandText = "select Count(*) from dbkinect.kinectdata where Exercise = " +
-            //ExerName +
-            //" and WristRightX <> '0' and WristRightZ <> '0' and ShoulderRightX <> '0' and Type = '1' and Created_at >= " +
-            //time;
-
-            //Reader = command.ExecuteReader();
-            //while (Reader.Read())
-            //{
-            //    numTrain = Convert.ToInt32(Reader[0].ToString());
-
-            //}
-            //Reader.Close();
-            //// get the total number of testing instrances
-            
-            //command.CommandText = "select Count(*) from dbkinect.kinectdata where Exercise = "+
-            //    ExerName +
-            //    " and WristRightX <> '0' and WristRightZ <> '0' and ShoulderRightX <> '0' and Type = '0' and Created_at >= " +
-            //    time;
-
-            //Reader = command.ExecuteReader();
-            //while (Reader.Read())
-            //{
-            //    numTest = Convert.ToInt32(Reader[0].ToString());
-
-            //}
-            //Reader.Close();
-
-
+           
             // sizes
             int[] frameTest = new int[ArraySize];
             int[] frameTrain = new int[ArraySize];
-
-            //DateTime[] timetest = new DateTime[numTest];
-            //DateTime[] timetrain = new DateTime[numTrain];
-
             
             double[] joint1train = new double[ArraySize];
             double[] joint1test = new double[ArraySize];
@@ -1186,46 +1224,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             double[] joint3train = new double[ArraySize];
             double[] joint3test = new double[ArraySize];
 
-            //command.CommandText = "select Framenumber,Type,WristRightX,WristRightY,ShoulderRightX from dbkinect.kinectdata where Exercise = "
-            //+ ExerName + " and WristRightX <> '0' and WristRightZ <> '0' and ShoulderRightX <> '0' and Created_at >=" + 
-            //time ;
-
-            //Reader = command.ExecuteReader();
-            //int test = 0;
-            //int train = 0;
-
-            //while (Reader.Read())
-            //{
-
-            //    if (Convert.ToInt32(Reader[1]) == 0)
-            //    {
-            //        //frameTest[test] = Convert.ToInt32(Reader[0]);
-            //        //timetest[test] = Convert.ToDateTime(Reader[0]);
-
-                            
-            //        //joint1test[test] = Convert.ToDouble(Reader[2]);
-            //        joint2test[test] = Convert.ToDouble(Reader[3]);
-            //        joint3test[test] = Convert.ToDouble(Reader[4]);
-            //        test++;
-            //    }
-            //    else if(Convert.ToInt32(Reader[1]) == 1)
-            //    {
-            //        //frameTrain[train] = Convert.ToInt32(Reader[0]);
-            //        //timetrain[train] = Convert.ToDateTime(Reader[0]);
-                            
-            //        joint1train[train] = Convert.ToDouble(Reader[2]);
-            //        joint2train[train] = Convert.ToDouble(Reader[3]);
-            //        joint3train[train] = Convert.ToDouble(Reader[4]);
-            //        train++;
-            //    }
-            //}
-            //connection.Close();
-
-            //var FrameTestDataSource = new EnumerableDataSource<DateTime>(timetest);
-            //FrameTestDataSource.SetXMapping(x =>Time1.ConvertToDouble(x));
-
-            //var FrameTrainDataSource = new EnumerableDataSource<DateTime>(timetrain);
-            //FrameTrainDataSource.SetXMapping(x =>Time1.ConvertToDouble(x));
+            
             TimeData.CopyTo(frameTest);
 
             Feature1Data.CopyTo(joint1test);
@@ -1278,25 +1277,60 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             ////CompositeDataSource compTrain3DataSource = new
             ////  CompositeDataSource(FrameTrainDataSource, Joint3TrainDataSource);
 
-            F1Graph.AddLineGraph(compTest1DataSource, Colors.Blue, 3,"live");
+
+            // assign graph visible window
+            Rect visibleReact1 = new Rect();
+            Rect visibleReact2 = new Rect();
+            Rect visibleReact3 = new Rect();
+            
+            switch (cmbExer.SelectedIndex)
+            {
+                case 0:
+                    visibleReact1 = new Rect(0, 0, 0, 0);
+                    visibleReact2 = new Rect(0, 0, 0, 0);
+                    visibleReact3 = new Rect(0, 0, 0, 0);
+                    break;
+                case 1:
+                    visibleReact1 = new Rect(0, 0, 0, 0);
+                    visibleReact2 = new Rect(0, 0, 0, 0);
+                    visibleReact3 = new Rect(0, 0, 0, 0);
+                    break;
+                case 2:
+                    visibleReact1 = new Rect(0, 0, 0, 0);
+                    visibleReact2 = new Rect(0, 0, 0, 0);
+                    visibleReact3 = new Rect(0, 0, 0, 0);
+                    break;
+                case 3:
+                    visibleReact1 = new Rect(0, 0, 0, 0);
+                    visibleReact2 = new Rect(0, 0, 0, 0);
+                    visibleReact3 = new Rect(0, 0, 0, 0);
+                    break;
+                case 4:
+                    visibleReact1 = new Rect(0, 0, 0, 0);
+                    visibleReact2 = new Rect(0, 0, 0, 0);
+                    visibleReact3 = new Rect(0, 0, 0, 0);
+                    break;
+                case 5:
+                    visibleReact1 = new Rect(0, 0, 0, 0);
+                    visibleReact2 = new Rect(0, 0, 0, 0);
+                    visibleReact3 = new Rect(0, 0, 0, 0);
+                    break;
+                default:
+                    break;
+            }
+
+            F1Graph.AddLineGraph(compTest1DataSource, Colors.Blue, 3, "live");
             ////F1Graph.AddLineGraph(compTrain1DataSource);
-            F1Graph.LegendVisible = false;
 
             F2Graph.AddLineGraph(compTest2DataSource ,Colors.Blue, 3, "Live");
             ////F2Graph.AddLineGraph(compTrain2DataSource);
-            F2Graph.LegendVisible = false;
 
             F3Graph.AddLineGraph(compTest3DataSource,Colors.Blue,4,"Live");
-            F3Graph.LegendVisible = false;
-            //F3Graph.Visible = new DataRect(3, 3);
-            
             
             ////F3Graph.AddLineGraph(compTrain3DataSource);
-            
-
-            //F1Graph.Viewport.FitToView();
-            
-            //F3Graph.Viewport.FitToView();
+            F3Graph.LegendVisible = false;
+            F2Graph.LegendVisible = false;
+            F1Graph.LegendVisible = false;
         }
     }
     public class MainWindowViewModel : DependencyObject

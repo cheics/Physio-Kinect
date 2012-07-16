@@ -71,8 +71,8 @@
 
         public double f_elbowFlare_R()
         {
-            Vector3D v_upperArm = GetJointData(JointType.ShoulderRight) - GetJointData(JointType.ElbowRight);
-            Vector3D v_rightShoulder = GetJointData(JointType.ShoulderCenter) - GetJointData(JointType.ShoulderRight);
+            Vector3D v_upperArm = GetJointData(JointType.ShoulderCenter) - GetJointData(JointType.ElbowRight);
+            Vector3D v_rightShoulder = GetJointData(JointType.Spine) - GetJointData(JointType.ShoulderCenter);
             return Vector3D.AngleBetween(v_upperArm, v_rightShoulder);
         }
 
@@ -124,6 +124,13 @@
             Vector3D v_Hand = GetJointData(JointType.WristLeft) - GetJointData(JointType.ElbowLeft);
             Vector3D v_foreArm = GetJointData(JointType.HandLeft) - GetJointData(JointType.WristLeft);
             return Vector3D.AngleBetween(v_Hand, v_foreArm);
+        }
+
+        public double f_forearmAbduction_R()
+        {
+            Vector3D v_Hand = GetJointData(JointType.HandRight) - GetJointData(JointType.ShoulderCenter);
+            //Vector3D v_foreArm = GetJointData(JointType.HandLeft) - GetJointData(JointType.WristLeft);
+            return v_Hand.X;
         }
     
     }

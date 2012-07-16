@@ -82,12 +82,14 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
                 <Label Name="X" Grid.Row="0" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">X: N/A</Label>
                 <Label Name="Y" Grid.Row="1" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">Y: N/A</Label>
                 <Label Name="Z" Grid.Row="2" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">Z: N/A</Label>
                 <ComboBox Grid.Row="3" Background="White" FontSize="24" Margin="0 10 0 0" Name="Joints" SelectionChanged="Joints_SelectionChanged" />
-            </Grid>
+                <ComboBox Grid.Row="4" Name="cmbExer" Background="White" FontSize="24"  Margin="0,10,0,0" />
+                </Grid>
             </Viewbox>
             
             <Viewbox Grid.Column="2" Stretch="Uniform" HorizontalAlignment="Center">
@@ -113,7 +115,7 @@
                     <d3:ChartPlotter.VerticalAxis >
                         <d3:VerticalIntegerAxis Name="Feature1"/>
                     </d3:ChartPlotter.VerticalAxis>
-                    <d3:VerticalAxisTitle FontFamily="Arial" Content="Right Hand X" FontSize="14"/>
+                    <d3:VerticalAxisTitle FontFamily="Arial" Name="G1Vertical" FontSize="10"/>
                     <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="14"/>
                 </d3:ChartPlotter>
                 
@@ -126,7 +128,7 @@
                         <d3:ChartPlotter.VerticalAxis >
                             <d3:VerticalIntegerAxis Name="Feature2"/>
                         </d3:ChartPlotter.VerticalAxis>
-                        <d3:VerticalAxisTitle FontFamily="Arial" Content="Right Hand Y" FontSize="14"/>
+                        <d3:VerticalAxisTitle FontFamily="Arial" Name="G2Vertical" FontSize="10"/>
                         <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="14"/>
                     </d3:ChartPlotter>
             </Viewbox>
@@ -138,7 +140,7 @@
                     <d3:ChartPlotter.VerticalAxis >
                         <d3:VerticalIntegerAxis Name="Feature3"/>
                     </d3:ChartPlotter.VerticalAxis>
-                    <d3:VerticalAxisTitle FontFamily="Arial" Content="Right Shoulder X" FontSize="14"/>
+                    <d3:VerticalAxisTitle FontFamily="Arial" Name="G3Vertical" FontSize="10"/>
                     <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="14"/>
                 </d3:ChartPlotter>
             </Viewbox>
@@ -148,7 +150,6 @@
             <Image DockPanel.Dock="Left" Source="Images\Logo.png" Stretch="None" Margin="0 10 0 5"/>
             <TextBlock DockPanel.Dock="Right" Margin="0 0 -1 0" VerticalAlignment="Bottom" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Segoe UI" FontSize="18">PhysioKinect</TextBlock>
             <Image Grid.Column="1" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Center" Margin="0 0 0 5"/>
-            <ComboBox Height="23" Name="cmbExer" Width="120" Background="White" FontSize="24"/>
         </DockPanel>
  
         <CheckBox Grid.Row="5" Style="{StaticResource SquareCheckBox}" Content="Seated Mode" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 10 10 10" Name="checkBoxSeatedMode" Checked="CheckBoxSeatedModeChanged" Unchecked="CheckBoxSeatedModeChanged"/>

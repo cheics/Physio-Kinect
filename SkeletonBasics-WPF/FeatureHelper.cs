@@ -46,7 +46,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             "Shoulder Angle Right",
             "Shoulder Angle Left",
             "Wrist Angle Right",
-            "Wrist Angle Left"                                          
+            "Wrist Angle Left",
+            "Forearm Abduciton Right"                              
         };
 
 		public string[] exerciseNames = new string[] 
@@ -62,39 +63,38 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		Dictionary<string, string> featurePrettyNames = new Dictionary<string, string>()
 		{
 			{"f_squatDepth", "Squat Depth"},
-            {"f_kneeAngle_R", "Right Knee Angle"},
-            {"f_kneeAngle_L", "Left Knee Angle"},
-            {"f_elbowAngle_R", "Right Elbow Angle"},
-            {"f_elbowAngle_L", "Left Elbow Angle"},
-            {"f_shoulderRange_R", "Right Shoulder Range"},
-            {"f_shoulderRange_L", "Left Shoulder Range"},
-            {"f_hipAngle_R", "Right Hip Angle"},
-            {"f_hipAngle_L", "Left Hipe Angle"},
-            {"f_spineAngle_C", "Coronal Spine Angle"},
-            {"f_spineAngle_S", "Sagittal Spine Angle"},
-            {"f_wristAngle_R", "Right Wrist Angle"},
-            {"f_wristAngle_L", "Left Wrist Angle"},
-            {"f_forearmAbduction_R", "Right Forearm Abduction"},
-            {"f_forearmAbduction_L", "Left Forearm Abduction"},
-            {"f_elbowFlare_R", "Right Elbow Flare"},
-            {"f_elbowFlare_L", "Left Elbow Flare"}
+            {"f_kneeAngle_R", "Knee Angle Right"},
+            {"f_kneeAngle_L", "Knee Angle Left"},
+            {"f_elbowAngle_R", "Elbow Angle Right"},
+            {"f_elbowAngle_L", "Elbow Angle Left"},
+            {"f_shoulderRange_R", "Shoulder Range Right"},
+            {"f_shoulderRange_L", "Shoulder Range Left"},
+            {"f_hipAngle_R", "Hip Angle Right"},
+            {"f_hipAngle_L", "Hipe Angle Left"},
+            {"f_spineAngle_C", "Spine Angle Coronal"},
+            {"f_spineAngle_S", "Spine Angle Sagittal"},
+            {"f_wristAngle_R", "Wrist Angle Right"},
+            {"f_wristAngle_L", "Wrist Angle Left"},
+            {"f_elbowFlare_R", "Elbow Flare Right"},
+            {"f_elbowFlare_L", "Elbow Flare Left"},
+            {"f_forearmAbduction_R", "Forearm Abduciton Right"}
 		};
 
 		public string[] BestFeatures(ExersizeType exType)
 		{
 			Console.WriteLine(exType.exName);
 			if(exType.exName.Equals(EX_Squat.defaultExName)) {
-					return new string[] { "f_squatDepth", "f_kneeAngle_L", "f_kneeAngle_R" };
+                return new string[] { "Squat Depth", "Knee Angle Left", "Knee Angle Right" };
 			} else if(exType.exName.Equals(EX_ShoulderRaise.defaultExName)) {
 				return new string[] { "Elbow Angle Right", "Elbow Angle Left", "Shoulder Angle Right", "Shoulder Angle Left" };
 			} else if(exType.exName.Equals(EX_HipAbduction.defaultExName)) {
-					return new string[] { "f_hipAngle_R", "f_spineAngle_C", "f_spineAngle_S" };
+                return new string[] { "Hip Angle Right", "Spine Angle Coronal", "Spine Angle Sagittal" };
 			} else if(exType.exName.Equals(EX_LegRaise.defaultExName)) {
-					return new string[] { "f_kneeAngle_R", "f_kneeAngle_L", "f_spineAngle_S" };
+                return new string[] { "Knee Angle Right", "Knee Angle Left", "Spine Angle Sagittal" };
 			} else if(exType.exName.Equals(EX_ArmAbduction.defaultExName)) {
-					return new string[] { "f_elbowAngle_R", "f_wristAngle_R", "f_elbowFlare_R" };
+                return new string[] { "Elbow Flare Right", "Elbow Angle Right", "Forearm Abduciton Right" };
 			} else if (exType.exName.Equals(EX_KneeBend.defaultExName)) {
-				return new string[] { "f_kneeAngle_R", "f_kneeAngle_L", "f_spineAngle_S" };
+                return new string[] { "Knee Angle Right", "Knee Angle Left", "Spine Angle Sagittal" };
 			} else {
 				throw new Exception();
 			}
