@@ -49,6 +49,11 @@
             return new FeatureData(exersizeName.exName, featureHelper.BestFeatures(exersizeName), AllFeatures());
         }
 
+        public FeatureData GetScores(ExersizeType exersizeName)
+        {
+            return new FeatureData(exersizeName.exName, featureHelper.BestFeatures(exersizeName), AllScores());
+        }
+
         private Dictionary<String, double> AllFeatures()
         {
             return new Dictionary<String, double>()
@@ -71,5 +76,29 @@
                 {"Forearm Abduciton Right", f_forearmAbduction_R()}
 		    };
         }
+
+        private Dictionary<String, double> AllThresholds()
+        {
+            return new Dictionary<String, double>()
+            {
+			    {"Squat Depth",  0.5},
+                {"Spine Angle Coronal", 0.5},
+                {"Spine Angle Sagittal",0.5},
+                {"Knee Angle Right",0.5},
+                {"Knee Angle Left",0.5},
+                {"Elbow Angle Right",0.5},
+                {"Elbow Angle Left",0.5},
+                {"Elbow Flare Right",0.1},
+                {"Elbow Flare Left",0.1},
+                {"Hip Angle Right",0.5},
+                {"Hip Angle Left",0.5},
+                {"Shoulder Angle Right",0.5},
+                {"Shoulder Angle Left",0.5},
+                {"Wrist Angle Right",0.5},
+                {"Wrist Angle Left",0.5},
+                {"Forearm Abduciton Right", 0.5}
+		    };
+        }
+
     }
 }

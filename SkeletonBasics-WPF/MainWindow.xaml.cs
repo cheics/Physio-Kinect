@@ -759,10 +759,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 break;
                         }
 
-                        F1Graph.Visible.X.Equals(0);
-                        F1Graph.Visible.Y.Equals(0);
-                        F1Graph.Width.Equals(400);
-                        F1Graph.Height.Equals(100);
+                        //F1Graph.Visible.X.Equals(0);
+                        //F1Graph.Visible.Y.Equals(0);
+                        //F1Graph.Width.Equals(400);
+                        //F1Graph.Height.Equals(100);
 
 						foreach (Joint joint in skel_1.Joints)
                         {
