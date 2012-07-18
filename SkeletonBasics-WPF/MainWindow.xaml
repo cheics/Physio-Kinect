@@ -75,22 +75,24 @@
             <Viewbox Grid.Column="0" Stretch="Uniform" HorizontalAlignment="Center">
                 <Image Name="ColorImage" Width="200" Height="200"/>
             </Viewbox>
-            <Viewbox Grid.Column="1" Stretch="Uniform" HorizontalAlignment="Center">
-                <Grid Margin="0 0 0 0">
+            
+                <Grid Grid.Column="1" HorizontalAlignment="Center" Margin="0 0 0 0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Label Name="X" Grid.Row="0" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">X: N/A</Label>
+                    <Label Name="X" Width="Auto" Height="Auto" Grid.Row="0" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">X: N/A</Label>
                     <Label Name="Y" Grid.Row="1" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">Y: N/A</Label>
                     <Label Name="Z" Grid.Row="2" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">Z: N/A</Label>
                     <ComboBox Grid.Row="3" Background="White" FontSize="24" Margin="0 10 0 0" Name="Joints" SelectionChanged="Joints_SelectionChanged" />
                     <ComboBox Grid.Row="4" Name="cmbExer" Background="White" FontSize="24"  Margin="0,10,0,0" />
+                    <Button Height="40" Width="75"  Grid.Row="5" Background="#505050" FontSize="14" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Reload" Name="button1" Click="button1_Click" />
                 </Grid>
-            </Viewbox>
+            
 
             <Viewbox Grid.Column="2" Stretch="Uniform" HorizontalAlignment="Center">
                 <Image Name="VBLiveSkeleton" Width="50" Height="50"/>
@@ -113,7 +115,7 @@
                         <d3:HorizontalIntegerAxis Name="Time1"/>
                     </d3:ChartPlotter.HorizontalAxis>
                     <d3:ChartPlotter.VerticalAxis >
-                        <d3:VerticalIntegerAxis Name="Feature1"/>
+                        <d3:VerticalAxis Name="Feature1"/>
                     </d3:ChartPlotter.VerticalAxis>
                     <d3:VerticalAxisTitle FontFamily="Arial" Name="G1Vertical" FontSize="10"/>
                     <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="12"/>
@@ -126,7 +128,7 @@
                         <d3:HorizontalIntegerAxis Name="Time2"/>
                     </d3:ChartPlotter.HorizontalAxis>
                     <d3:ChartPlotter.VerticalAxis >
-                        <d3:VerticalIntegerAxis Name="Feature2"/>
+                        <d3:VerticalAxis Name="Feature2"/>
                     </d3:ChartPlotter.VerticalAxis>
                     <d3:VerticalAxisTitle FontFamily="Arial" Name="G2Vertical" FontSize="10"/>
                     <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="12"/>
@@ -166,7 +168,7 @@
                 </StatusBarItem>
             </StatusBar>
             <CheckBox DockPanel.Dock="Left" Content="Baseline?" Height="16" Name="baseline" VerticalAlignment="Top"/>
-            <Button DockPanel.Dock="Top" Background="#505050" FontSize="10" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Reload" Height="20" Name="button1" Width="75" Click="button1_Click" />
+            
         </DockPanel>
 
     </Grid>

@@ -47,6 +47,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         ArrayList Feature2Data = new ArrayList();
         ArrayList Feature3Data = new ArrayList();
 
+        ArrayList feature1Train = new ArrayList();
+        ArrayList feature2Train = new ArrayList();
+        ArrayList feature3Train = new ArrayList();
+
         ArrayList TimeData = new ArrayList();
 
         // Database connection strings
@@ -70,6 +74,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         private Dictionary<string, int> jointMapping;
         private Dictionary<string, Joint> jointMapping1;
+        private Dictionary<string, Joint> jointMapping2;
         /// <summary>
         /// Width of output drawing
         /// </summary>
@@ -267,6 +272,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             int i = 0;
             jointMapping = new Dictionary<string, int>();
             jointMapping1 = new Dictionary<string, Joint>();
+            jointMapping2 = new Dictionary<string, Joint>();
 
             foreach (Joint joint in skeleton.Joints)
             {
@@ -338,7 +344,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
             else
             {
-                //GetCameraPoint(first, e); 
+                GetCameraPoint(first, e); 
             }
             //throw new System.NotImplementedException();
         }
@@ -382,8 +388,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 //Map a joint location to a point on the depth map
                 //head
                 //if(first.Joints[JointType.AnkleLeft].Position != null)
-                DepthImagePoint AnkleLeftDepthPoint =
-                    depth.MapFromSkeletonPoint(first.Joints[JointType.AnkleLeft].Position);
+                if (depth != null) { 
+                DepthImagePoint AnkleLeftDepthPoint = new DepthImagePoint();
+                   AnkleLeftDepthPoint =  depth.MapFromSkeletonPoint(first.Joints[JointType.AnkleLeft].Position);
                 DepthImagePoint AnkleRightDepthPoint =
                     depth.MapFromSkeletonPoint(first.Joints[JointType.AnkleRight].Position);
                 DepthImagePoint ElbowLeftDepthPoint =
@@ -422,7 +429,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     depth.MapFromSkeletonPoint(first.Joints[JointType.WristLeft].Position);
                 DepthImagePoint WristRightDepthPoint =
                     depth.MapFromSkeletonPoint(first.Joints[JointType.WristRight].Position);
-
+                
                 //Map a depth point to a point on the color image
                 //head
                 ColorImagePoint AnkleLeftColorPoint =
@@ -504,6 +511,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 ColorImagePoint WristRightColorPoint =
                     depth.MapToColorImagePoint(WristRightDepthPoint.X, WristRightDepthPoint.Y,
                     ColorImageFormat.RgbResolution640x480Fps30);
+                    
 
 
                 foreach (Joint joint in first.Joints)
@@ -512,8 +520,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         joint.JointType.ToString() + "X" + "," +
                         joint.JointType.ToString() + "Y";
                 }
+                DateTime now = DateTime.Now;
+                    
+                string date = "'" + now.Year.ToString() + "-" + now.Month.ToString() + "-" + now.Day.ToString() + " " +
+                    now.Hour.ToString() + ":" +
+                    now.Minute.ToString() + ":" +
+                    now.Second.ToString() + "'";
 
                 values = depth.FrameNumber.ToString() + "," +
+                    date + "," +
                     HipCenterColorPoint.X.ToString() + "," + HipCenterColorPoint.Y.ToString() + "," +
                     SpineColorPoint.X.ToString() + "," + SpineColorPoint.Y.ToString() + "," +
                     ShoulderCenterColorPoint.X.ToString() + "," + ShoulderCenterColorPoint.Y.ToString() + "," +
@@ -535,11 +550,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     AnkleRightColorPoint.X.ToString() + "," + AnkleRightColorPoint.Y.ToString() + "," +
                     FootRightColorPoint.X.ToString() + "," + FootRightColorPoint.Y.ToString();
 
-                command.CommandText = "INSERT INTO dbkinect.kinectcolorimagedata (Timestamp " + command.CommandText + ") VALUE ("
+                command.CommandText = "INSERT INTO dbkinect.kinectcolorimagedata (Timestamp, Created_at " + command.CommandText + ") VALUE ("
                        + values + ")";
                 Reader = command.ExecuteReader();
                 Reader.Close();
-
+                }
 
                 //Set location
                 //CameraPosition(headImage, headColorPoint);
@@ -737,11 +752,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         }
                         string testing = null;
 
-                        //for(int i = 0; i < featureFrame.featureValues.Count; i++)
-                        //{
-                            
-                        //    testing = "," + testing + featureFrame.featureValues[i].ToString();
-                        //}
 
                         foreach (string stringKey in featureFrame.featureValues.Keys)
                         {
@@ -802,7 +812,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                         if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 15) == 0)
                         {
-                            Make_Graph();
+                            //Make_Graph();
                         }
                     }
                 }
@@ -1248,8 +1258,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     visibleReact3 = new Rect(0, -10, 400, 190);
                     break;
                 case 1:
-                    visibleReact1 = new Rect(0, 30, 400, 30);
-                    visibleReact2 = new Rect(0, 10, 400, 40);
+                    visibleReact1 = new Rect(0, 0, 400, 60);
+                    visibleReact2 = new Rect(0, 0, 400, 50);
                     visibleReact3 = new Rect(0, -5, 400, 75);
                     break;
                 case 2:
@@ -1297,6 +1307,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
+            Skeleton TrainSkel = new Skeleton();
+            SkeletonPoint sp = new SkeletonPoint();
+            Dictionary<string, Joint> jointMappingFinal = new Dictionary<string, Joint>();
+
             // get skeleton data from database
             MySqlConnection con = new MySqlConnection(MyConString);
             MySqlCommand cmd = con.CreateCommand();
@@ -1317,6 +1331,62 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 }
                 dt.Rows.Add(newRow);
             }
+            //for (int i = 0; i < dt.Rows.Count; i++)
+            //{
+            //foreach (KeyValuePair<string, Joint> entry in jointMapping1)
+            //{
+            //    sp.X = (float)Convert.ToDecimal(dt.Rows[i][entry.Key + "X"]);
+            //    sp.Y = (float)Convert.ToDecimal(dt.Rows[i][entry.Key + "Y"]);
+            //    sp.Z = (float)Convert.ToDecimal(dt.Rows[i][entry.Key + "Z"]);
+
+            //    Joint joint = new Joint();
+            //    joint = entry.Value;
+            //    joint.Position = sp;
+            //    //jointMappingFinal.Add(entry.Key, joint);
+
+            //    TrainSkel.Joints[joint.JointType] = joint;
+            //}
+            //Joint Head = new Joint();
+            //if (jointMappingFinal.TryGetValue("Head", out Head)) { }
+            //Joint ShoulderCenter = new Joint();
+            //if (jointMappingFinal.TryGetValue("ShoulderCenter", out ShoulderCenter)) { }
+            //Joint ShoulderLeft = new Joint();
+            //if (jointMappingFinal.TryGetValue("ShoulderLeft", out ShoulderLeft)) { }
+            //Joint ShoulderRight = new Joint();
+            //if (jointMappingFinal.TryGetValue("ShoulderRight", out ShoulderRight)) { }
+            //Joint Spine = new Joint();
+            //if (jointMappingFinal.TryGetValue("Spine", out Spine)) { }
+            //Joint HipCenter = new Joint();
+            //if (jointMappingFinal.TryGetValue("HipCenter", out HipCenter)) { }
+            //Joint HipLeft = new Joint();
+            //if (jointMappingFinal.TryGetValue("HipLeft", out HipLeft)) { }
+            //Joint HipRight = new Joint();
+            //if (jointMappingFinal.TryGetValue("HipRight", out HipRight)) { }
+            //Joint ElbowLeft = new Joint();
+            //if (jointMappingFinal.TryGetValue("ElbowLeft", out ElbowLeft)) { }
+            //Joint WristLeft = new Joint();
+            //if (jointMappingFinal.TryGetValue("WristLeft", out WristLeft)) { }
+            //Joint HandLeft = new Joint();
+            //if (jointMappingFinal.TryGetValue("HandLeft", out HandLeft)) { }
+            //Joint ElbowRight = new Joint();
+            //if (jointMappingFinal.TryGetValue("ElbowRight", out ElbowRight)) { }
+            //Joint WristRight = new Joint();
+            //if (jointMappingFinal.TryGetValue("WristRight", out WristRight)) { }
+            //Joint HandRight = new Joint();
+            //if (jointMappingFinal.TryGetValue("HandRight", out HandRight)) { }
+            //Joint KneeLeft = new Joint();
+            //if (jointMappingFinal.TryGetValue("KneeLeft", out KneeLeft)) { }
+            //Joint AnkleLeft = new Joint();
+            //if (jointMappingFinal.TryGetValue("AnkleLeft", out AnkleLeft)) { }
+            //Joint FootLeft = new Joint();
+            //if (jointMappingFinal.TryGetValue("FootLeft", out FootLeft)) { }
+            //Joint KneeRight = new Joint();
+            //if (jointMappingFinal.TryGetValue("KneeRight", out KneeRight)) { }
+            //Joint AnkleRight = new Joint();
+            //if (jointMappingFinal.TryGetValue("AnkleRight", out AnkleRight)) { }
+            //Joint FootRight = new Joint();
+            //if (jointMappingFinal.TryGetValue("FootRight", out FootRight)) { 
+
             dr.Close();
             tableCounter = 1;
         }
