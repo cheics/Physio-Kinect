@@ -294,11 +294,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             MySqlConnection con = new MySqlConnection(MyConString);
             MySqlCommand cmd = con.CreateCommand();
             cmd.CommandText = "select * from dbkinect.kinectdata where UserFirst = '" + firstName.Text.ToString() +
-                "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='0' and Exercise = '" + cmbExer.SelectedValue.ToString() + "' limit 1000";
+                "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='1' and Exercise = '" + cmbExer.SelectedValue.ToString() + "' limit 500";
 
             con.Open();
             MySqlDataReader dr = cmd.ExecuteReader();
-
+            
             while (dr.Read())
             {
                 DataRow newRow = dt.NewRow();
@@ -735,6 +735,19 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                         }
+                        string testing = null;
+
+                        //for(int i = 0; i < featureFrame.featureValues.Count; i++)
+                        //{
+                            
+                        //    testing = "," + testing + featureFrame.featureValues[i].ToString();
+                        //}
+
+                        foreach (string stringKey in featureFrame.featureValues.Keys)
+                        {
+                           testing = "," + stringKey.ToString();
+                        }
+
 
                         foreach (Joint joint in skel_1.Joints)
                         {
