@@ -65,7 +65,7 @@
                 <ColumnDefinition MinWidth="50" Width="50*"/>
             </Grid.ColumnDefinitions>
 
-<!--  
+            <!--  
             <Canvas Name="MainCanvas" Grid.Column="0">
                     <Ellipse Canvas.Top="0" Canvas.Left="0" Height="20" Name="leftEllipse"  Width="20" Fill="#FF3285AA" Opacity="1" Stroke="White" />
                     <Ellipse Canvas.Top="0" Canvas.Left="0" Fill="#FF3285AA" Height="20" Name="rightEllipse" Width="20" Opacity="1" Stroke="White" />
@@ -76,29 +76,29 @@
                 <Image Name="ColorImage" Width="200" Height="200"/>
             </Viewbox>
             <Viewbox Grid.Column="1" Stretch="Uniform" HorizontalAlignment="Center">
-            <Grid Margin="0 0 0 0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                <Grid Margin="0 0 0 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                <Label Name="X" Grid.Row="0" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">X: N/A</Label>
-                <Label Name="Y" Grid.Row="1" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">Y: N/A</Label>
-                <Label Name="Z" Grid.Row="2" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">Z: N/A</Label>
-                <ComboBox Grid.Row="3" Background="White" FontSize="24" Margin="0 10 0 0" Name="Joints" SelectionChanged="Joints_SelectionChanged" />
-                <ComboBox Grid.Row="4" Name="cmbExer" Background="White" FontSize="24"  Margin="0,10,0,0" />
+                    <Label Name="X" Grid.Row="0" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">X: N/A</Label>
+                    <Label Name="Y" Grid.Row="1" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">Y: N/A</Label>
+                    <Label Name="Z" Grid.Row="2" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">Z: N/A</Label>
+                    <ComboBox Grid.Row="3" Background="White" FontSize="24" Margin="0 10 0 0" Name="Joints" SelectionChanged="Joints_SelectionChanged" />
+                    <ComboBox Grid.Row="4" Name="cmbExer" Background="White" FontSize="24"  Margin="0,10,0,0" />
                 </Grid>
             </Viewbox>
-            
+
             <Viewbox Grid.Column="2" Stretch="Uniform" HorizontalAlignment="Center">
                 <Image Name="VBLiveSkeleton" Width="50" Height="50"/>
             </Viewbox>
             <Viewbox Grid.Column="3" Stretch="Uniform" HorizontalAlignment="Center">
                 <Image Name="RecSkeleton" Width="50" Height="50"/>
             </Viewbox>
-            
+
         </Grid>
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
@@ -107,41 +107,41 @@
                 <ColumnDefinition MinWidth="50" Width="50*"/>
             </Grid.ColumnDefinitions>
             <Viewbox Grid.Column="0" Stretch="Uniform" HorizontalAlignment="Center">
-                
-                <d3:ChartPlotter Name="F1Graph" Margin="5,0,0,5" LegendVisible="False">
+
+                <d3:ChartPlotter Name="F1Graph" Margin="5,0,0,5" LegendVisible="False" BorderBrush="#FF000095" FontSize="10" Background="White">
                     <d3:ChartPlotter.HorizontalAxis>
-                        <d3:HorizontalAxis Name="Time1"/>
+                        <d3:HorizontalIntegerAxis Name="Time1"/>
                     </d3:ChartPlotter.HorizontalAxis>
                     <d3:ChartPlotter.VerticalAxis >
                         <d3:VerticalIntegerAxis Name="Feature1"/>
                     </d3:ChartPlotter.VerticalAxis>
                     <d3:VerticalAxisTitle FontFamily="Arial" Name="G1Vertical" FontSize="10"/>
-                    <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="14"/>
+                    <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="12"/>
                 </d3:ChartPlotter>
-                
+
             </Viewbox>
             <Viewbox Grid.Column="1" Stretch="Uniform" HorizontalAlignment="Center">
-                <d3:ChartPlotter Name="F2Graph" Margin="5,0,0,5" LegendVisible="False" >
-                        <d3:ChartPlotter.HorizontalAxis>
-                            <d3:HorizontalIntegerAxis Name="Time2"/>
-                        </d3:ChartPlotter.HorizontalAxis>
-                        <d3:ChartPlotter.VerticalAxis >
-                            <d3:VerticalIntegerAxis Name="Feature2"/>
-                        </d3:ChartPlotter.VerticalAxis>
-                        <d3:VerticalAxisTitle FontFamily="Arial" Name="G2Vertical" FontSize="10"/>
-                        <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="14"/>
-                    </d3:ChartPlotter>
+                <d3:ChartPlotter Name="F2Graph" Margin="5,0,0,5" BorderBrush="#FF000095" FontSize="10" Background="White" >
+                    <d3:ChartPlotter.HorizontalAxis>
+                        <d3:HorizontalIntegerAxis Name="Time2"/>
+                    </d3:ChartPlotter.HorizontalAxis>
+                    <d3:ChartPlotter.VerticalAxis >
+                        <d3:VerticalIntegerAxis Name="Feature2"/>
+                    </d3:ChartPlotter.VerticalAxis>
+                    <d3:VerticalAxisTitle FontFamily="Arial" Name="G2Vertical" FontSize="10"/>
+                    <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="12"/>
+                </d3:ChartPlotter>
             </Viewbox>
             <Viewbox Grid.Column="2" Stretch="Uniform" HorizontalAlignment="Center">
-                <d3:ChartPlotter Name="F3Graph" Margin="5,0,0,5" LegendVisible="False" >
+                <d3:ChartPlotter Name="F3Graph" Margin="5,0,0,5" BorderBrush="#FF000095" FontSize="10" Background="White" >
                     <d3:ChartPlotter.HorizontalAxis>
                         <d3:HorizontalIntegerAxis Name="Time3"/>
                     </d3:ChartPlotter.HorizontalAxis>
                     <d3:ChartPlotter.VerticalAxis >
-                        <d3:VerticalIntegerAxis Name="Feature3"/>
+                        <d3:VerticalAxis Name="Feature3"/>
                     </d3:ChartPlotter.VerticalAxis>
                     <d3:VerticalAxisTitle FontFamily="Arial" Name="G3Vertical" FontSize="10"/>
-                    <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="14"/>
+                    <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="12"/>
                 </d3:ChartPlotter>
             </Viewbox>
         </Grid>
@@ -151,16 +151,23 @@
             <TextBlock DockPanel.Dock="Right" Margin="0 0 -1 0" VerticalAlignment="Bottom" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Segoe UI" FontSize="18">PhysioKinect</TextBlock>
             <Image Grid.Column="1" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Center" Margin="0 0 0 5"/>
         </DockPanel>
- 
-        <CheckBox Grid.Row="5" Style="{StaticResource SquareCheckBox}" Content="Seated Mode" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 10 10 10" Name="checkBoxSeatedMode" Checked="CheckBoxSeatedModeChanged" Unchecked="CheckBoxSeatedModeChanged"/>
-        <DockPanel Grid.Row="3">
-        <StatusBar DockPanel.Dock="Right" Grid.Row="3" HorizontalAlignment="Stretch" Name="statusBar" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
-            <StatusBarItem Padding="0 0 0 10">
-                <TextBlock Name="statusBarText" Margin="-1 0 0 0">Click 'Seated' to change skeletal pipeline type!</TextBlock>
-            </StatusBarItem>
-        </StatusBar>
-            <CheckBox DockPanel.Dock="Left" Content="Baseline?" Height="16" Name="baseline" VerticalAlignment="Top"/>
+        <DockPanel Grid.Row="5">
+            <CheckBox Style="{StaticResource SquareCheckBox}" Content="Seated Mode" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 10 10 10" Name="checkBoxSeatedMode" Checked="CheckBoxSeatedModeChanged" Unchecked="CheckBoxSeatedModeChanged"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                <TextBox   Height="23" HorizontalAlignment="Left" Name="firstName" Width="120" Text="First"/>
+                <TextBox   Height="23" HorizontalAlignment="Left" Name="lastName" Width="120" Text="Last"/>
+            </StackPanel>
         </DockPanel>
-        <Button Content="Graph" Height="26" HorizontalAlignment="Left" Margin="253,6,0,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click" Grid.Row="5" />
+
+        <DockPanel Grid.Row="3">
+            <StatusBar DockPanel.Dock="Right" Grid.Row="3" HorizontalAlignment="Stretch" Name="statusBar" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
+                <StatusBarItem Padding="0 0 0 10">
+                    <TextBlock Name="statusBarText" Margin="-1 0 0 0">Click 'Seated' to change skeletal pipeline type!</TextBlock>
+                </StatusBarItem>
+            </StatusBar>
+            <CheckBox DockPanel.Dock="Left" Content="Baseline?" Height="16" Name="baseline" VerticalAlignment="Top"/>
+            <Button DockPanel.Dock="Top" Background="#505050" FontSize="10" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Reload" Height="20" Name="button1" Width="75" Click="button1_Click" />
+        </DockPanel>
+
     </Grid>
 </Window>

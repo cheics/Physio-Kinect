@@ -1,27 +1,27 @@
 ﻿namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Text;
-	using System.Windows.Media.Media3D;
-	using Microsoft.Samples.Kinect.SkeletonBasics.ExerciseClass;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Windows.Media.Media3D;
+    using Microsoft.Samples.Kinect.SkeletonBasics.ExerciseClass;
 
-	using Microsoft.Kinect;
+    using Microsoft.Kinect;
 
-	public struct FeatureData 
-	{
-		public string exName;
-		public string[] bestFeatures;
-		public Dictionary<String, Double> featureValues;
+    public struct FeatureData
+    {
+        public string exName;
+        public string[] bestFeatures;
+        public Dictionary<String, Double> featureValues;
 
-		public FeatureData(String exName, String[] bestFeatures, Dictionary<String, Double> featureValues) 
-		{
-			this.exName=exName;
-			this.bestFeatures = bestFeatures;
-			this.featureValues = featureValues;
-		}
-	}
+        public FeatureData(String exName, String[] bestFeatures, Dictionary<String, Double> featureValues)
+        {
+            this.exName = exName;
+            this.bestFeatures = bestFeatures;
+            this.featureValues = featureValues;
+        }
+    }
 
 
     public partial class FeatureDefinition
@@ -51,7 +51,7 @@
 
         public FeatureData GetScores(ExersizeType exersizeName)
         {
-            return new FeatureData(exersizeName.exName, featureHelper.BestFeatures(exersizeName), AllScores());
+            return new FeatureData(exersizeName.exName, featureHelper.BestFeatures(exersizeName), AllThresholds());
         }
 
         private Dictionary<String, double> AllFeatures()
@@ -63,6 +63,8 @@
                 {"Spine Angle Sagittal",f_spineAngle_S()},
                 {"Knee Angle Right",f_kneeAngle_R()},
                 {"Knee Angle Left",f_kneeAngle_L()},
+                {"Knee Flare Right",f_kneeFlare_R()},
+                {"Knee Flare Left",f_kneeFlare_L()},
                 {"Elbow Angle Right",f_elbowAngle_R()},
                 {"Elbow Angle Left",f_elbowAngle_L()},
                 {"Elbow Flare Right",f_elbowFlare_R()},

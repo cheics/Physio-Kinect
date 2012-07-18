@@ -7,7 +7,7 @@
 namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
     using System;
-    
+
     using System.IO;
     using System.Linq;
     using System.Collections;
@@ -18,11 +18,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using System.Windows.Media.Imaging;
     using System.Windows.Controls;
     using System.Data;
-    
+
     using System.Text.RegularExpressions;
     using System.Collections.Generic;
-    
-    
+
+
     using Microsoft.Kinect;
     using Microsoft.Samples.Kinect.WpfViewers;
     using Microsoft.Samples.Kinect.SkeletonBasics;
@@ -43,11 +43,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         int tableCounter = 1;
         int ArraySize = 400;
 
-        ArrayList Feature1Data=new ArrayList();
+        ArrayList Feature1Data = new ArrayList();
         ArrayList Feature2Data = new ArrayList();
-        ArrayList Feature3Data = new ArrayList();       
+        ArrayList Feature3Data = new ArrayList();
+
         ArrayList TimeData = new ArrayList();
-        
+
         // Database connection strings
         private string selectedJoint;
         private string MyConString = "SERVER=localhost;" +
@@ -66,8 +67,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         typeof(KinectSensor),
         typeof(MainWindow),
         new PropertyMetadata(null));
-
-        private readonly MainWindowViewModel viewModel;
 
         private Dictionary<string, int> jointMapping;
         private Dictionary<string, Joint> jointMapping1;
@@ -144,30 +143,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// </summary>
         public MainWindow()
         {
-            
-            this.viewModel = new MainWindowViewModel();
 
-            // The KinectSensorManager class is a wrapper for a KinectSensor that adds
-            // state logic and property change/binding/etc support, and is the data model
-            // for KinectDiagnosticViewer.
-            this.viewModel.KinectSensorManager = new KinectSensorManager();
-
-            Binding sensorBinding = new Binding("KinectSensor");
-            sensorBinding.Source = this;
-            BindingOperations.SetBinding(this.viewModel.KinectSensorManager, KinectSensorManager.KinectSensorProperty, sensorBinding);
-
-            // Attempt to turn on Skeleton Tracking for each Kinect Sensor
-            this.viewModel.KinectSensorManager.SkeletonStreamEnabled = true;
-            this.DataContext = this.viewModel;
-            
             newPath = System.IO.Path.Combine(activeDir, "mehrad");
             System.IO.Directory.CreateDirectory(newPath);
             string newFileName = "colorStream.avi";
             newPath = System.IO.Path.Combine(newPath, newFileName);
-            
+
             InitializeComponent();
         }
-        const int skeletonCount = 6; 
+        const int skeletonCount = 6;
         Skeleton[] allSkeletons = new Skeleton[skeletonCount];
 
         /// <summary>
@@ -258,7 +242,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.sensor.DepthStream.Enable();
                 this.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
                 this.sensor.AllFramesReady += new System.EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
-                
+
 
                 // Add an event handler to be called whenever there is new color frame data
                 this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
@@ -279,19 +263,19 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
 
             Skeleton skeleton = new Skeleton();
-            
+
             int i = 0;
             jointMapping = new Dictionary<string, int>();
             jointMapping1 = new Dictionary<string, Joint>();
-            
+
             foreach (Joint joint in skeleton.Joints)
             {
                 Joint refJoint = new Joint();
                 string name = joint.JointType.ToString();
                 jointMapping1.Add(name, refJoint);
-                dt.Columns.Add(name+"X", typeof(Decimal));
-                dt.Columns.Add(name+"Y", typeof(Decimal));
-                dt.Columns.Add(name+"Z", typeof(Decimal));
+                dt.Columns.Add(name + "X", typeof(Decimal));
+                dt.Columns.Add(name + "Y", typeof(Decimal));
+                dt.Columns.Add(name + "Z", typeof(Decimal));
                 name = Regex.Replace(name, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
                 this.Joints.Items.Add(name);
                 this.jointMapping.Add(name, i);
@@ -309,7 +293,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // get skeleton data from database
             MySqlConnection con = new MySqlConnection(MyConString);
             MySqlCommand cmd = con.CreateCommand();
-            cmd.CommandText = "select * from dbkinect.kinectdata";
+            cmd.CommandText = "select * from dbkinect.kinectdata where UserFirst = '" + firstName.Text.ToString() +
+                "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='0' and Exercise = '" + cmbExer.SelectedValue.ToString() + "' limit 1000";
 
             con.Open();
             MySqlDataReader dr = cmd.ExecuteReader();
@@ -317,7 +302,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             while (dr.Read())
             {
                 DataRow newRow = dt.NewRow();
-                for(int j=0; j<dt.Columns.Count;j++)
+                for (int j = 0; j < dt.Columns.Count; j++)
                 {
                     string columnName = dt.Columns[j].ColumnName;
                     newRow[columnName] = Convert.ToDecimal(dr[columnName]);
@@ -329,8 +314,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
 
         void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
-        {     
-           using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
+        {
+            using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
                 if (colorFrame == null)
                 {
@@ -339,24 +324,24 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                 byte[] pixels = new byte[colorFrame.PixelDataLength];
                 colorFrame.CopyPixelDataTo(pixels);
-               
+
                 int stride = colorFrame.Width * 4;
                 ColorImage.Source = BitmapSource.Create(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
 
             }
 
-           Skeleton first = GetFirstSkeleton(e);
+            Skeleton first = GetFirstSkeleton(e);
 
-           if (first == null)
-           {
-               return;
-           }
-           else 
-           {
-            //GetCameraPoint(first, e); 
-           }
+            if (first == null)
+            {
+                return;
+            }
+            else
+            {
+                //GetCameraPoint(first, e); 
+            }
             //throw new System.NotImplementedException();
-       }
+        }
 
         public KinectSensor KinectSensor
         {
@@ -372,7 +357,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 {
                     return null;
                 }
-                
+
                 skeletonFrameData.CopySkeletonDataTo(allSkeletons);
 
                 //get the first tracked skeleton
@@ -482,8 +467,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                 ColorImagePoint HipCenterColorPoint =
                     depth.MapToColorImagePoint(HipCenterDepthPoint.X, HipCenterDepthPoint.Y,
-                    ColorImageFormat.RgbResolution640x480Fps30);           
-    
+                    ColorImageFormat.RgbResolution640x480Fps30);
+
                 ColorImagePoint HipLeftColorPoint =
                     depth.MapToColorImagePoint(HipLeftDepthPoint.X, HipLeftDepthPoint.Y,
                     ColorImageFormat.RgbResolution640x480Fps30);
@@ -520,15 +505,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     depth.MapToColorImagePoint(WristRightDepthPoint.X, WristRightDepthPoint.Y,
                     ColorImageFormat.RgbResolution640x480Fps30);
 
-                
-                foreach (Joint joint in first.Joints)
-                       {
-                           command.CommandText = command.CommandText + "," +
-                               joint.JointType.ToString() + "X" + "," +
-                               joint.JointType.ToString() + "Y";
-                       }
 
-                values = depth.FrameNumber.ToString()+ "," + 
+                foreach (Joint joint in first.Joints)
+                {
+                    command.CommandText = command.CommandText + "," +
+                        joint.JointType.ToString() + "X" + "," +
+                        joint.JointType.ToString() + "Y";
+                }
+
+                values = depth.FrameNumber.ToString() + "," +
                     HipCenterColorPoint.X.ToString() + "," + HipCenterColorPoint.Y.ToString() + "," +
                     SpineColorPoint.X.ToString() + "," + SpineColorPoint.Y.ToString() + "," +
                     ShoulderCenterColorPoint.X.ToString() + "," + ShoulderCenterColorPoint.Y.ToString() + "," +
@@ -543,23 +528,23 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     HandRightColorPoint.X.ToString() + "," + HandRightColorPoint.Y.ToString() + "," +
                     HipLeftColorPoint.X.ToString() + "," + HipLeftColorPoint.Y.ToString() + "," +
                     KneeLeftDepthColorPoint.X.ToString() + "," + KneeLeftDepthColorPoint.Y.ToString() + "," +
-                    AnkleLeftColorPoint.X.ToString() + "," + AnkleLeftColorPoint.Y.ToString()+"," +
-                    FootLeftColorPoint.X.ToString() +"," + FootLeftColorPoint.Y.ToString() + ","+
-                    HipRightColorPoint.X.ToString() +"," + HipRightColorPoint.Y.ToString() +","+
+                    AnkleLeftColorPoint.X.ToString() + "," + AnkleLeftColorPoint.Y.ToString() + "," +
+                    FootLeftColorPoint.X.ToString() + "," + FootLeftColorPoint.Y.ToString() + "," +
+                    HipRightColorPoint.X.ToString() + "," + HipRightColorPoint.Y.ToString() + "," +
                     KneeRightColorPoint.X.ToString() + "," + KneeRightColorPoint.Y.ToString() + "," +
-                    AnkleRightColorPoint.X.ToString() + "," + AnkleRightColorPoint.Y.ToString() + ","+
+                    AnkleRightColorPoint.X.ToString() + "," + AnkleRightColorPoint.Y.ToString() + "," +
                     FootRightColorPoint.X.ToString() + "," + FootRightColorPoint.Y.ToString();
 
                 command.CommandText = "INSERT INTO dbkinect.kinectcolorimagedata (Timestamp " + command.CommandText + ") VALUE ("
-                       + values+")";
-                    Reader = command.ExecuteReader();
-                    Reader.Close();
-                
+                       + values + ")";
+                Reader = command.ExecuteReader();
+                Reader.Close();
+
 
                 //Set location
                 //CameraPosition(headImage, headColorPoint);
-               // CameraPosition(leftEllipse, leftColorPoint);
-               // CameraPosition(rightEllipse, rightColorPoint);
+                // CameraPosition(leftEllipse, leftColorPoint);
+                // CameraPosition(rightEllipse, rightColorPoint);
             }
         }
 
@@ -567,7 +552,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             //Divide by 2 for width and height so point is right in the middle 
             // instead of in top/left corner
-            
+
             Canvas.SetLeft(element, point.X - element.Width / 2);
             Canvas.SetTop(element, point.Y - element.Height / 2);
 
@@ -583,7 +568,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             //Canvas.SetLeft(element, scaledJoint.Position.X);
             //Canvas.SetTop(element, scaledJoint.Position.Y);
 
-        }           
+        }
 
         /// <summary>
         /// Execute shutdown tasks
@@ -612,52 +597,43 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             MySqlCommand command = connection.CreateCommand();
             MySqlDataReader Reader;
             connection.Open();
-            string values =null;
-             
+            string values = null;
+
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
             {
                 if (skeletonFrame != null)
                 {
-					
-                    double[] TempF1Data = new double[ArraySize+1];
-                    double[] TempF2Data = new double[ArraySize+1];
-                    double[] TempF3Data = new double[ArraySize+1];
-
-                    //Feature1Data.CopyTo(TempF1Data, 1);
-                    //Feature2Data.CopyTo(TempF2Data, 1);
-                    //Feature3Data.CopyTo(TempF3Data, 1);
 
                     skeletons = new Skeleton[skeletonFrame.SkeletonArrayLength];
                     skeletonFrame.CopySkeletonDataTo(skeletons);
 
                     //get the first tracked skeleton
                     Skeleton skel_1 = (from s in skeletons
-                                      where s.TrackingState == SkeletonTrackingState.Tracked
-                                      select s).FirstOrDefault();
+                                       where s.TrackingState == SkeletonTrackingState.Tracked
+                                       select s).FirstOrDefault();
 
-                    // creating commands for MySQL                  
-					if (skel_1 != null)
+                    if (skel_1 != null)
                     {
-						// Colin Code // Mehrad code now! 
+                        // Colin Code // Mehrad code now! 
 
-            featureDefinition.StoreSkeletonFrame(skel_1);
-            FeatureData featureFrame;
-            Rectangle graphRange = new Rectangle();
+                        featureDefinition.StoreSkeletonFrame(skel_1);
+                        FeatureData featureFrame;
+                        Rectangle graphRange = new Rectangle();
 
-                        switch(cmbExer.SelectedIndex)
+                        switch (cmbExer.SelectedIndex)
                         {
                             case 0:
                                 ExerciseClass.EX_Squat squat = new ExerciseClass.EX_Squat();
                                 featureFrame = featureDefinition.GetFeatures(squat);
                                 Feature1Data.RemoveAt(0);
-						        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-                                
-						        Feature2Data.RemoveAt(0);
-						        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
-                                
+                                Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
 
-						        Feature3Data.RemoveAt(0);
-						        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                Feature2Data.RemoveAt(0);
+                                Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+
+                                Feature3Data.RemoveAt(0);
+                                Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
 
 
                                 G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
@@ -668,13 +644,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 ExerciseClass.EX_HipAbduction hipAbduction = new ExerciseClass.EX_HipAbduction();
                                 featureFrame = featureDefinition.GetFeatures(hipAbduction);
                                 Feature1Data.RemoveAt(0);
-						        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+                                Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
 
-						        Feature2Data.RemoveAt(0);
-						        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+                                Feature2Data.RemoveAt(0);
+                                Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
 
-						        Feature3Data.RemoveAt(0);
-						        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                Feature3Data.RemoveAt(0);
+                                Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
                                 G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
                                 G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
                                 G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
@@ -684,28 +660,29 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 featureFrame = featureDefinition.GetFeatures(shoulderRaise);
 
                                 Feature1Data.RemoveAt(0);
-						        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+                                Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
 
-						        Feature2Data.RemoveAt(0);
-						        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                Feature2Data.RemoveAt(0);
+                                Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
 
-						        Feature3Data.RemoveAt(0);
-						        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[3]]);
+                                Feature3Data.RemoveAt(0);
+                                Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[3]]);
+
                                 G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
-                                G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
-                                G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
+                                G2Vertical.Content = featureFrame.bestFeatures[2].ToString();
+                                G3Vertical.Content = featureFrame.bestFeatures[3].ToString();
                                 break;
                             case 3:
                                 ExerciseClass.EX_LegRaise legRaise = new ExerciseClass.EX_LegRaise();
                                 featureFrame = featureDefinition.GetFeatures(legRaise);
                                 Feature1Data.RemoveAt(0);
-						        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+                                Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
 
-						        Feature2Data.RemoveAt(0);
-						        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+                                Feature2Data.RemoveAt(0);
+                                Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
 
-						        Feature3Data.RemoveAt(0);
-						        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                Feature3Data.RemoveAt(0);
+                                Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
                                 G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
                                 G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
                                 G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
@@ -714,13 +691,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 ExerciseClass.EX_KneeBend kneeBend = new ExerciseClass.EX_KneeBend();
                                 featureFrame = featureDefinition.GetFeatures(kneeBend);
                                 Feature1Data.RemoveAt(0);
-						        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+                                Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
 
-						        Feature2Data.RemoveAt(0);
-						        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+                                Feature2Data.RemoveAt(0);
+                                Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
 
-						        Feature3Data.RemoveAt(0);
-						        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                Feature3Data.RemoveAt(0);
+                                Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
                                 G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
                                 G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
                                 G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
@@ -728,15 +705,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             case 5:
                                 ExerciseClass.EX_ArmAbduction armAbduciton = new ExerciseClass.EX_ArmAbduction();
                                 featureFrame = featureDefinition.GetFeatures(armAbduciton);
-                                
-                                Feature1Data.RemoveAt(0);
-						        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-                                
-						        Feature2Data.RemoveAt(0);
-						        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
 
-						        Feature3Data.RemoveAt(0);
-						        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                Feature1Data.RemoveAt(0);
+                                Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+                                Feature2Data.RemoveAt(0);
+                                Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+                                Feature3Data.RemoveAt(0);
+                                Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
 
                                 G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
                                 G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
@@ -746,41 +723,36 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 armAbduciton = new ExerciseClass.EX_ArmAbduction();
                                 featureFrame = featureDefinition.GetFeatures(armAbduciton);
                                 Feature1Data.RemoveAt(0);
-						        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+                                Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
 
-						        Feature2Data.RemoveAt(0);
-						        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+                                Feature2Data.RemoveAt(0);
+                                Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
 
-						        Feature3Data.RemoveAt(0);
-						        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                Feature3Data.RemoveAt(0);
+                                Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
                                 G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
                                 G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
                                 G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                         }
 
-                        //F1Graph.Visible.X.Equals(0);
-                        //F1Graph.Visible.Y.Equals(0);
-                        //F1Graph.Width.Equals(400);
-                        //F1Graph.Height.Equals(100);
-
-						foreach (Joint joint in skel_1.Joints)
+                        foreach (Joint joint in skel_1.Joints)
                         {
-                            
-								command.CommandText = command.CommandText + "," +
-                                joint.JointType.ToString() + "X" + "," +
-                                joint.JointType.ToString() + "Y" + "," +
-                                joint.JointType.ToString() + "Z";
+
+                            command.CommandText = command.CommandText + "," +
+                            joint.JointType.ToString() + "X" + "," +
+                            joint.JointType.ToString() + "Y" + "," +
+                            joint.JointType.ToString() + "Z";
 
 
                             values = values + "," +
                                 joint.Position.X.ToString() + "," +
                                 joint.Position.Y.ToString() + "," +
                                 joint.Position.Z.ToString();
-                            
-                        }
-                        // Storing skeleton info into db
 
+                        }
+
+                        // Storing skeleton info into db
                         if (baseline.IsChecked == true)
                         {
                             values = ",1" + values;
@@ -790,11 +762,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             values = ",0" + values;
                         }
                         DateTime now = DateTime.Now;
+
                         string date = "'" + now.Year.ToString() + "-" + now.Month.ToString() + "-" + now.Day.ToString() + " " +
                             now.Hour.ToString() + ":" +
                             now.Minute.ToString() + ":" +
-                            now.Second.ToString()+"'";
-                        
+                            now.Second.ToString() + "'";
+
                         string SelectedItem = null;
                         if (cmbExer.SelectedItem == null)
                         {
@@ -803,19 +776,20 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         else
                             SelectedItem = cmbExer.SelectedItem.ToString();
 
-                        values = skeletonFrame.FrameNumber.ToString() +" ,"
-                            + date +","
-                            + "'Mehrad' , 'Karamlou' ,'" + SelectedItem + "'"
+                        values = skeletonFrame.FrameNumber.ToString() + " ,"
+                            + date + ", '"
+                            + firstName.Text.ToString() + "','" + lastName.Text.ToString() + "' , '"
+                            + SelectedItem + "'"
                             + values;
                         command.CommandText = "INSERT INTO dbkinect.kinectdata (Framenumber,Created_at,UserFirst, UserLast , Exercise ,Type " + command.CommandText + ") VALUE ("
                            + values + ")";
-                        
-						Reader = command.ExecuteReader();
+
+                        Reader = command.ExecuteReader();
                         Reader.Close();
 
                         if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 15) == 0)
                         {
-                           Make_Graph();
+                            Make_Graph();
                         }
                     }
                 }
@@ -826,7 +800,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             using (DrawingContext dc = this.drawingGroup1.Open())
             {
-                 //Draw a transparent background to set the render size
+                //Draw a transparent background to set the render size
                 dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, RenderWidth, RenderHeight));
 
                 if (skeletons.Length != 0)
@@ -891,13 +865,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void DrawBonesAndJoints1(DrawingContext drawingContext)
         {
             SkeletonPoint sp = new SkeletonPoint();
-            Dictionary<string, Joint> jointMappingFinal = new Dictionary<string,Joint>();
+            Dictionary<string, Joint> jointMappingFinal = new Dictionary<string, Joint>();
 
-            foreach(KeyValuePair<string, Joint> entry in jointMapping1)
+            foreach (KeyValuePair<string, Joint> entry in jointMapping1)
             {
-                sp.X = (float)Convert.ToDecimal(dt.Rows[tableCounter][entry.Key+"X"]);
-                sp.Y = (float)Convert.ToDecimal(dt.Rows[tableCounter][entry.Key+"Y"]);
-                sp.Z = (float)Convert.ToDecimal(dt.Rows[tableCounter][entry.Key+"Z"]);
+                sp.X = (float)Convert.ToDecimal(dt.Rows[tableCounter][entry.Key + "X"]);
+                sp.Y = (float)Convert.ToDecimal(dt.Rows[tableCounter][entry.Key + "Y"]);
+                sp.Z = (float)Convert.ToDecimal(dt.Rows[tableCounter][entry.Key + "Z"]);
                 Joint joint = new Joint();
                 joint = entry.Value;
                 joint.Position = sp;
@@ -905,9 +879,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
 
             Joint Head = new Joint();
-            if(jointMappingFinal.TryGetValue("Head", out Head)){}
+            if (jointMappingFinal.TryGetValue("Head", out Head)) { }
             Joint ShoulderCenter = new Joint();
-            if(jointMappingFinal.TryGetValue("ShoulderCenter", out ShoulderCenter)){}
+            if (jointMappingFinal.TryGetValue("ShoulderCenter", out ShoulderCenter)) { }
             Joint ShoulderLeft = new Joint();
             if (jointMappingFinal.TryGetValue("ShoulderLeft", out ShoulderLeft)) { }
             Joint ShoulderRight = new Joint();
@@ -981,7 +955,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 drawingContext.DrawEllipse(drawBrush, null, this.SkeletonPointToScreen(entry.Value.Position), JointThickness, JointThickness);
             }
 
-            tableCounter = tableCounter +1;
+            tableCounter = tableCounter + 1;
             if (tableCounter == dt.Rows.Count)
             {
                 tableCounter = 1;
@@ -1023,7 +997,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             this.DrawBone(skeleton, drawingContext, JointType.HipRight, JointType.KneeRight);
             this.DrawBone(skeleton, drawingContext, JointType.KneeRight, JointType.AnkleRight);
             this.DrawBone(skeleton, drawingContext, JointType.AnkleRight, JointType.FootRight);
- 
+
             // Render Joints
             foreach (Joint joint in skeleton.Joints)
             {
@@ -1031,11 +1005,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                 if (joint.TrackingState == JointTrackingState.Tracked)
                 {
-                    drawBrush = this.trackedJointBrush;                    
+                    drawBrush = this.trackedJointBrush;
                 }
                 else if (joint.TrackingState == JointTrackingState.Inferred)
                 {
-                    drawBrush = this.inferredJointBrush;                    
+                    drawBrush = this.inferredJointBrush;
                 }
 
                 if (drawBrush != null)
@@ -1043,7 +1017,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     drawingContext.DrawEllipse(drawBrush, null, this.SkeletonPointToScreen(joint.Position), JointThickness, JointThickness);
                 }
             }
-            
+
             // get x, y, z for selected joint to show in live data
             if (selectedJoint != null)
             {
@@ -1052,34 +1026,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 Y.Content = "Y: " + System.Math.Round(skeleton.Joints[key].Position.Y, 2).ToString();
                 Z.Content = "Z: " + System.Math.Round(skeleton.Joints[key].Position.Z, 2).ToString();
             }
-
-            //some code to test mySQL connection and creation of kinectdata table with proper columns
-            // SQL connection to record skeleton data
-            /*
-            MySqlConnection connection = new MySqlConnection(MyConString);
-            MySqlCommand command = connection.CreateCommand();
-            MySqlDataReader Reader;
-            connection.Open();
-            
-            foreach (Joint joint in skeleton.Joints)
-            {
-                command.CommandText = command.CommandText + "," + joint.JointType.ToString() + "X" + " VARCHAR(30) " + ","+
-                    joint.JointType.ToString() + "Y" + " VARCHAR(30) "+ "," +
-                    joint.JointType.ToString() + "Z" + " VARCHAR(30) ";
-            }
-            
-            MySqlCommand command2 = connection.CreateCommand();
-            command2.CommandText = "CREATE TABLE dbkinect.kinectdata(id INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), Framenumber VARCHAR(30), Created_at DATETIME DEFAULT NULL, UserFirst VARCHAR(30), UserLast VARCHAR(30), Type VARCHAR(30), Exercise VARCHAR(30) " 
-                + command.CommandText + ")";
-            //Reader = command2.ExecuteReader();
-            
-            //Reader.Close();          
-            connection.Close();
-            */
-
-
         }
-        
+
 
         /// <summary>
         /// Maps a SkeletonPoint to lie within our render space and converts to Point
@@ -1161,10 +1109,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             selectedJoint = this.Joints.SelectedValue.ToString();
         }
-        private void button1_Click(object sender, RoutedEventArgs e)
-        {
-            Make_Graph();
-        }
         private void Make_Graph()
         {
             // Clean the graphs
@@ -1210,11 +1154,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 F3Graph.Children.Remove(item);
             }
 
-           
+
             // sizes
             int[] frameTest = new int[ArraySize];
             int[] frameTrain = new int[ArraySize];
-            
+
             double[] joint1train = new double[ArraySize];
             double[] joint1test = new double[ArraySize];
 
@@ -1224,7 +1168,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             double[] joint3train = new double[ArraySize];
             double[] joint3test = new double[ArraySize];
 
-            
+
             TimeData.CopyTo(frameTest);
 
             Feature1Data.CopyTo(joint1test);
@@ -1282,70 +1226,86 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             Rect visibleReact1 = new Rect();
             Rect visibleReact2 = new Rect();
             Rect visibleReact3 = new Rect();
-            
+
             switch (cmbExer.SelectedIndex)
             {
                 case 0:
-                    visibleReact1 = new Rect(0, 0, 0, 0);
-                    visibleReact2 = new Rect(0, 0, 0, 0);
-                    visibleReact3 = new Rect(0, 0, 0, 0);
+                    visibleReact1 = new Rect(0, -20, 400, 120);
+                    visibleReact2 = new Rect(0, -10, 400, 190);
+                    visibleReact3 = new Rect(0, -10, 400, 190);
                     break;
                 case 1:
-                    visibleReact1 = new Rect(0, 0, 0, 0);
-                    visibleReact2 = new Rect(0, 0, 0, 0);
-                    visibleReact3 = new Rect(0, 0, 0, 0);
+                    visibleReact1 = new Rect(0, 30, 400, 30);
+                    visibleReact2 = new Rect(0, 10, 400, 40);
+                    visibleReact3 = new Rect(0, -5, 400, 75);
                     break;
                 case 2:
-                    visibleReact1 = new Rect(0, 0, 0, 0);
-                    visibleReact2 = new Rect(0, 0, 0, 0);
-                    visibleReact3 = new Rect(0, 0, 0, 0);
+                    visibleReact1 = new Rect(0, -5, 400, 105);
+                    visibleReact2 = new Rect(0, 20, 400, 130);
+                    visibleReact3 = new Rect(0, 20, 400, 130);
                     break;
                 case 3:
-                    visibleReact1 = new Rect(0, 0, 0, 0);
-                    visibleReact2 = new Rect(0, 0, 0, 0);
-                    visibleReact3 = new Rect(0, 0, 0, 0);
+                    visibleReact1 = new Rect(0, -5, 400, 105);
+                    visibleReact2 = new Rect(0, 0, 400, 50);
+                    visibleReact3 = new Rect(0, 20, 400, 40);
                     break;
                 case 4:
-                    visibleReact1 = new Rect(0, 0, 0, 0);
-                    visibleReact2 = new Rect(0, 0, 0, 0);
-                    visibleReact3 = new Rect(0, 0, 0, 0);
+                    visibleReact1 = new Rect(0, 0, 400, 30);
+                    visibleReact2 = new Rect(0, 0, 400, 30);
+                    visibleReact3 = new Rect(0, 20, 400, 40);
                     break;
                 case 5:
-                    visibleReact1 = new Rect(0, 0, 0, 0);
-                    visibleReact2 = new Rect(0, 0, 0, 0);
-                    visibleReact3 = new Rect(0, 0, 0, 0);
+                    visibleReact1 = new Rect(0, 100, 400, 80);
+                    visibleReact2 = new Rect(0, 0, 400, 100);
+                    visibleReact3 = new Rect(0, -.5, 400, 2);
                     break;
                 default:
                     break;
             }
 
+
             F1Graph.AddLineGraph(compTest1DataSource, Colors.Blue, 3, "live");
             ////F1Graph.AddLineGraph(compTrain1DataSource);
 
-            F2Graph.AddLineGraph(compTest2DataSource ,Colors.Blue, 3, "Live");
+            F2Graph.AddLineGraph(compTest2DataSource, Colors.Blue, 3, "Live");
             ////F2Graph.AddLineGraph(compTrain2DataSource);
 
-            F3Graph.AddLineGraph(compTest3DataSource,Colors.Blue,4,"Live");
-            
+            F3Graph.AddLineGraph(compTest3DataSource, Colors.Blue, 4, "Live");
+
             ////F3Graph.AddLineGraph(compTrain3DataSource);
+            F1Graph.Viewport.Visible = visibleReact1;
+            F2Graph.Viewport.Visible = visibleReact2;
+            F3Graph.Viewport.Visible = visibleReact3;
+
             F3Graph.LegendVisible = false;
             F2Graph.LegendVisible = false;
             F1Graph.LegendVisible = false;
         }
-    }
-    public class MainWindowViewModel : DependencyObject
-    {
-        public static readonly DependencyProperty KinectSensorManagerProperty =
-            DependencyProperty.Register(
-                "KinectSensorManager",
-                typeof(KinectSensorManager),
-                typeof(MainWindowViewModel),
-                new PropertyMetadata(null));
 
-        public KinectSensorManager KinectSensorManager
+        private void button1_Click(object sender, RoutedEventArgs e)
         {
-            get { return (KinectSensorManager)GetValue(KinectSensorManagerProperty); }
-            set { SetValue(KinectSensorManagerProperty, value); }
+            // get skeleton data from database
+            MySqlConnection con = new MySqlConnection(MyConString);
+            MySqlCommand cmd = con.CreateCommand();
+            cmd.CommandText = "select * from dbkinect.kinectdata where UserFirst = '" + firstName.Text.ToString() +
+                "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='1' and Exercise = '" + cmbExer.SelectedValue.ToString() + "' limit 1000";
+
+            con.Open();
+            MySqlDataReader dr = cmd.ExecuteReader();
+            dt.Clear();
+
+            while (dr.Read())
+            {
+                DataRow newRow = dt.NewRow();
+                for (int j = 0; j < dt.Columns.Count; j++)
+                {
+                    string columnName = dt.Columns[j].ColumnName;
+                    newRow[columnName] = Convert.ToDecimal(dr[columnName]);
+                }
+                dt.Rows.Add(newRow);
+            }
+            dr.Close();
+            tableCounter = 1;
         }
     }
 }
