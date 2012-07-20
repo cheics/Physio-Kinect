@@ -87,6 +87,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Classification.cs" />
     <Compile Include="ExersizeType.cs" />
     <Compile Include="f_FeatureDefinition.cs" />
     <Compile Include="FeatureHelper.cs" />

@@ -49,7 +49,7 @@
             return new FeatureData(exersizeName.exName, featureHelper.BestFeatures(exersizeName), AllFeatures());
         }
 
-        public FeatureData GetScores(ExersizeType exersizeName)
+        public FeatureData GetScore(ExersizeType exersizeName)
         {
             return new FeatureData(exersizeName.exName, featureHelper.BestFeatures(exersizeName), AllThresholds());
         }
@@ -101,6 +101,5 @@
                 {"Forearm Abduciton Right", 0.5}
 		    };
         }
-
     }
 }

@@ -63,7 +63,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         public string newPath = "test";
 
         private FeatureDefinition featureDefinition = new FeatureDefinition();
-
+        private Classification featurEvaluation = new Classification();
 
         public static readonly DependencyProperty KinectSensorProperty =
     DependencyProperty.Register(

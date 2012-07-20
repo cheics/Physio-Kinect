@@ -164,7 +164,7 @@
           /// </summary>
           /// <param name="Item">Item to calculate</param>
           /// <returns>The probability that the token is from set A</returns>
-          private double CalculateProbabilityOfToken(T Item)
+          private double CalculateProbabilityOfToken(int Item)
           {
               double Probability = 0;
               int ACount = SetA.Contains(Item) ? SetA[Item] * ATokenWeight : 0;
