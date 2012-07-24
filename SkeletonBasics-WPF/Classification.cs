@@ -17,21 +17,21 @@
           /// <summary>
         /// Constructor
          /// </summary>
-         public void Classification()
-         {
-             List<double> SetA = new List<double>();
-             List<double> SetB = new List<double>();
-             Dictionary<int, double> Probabilities = new Dictionary<int, double>();
-             double Total = 0;
-             double TotalA = 0;
-             double TotalB = 0;
-             int ATokenWeight = 1;
-             int BTokenWeight = 1;
-             int MinCountForInclusion = 1;
-             double MinTokenProbability = 0.01;
-             double MaxTokenProbability = 0.999;
-             int MaxInterestingTokenCount = int.MaxValue;
-         }  
+         //public void Initialize()
+         //{
+         //    List<double> SetA = new List<double>();
+         //    List<double> SetB = new List<double>();
+         //    Dictionary<int, double> Probabilities = new Dictionary<int, double>();
+         //    double Total = 0;
+         //    double TotalA = 0;
+         //    double TotalB = 0;
+         //    int ATokenWeight = 1;
+         //    int BTokenWeight = 1;
+         //    int MinCountForInclusion = 1;
+         //    double MinTokenProbability = 0.01;
+         //    double MaxTokenProbability = 0.999;
+         //    int MaxInterestingTokenCount = int.MaxValue;
+         //}  
          #endregion
   
          #region Properties
@@ -182,5 +182,5 @@
           #endregion
      }
     
-     }
 }
+

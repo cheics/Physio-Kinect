@@ -42,7 +42,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         DataTable dt = new DataTable();
         int tableCounter = 1;
         int ArraySize = 400;
-
+        int graphCounter = 0;
         ArrayList Feature1Data = new ArrayList();
         ArrayList Feature2Data = new ArrayList();
         ArrayList Feature3Data = new ArrayList();
@@ -214,6 +214,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 Feature1Data.Add(0.0);
                 Feature2Data.Add(0.0);
                 Feature3Data.Add(0.0);
+
+                feature3Train.Add(0.0);
+                feature2Train.Add(0.0);
+                feature1Train.Add(0.0);
+
                 TimeData.Add(ii);
             }
 
@@ -344,7 +349,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
             else
             {
-                GetCameraPoint(first, e); 
+                //GetCameraPoint(first, e); 
             }
             //throw new System.NotImplementedException();
         }
@@ -606,12 +611,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void SensorSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
             Skeleton[] skeletons = new Skeleton[0];
-
-            // SQL connection to record skeleton data
-            MySqlConnection connection = new MySqlConnection(MyConString);
-            MySqlCommand command = connection.CreateCommand();
-            MySqlDataReader Reader;
-            connection.Open();
             string values = null;
 
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
@@ -630,7 +629,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     if (skel_1 != null)
                     {
                         // Colin Code // Mehrad code now! 
-
+                        graphCounter++;
                         featureDefinition.StoreSkeletonFrame(skel_1);
                         FeatureData featureFrame;
                         Rectangle graphRange = new Rectangle();
@@ -750,76 +749,82 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                         }
-                        string testing = null;
 
 
-                        foreach (string stringKey in featureFrame.featureValues.Keys)
-                        {
-                           testing = "," + stringKey.ToString();
-                        }
-
-
-                        foreach (Joint joint in skel_1.Joints)
-                        {
-
-                            command.CommandText = command.CommandText + "," +
-                            joint.JointType.ToString() + "X" + "," +
-                            joint.JointType.ToString() + "Y" + "," +
-                            joint.JointType.ToString() + "Z";
-
-
-                            values = values + "," +
-                                joint.Position.X.ToString() + "," +
-                                joint.Position.Y.ToString() + "," +
-                                joint.Position.Z.ToString();
-
-                        }
-
-                        // Storing skeleton info into db
                         if (baseline.IsChecked == true)
                         {
-                            values = ",1" + values;
+                            // SQL connection to record skeleton data
+                            MySqlConnection connection = new MySqlConnection(MyConString);
+                            MySqlCommand command = connection.CreateCommand();
+                            MySqlDataReader Reader;
+                            connection.Open();
+
+                            string testing = null;
+                            foreach (string stringKey in featureFrame.featureValues.Keys)
+                            {
+                                testing = "," + stringKey.ToString();
+                            }
+
+                            foreach (Joint joint in skel_1.Joints)
+                            {
+
+                                command.CommandText = command.CommandText + "," +
+                                joint.JointType.ToString() + "X" + "," +
+                                joint.JointType.ToString() + "Y" + "," +
+                                joint.JointType.ToString() + "Z";
+
+
+                                values = values + "," +
+                                    joint.Position.X.ToString() + "," +
+                                    joint.Position.Y.ToString() + "," +
+                                    joint.Position.Z.ToString();
+
+                            }
+
+                            // Storing skeleton info into db
+                            if (baseline.IsChecked == true)
+                            {
+                                values = ",1" + values;
+                            }
+                            else
+                            {
+                                values = ",0" + values;
+                            }
+                            DateTime now = DateTime.Now;
+
+                            string date = "'" + now.Year.ToString() + "-" + now.Month.ToString() + "-" + now.Day.ToString() + " " +
+                                now.Hour.ToString() + ":" +
+                                now.Minute.ToString() + ":" +
+                                now.Second.ToString() + "'";
+
+                            string SelectedItem = null;
+                            if (cmbExer.SelectedItem == null)
+                            {
+                                SelectedItem = "null";
+                            }
+                            else
+                                SelectedItem = cmbExer.SelectedItem.ToString();
+
+                            values = skeletonFrame.FrameNumber.ToString() + " ,"
+                                + date + ", '"
+                                + firstName.Text.ToString() + "','" + lastName.Text.ToString() + "' , '"
+                                + SelectedItem + "'"
+                                + values;
+                            command.CommandText = "INSERT INTO dbkinect.kinectdata (Framenumber,Created_at,UserFirst, UserLast , Exercise ,Type " + command.CommandText + ") VALUE ("
+                               + values + ")";
+
+                            Reader = command.ExecuteReader();
+                            connection.Close();
+                            Reader.Close();
                         }
-                        else
-                        {
-                            values = ",0" + values;
-                        }
-                        DateTime now = DateTime.Now;
-
-                        string date = "'" + now.Year.ToString() + "-" + now.Month.ToString() + "-" + now.Day.ToString() + " " +
-                            now.Hour.ToString() + ":" +
-                            now.Minute.ToString() + ":" +
-                            now.Second.ToString() + "'";
-
-                        string SelectedItem = null;
-                        if (cmbExer.SelectedItem == null)
-                        {
-                            SelectedItem = "null";
-                        }
-                        else
-                            SelectedItem = cmbExer.SelectedItem.ToString();
-
-                        values = skeletonFrame.FrameNumber.ToString() + " ,"
-                            + date + ", '"
-                            + firstName.Text.ToString() + "','" + lastName.Text.ToString() + "' , '"
-                            + SelectedItem + "'"
-                            + values;
-                        command.CommandText = "INSERT INTO dbkinect.kinectdata (Framenumber,Created_at,UserFirst, UserLast , Exercise ,Type " + command.CommandText + ") VALUE ("
-                           + values + ")";
-
-                        Reader = command.ExecuteReader();
-                        Reader.Close();
-
                         if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 15) == 0)
                         {
-                            //Make_Graph();
+                            Make_Graph();
                         }
                     }
                 }
 
             }
-
-            connection.Close();
 
             using (DrawingContext dc = this.drawingGroup1.Open())
             {
@@ -1193,35 +1198,44 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
             TimeData.CopyTo(frameTest);
+            TimeData.CopyTo(frameTrain);
 
             Feature1Data.CopyTo(joint1test);
             Feature2Data.CopyTo(joint2test);
             Feature3Data.CopyTo(joint3test);
+            
+            for (int ii = 0; ii < ArraySize; ii++)
+            {  
+                joint1train[ii] = Convert.ToDouble(feature1Train[(ii +  graphCounter % 400) % 400]);
+                joint2train[ii] = Convert.ToDouble(feature2Train[(ii + graphCounter % 400) % 400]);
+                joint3train[ii] = Convert.ToDouble(feature3Train[(ii + graphCounter % 400) % 400]);
+            }
+
+            ///feature1Train.CopyTo(joint1train);
+            //feature2Train.CopyTo(joint2train);
+           // feature3Train.CopyTo(joint3train);
 
 
             var FrameTestDataSource = new EnumerableDataSource<int>(frameTest);
             FrameTestDataSource.SetXMapping(x => x);
 
-            ////var FrameTrainDataSource = new EnumerableDataSource<int>(frameTrain);
-            ////FrameTrainDataSource.SetXMapping(x => x);
+            var FrameTrainDataSource = new EnumerableDataSource<int>(frameTrain);
+            FrameTrainDataSource.SetXMapping(x => x);
 
-            //var Joint1TrainDataSource = new EnumerableDataSource<Double>(joint1train);
-            //Joint1TrainDataSource.SetYMapping(y => y);
-
-            ////var Joint1TrainDataSource = new EnumerableDataSource<Double>(Feature1Data);
-            ////Joint1TrainDataSource.SetYMapping(y => y);
+            var Joint1TrainDataSource = new EnumerableDataSource<Double>(joint1train);
+            Joint1TrainDataSource.SetYMapping(y => y);
 
             var Joint1TestDataSource = new EnumerableDataSource<Double>(joint1test);
             Joint1TestDataSource.SetYMapping(y => y);
 
-            ////var Joint2TrainDataSource = new EnumerableDataSource<Double>(joint2train);
-            ////Joint2TrainDataSource.SetYMapping(y => y);
+            var Joint2TrainDataSource = new EnumerableDataSource<Double>(joint2train);
+            Joint2TrainDataSource.SetYMapping(y => y);
 
             var Joint2TestDataSource = new EnumerableDataSource<Double>(joint2test);
             Joint2TestDataSource.SetYMapping(y => y);
 
-            ////var Joint3TrainDataSource = new EnumerableDataSource<Double>(joint3train);
-            ////Joint3TrainDataSource.SetYMapping(y => y);
+            var Joint3TrainDataSource = new EnumerableDataSource<Double>(joint3train);
+            Joint3TrainDataSource.SetYMapping(y => y);
 
             var Joint3TestDataSource = new EnumerableDataSource<Double>(joint3test);
             Joint3TestDataSource.SetYMapping(y => y);
@@ -1229,20 +1243,20 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             CompositeDataSource compTest1DataSource = new
               CompositeDataSource(FrameTestDataSource, Joint1TestDataSource);
 
-            ////CompositeDataSource compTrain1DataSource = new
-            ////  CompositeDataSource(FrameTrainDataSource, Joint1TrainDataSource);
+            CompositeDataSource compTrain1DataSource = new
+              CompositeDataSource(FrameTrainDataSource, Joint1TrainDataSource);
 
             CompositeDataSource compTest2DataSource = new
                 CompositeDataSource(FrameTestDataSource, Joint2TestDataSource);
 
-            ////CompositeDataSource compTrain2DataSource = new
-            ////  CompositeDataSource(FrameTrainDataSource, Joint2TrainDataSource);
+            CompositeDataSource compTrain2DataSource = new
+              CompositeDataSource(FrameTrainDataSource, Joint2TrainDataSource);
 
             CompositeDataSource compTest3DataSource = new
                 CompositeDataSource(FrameTestDataSource, Joint3TestDataSource);
 
-            ////CompositeDataSource compTrain3DataSource = new
-            ////  CompositeDataSource(FrameTrainDataSource, Joint3TrainDataSource);
+            CompositeDataSource compTrain3DataSource = new
+              CompositeDataSource(FrameTrainDataSource, Joint3TrainDataSource);
 
 
             // assign graph visible window
@@ -1288,14 +1302,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
             F1Graph.AddLineGraph(compTest1DataSource, Colors.Blue, 3, "live");
-            ////F1Graph.AddLineGraph(compTrain1DataSource);
+            F1Graph.AddLineGraph(compTrain1DataSource, Colors.Aqua, 2, "Base");
 
             F2Graph.AddLineGraph(compTest2DataSource, Colors.Blue, 3, "Live");
-            ////F2Graph.AddLineGraph(compTrain2DataSource);
+            F2Graph.AddLineGraph(compTrain2DataSource, Colors.Aqua, 2, "Base");
 
             F3Graph.AddLineGraph(compTest3DataSource, Colors.Blue, 4, "Live");
+            F3Graph.AddLineGraph(compTrain3DataSource, Colors.Aqua, 2, "Base");
 
-            ////F3Graph.AddLineGraph(compTrain3DataSource);
             F1Graph.Viewport.Visible = visibleReact1;
             F2Graph.Viewport.Visible = visibleReact2;
             F3Graph.Viewport.Visible = visibleReact3;
@@ -1331,62 +1345,228 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 }
                 dt.Rows.Add(newRow);
             }
-            //for (int i = 0; i < dt.Rows.Count; i++)
-            //{
-            //foreach (KeyValuePair<string, Joint> entry in jointMapping1)
-            //{
-            //    sp.X = (float)Convert.ToDecimal(dt.Rows[i][entry.Key + "X"]);
-            //    sp.Y = (float)Convert.ToDecimal(dt.Rows[i][entry.Key + "Y"]);
-            //    sp.Z = (float)Convert.ToDecimal(dt.Rows[i][entry.Key + "Z"]);
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                foreach (KeyValuePair<string, Joint> entry in jointMapping1)
+                {
+                    sp.X = (float)Convert.ToDecimal(dt.Rows[i][entry.Key + "X"]);
+                    sp.Y = (float)Convert.ToDecimal(dt.Rows[i][entry.Key + "Y"]);
+                    sp.Z = (float)Convert.ToDecimal(dt.Rows[i][entry.Key + "Z"]);
 
-            //    Joint joint = new Joint();
-            //    joint = entry.Value;
-            //    joint.Position = sp;
-            //    //jointMappingFinal.Add(entry.Key, joint);
+                    Joint joint = new Joint();
+                    joint = TrainSkel.Joints[JointType.Head];
+                    
+                    
+                    //jointMapping2.Add(entry.Key, joint);
+                    //TrainSkel.Joints[joint.JointType] = joint;
 
-            //    TrainSkel.Joints[joint.JointType] = joint;
-            //}
-            //Joint Head = new Joint();
-            //if (jointMappingFinal.TryGetValue("Head", out Head)) { }
-            //Joint ShoulderCenter = new Joint();
-            //if (jointMappingFinal.TryGetValue("ShoulderCenter", out ShoulderCenter)) { }
-            //Joint ShoulderLeft = new Joint();
-            //if (jointMappingFinal.TryGetValue("ShoulderLeft", out ShoulderLeft)) { }
-            //Joint ShoulderRight = new Joint();
-            //if (jointMappingFinal.TryGetValue("ShoulderRight", out ShoulderRight)) { }
-            //Joint Spine = new Joint();
-            //if (jointMappingFinal.TryGetValue("Spine", out Spine)) { }
-            //Joint HipCenter = new Joint();
-            //if (jointMappingFinal.TryGetValue("HipCenter", out HipCenter)) { }
-            //Joint HipLeft = new Joint();
-            //if (jointMappingFinal.TryGetValue("HipLeft", out HipLeft)) { }
-            //Joint HipRight = new Joint();
-            //if (jointMappingFinal.TryGetValue("HipRight", out HipRight)) { }
-            //Joint ElbowLeft = new Joint();
-            //if (jointMappingFinal.TryGetValue("ElbowLeft", out ElbowLeft)) { }
-            //Joint WristLeft = new Joint();
-            //if (jointMappingFinal.TryGetValue("WristLeft", out WristLeft)) { }
-            //Joint HandLeft = new Joint();
-            //if (jointMappingFinal.TryGetValue("HandLeft", out HandLeft)) { }
-            //Joint ElbowRight = new Joint();
-            //if (jointMappingFinal.TryGetValue("ElbowRight", out ElbowRight)) { }
-            //Joint WristRight = new Joint();
-            //if (jointMappingFinal.TryGetValue("WristRight", out WristRight)) { }
-            //Joint HandRight = new Joint();
-            //if (jointMappingFinal.TryGetValue("HandRight", out HandRight)) { }
-            //Joint KneeLeft = new Joint();
-            //if (jointMappingFinal.TryGetValue("KneeLeft", out KneeLeft)) { }
-            //Joint AnkleLeft = new Joint();
-            //if (jointMappingFinal.TryGetValue("AnkleLeft", out AnkleLeft)) { }
-            //Joint FootLeft = new Joint();
-            //if (jointMappingFinal.TryGetValue("FootLeft", out FootLeft)) { }
-            //Joint KneeRight = new Joint();
-            //if (jointMappingFinal.TryGetValue("KneeRight", out KneeRight)) { }
-            //Joint AnkleRight = new Joint();
-            //if (jointMappingFinal.TryGetValue("AnkleRight", out AnkleRight)) { }
-            //Joint FootRight = new Joint();
-            //if (jointMappingFinal.TryGetValue("FootRight", out FootRight)) { 
+                    switch (entry.Key)
+                    {
+                        case "Head":
+                            joint = TrainSkel.Joints[JointType.Head];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.Head] = joint;
 
+                            break;
+                        case "ShoulderRight":
+                            joint = TrainSkel.Joints[JointType.ShoulderRight];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.ShoulderRight] = joint;
+                            break;
+                        case "ShoulderLeft":
+                            joint = TrainSkel.Joints[JointType.ShoulderLeft];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.ShoulderLeft] = joint;
+                            break;
+                        case"ShoulderCenter":
+                            joint = TrainSkel.Joints[JointType.ShoulderCenter];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.ShoulderCenter] = joint;
+                            break;
+                        case "Spine":
+                            joint = TrainSkel.Joints[JointType.Spine];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.Spine] = joint;
+                            break;
+                        case "WristLeft":
+                            joint = TrainSkel.Joints[JointType.WristLeft];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.WristLeft] = joint;
+                            break;
+                        case "WristRight":
+                            joint = TrainSkel.Joints[JointType.WristRight];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.WristRight] = joint;
+                            break;
+                        case "AnkleLeft":
+                            joint = TrainSkel.Joints[JointType.AnkleLeft];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.AnkleLeft] = joint;
+                            break;
+
+                        case "AnkleRight":
+                            joint = TrainSkel.Joints[JointType.AnkleRight];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.AnkleRight] = joint;
+                            break;
+
+                        case "ElbowLeft":
+                            joint = TrainSkel.Joints[JointType.ElbowLeft];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.ElbowLeft] = joint;
+                            break;
+                        case "ElbowRight":
+                            joint = TrainSkel.Joints[JointType.ElbowRight];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.ElbowRight] = joint;
+                            break;
+
+                        case "FootLeft":
+                            joint = TrainSkel.Joints[JointType.FootLeft];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.FootLeft] = joint;
+                            break;
+                        case "FootRight":
+                            joint = TrainSkel.Joints[JointType.FootRight];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.FootRight] = joint;
+                            break;
+                        case "HandLeft":
+                            joint = TrainSkel.Joints[JointType.HandLeft];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.HandLeft] = joint;
+                            break;
+                        case "HandRight":
+                            joint = TrainSkel.Joints[JointType.HandRight];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.HandRight] = joint;
+                            break;
+
+                        case "HipCenter":
+                            joint = TrainSkel.Joints[JointType.HipCenter];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.HipCenter] = joint;
+                            break;
+
+                        case "HipLeft":
+                            joint = TrainSkel.Joints[JointType.HipLeft];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.HipLeft] = joint;
+                            break;
+                        case "HipRight":
+                            joint = TrainSkel.Joints[JointType.HipRight];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.HipRight] = joint;
+                            break;
+                        case "KneeLeft":
+                            joint = TrainSkel.Joints[JointType.KneeLeft];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.KneeLeft] = joint;
+                            break;
+
+                        case "KneeRight":
+                            joint = TrainSkel.Joints[JointType.KneeRight];
+                            joint.Position = sp;
+                            TrainSkel.Joints[JointType.KneeRight] = joint;
+                            break;
+                        default:
+                            return;
+                            break;
+                    }
+                }
+                featureDefinition.StoreSkeletonFrame(TrainSkel);
+                FeatureData featureFrame;
+                switch (cmbExer.SelectedIndex)
+                {
+                    case 0:
+                        ExerciseClass.EX_Squat squat = new ExerciseClass.EX_Squat();
+                        featureFrame = featureDefinition.GetFeatures(squat);
+                        feature1Train.RemoveAt(0);
+                        feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+                        feature2Train.RemoveAt(0);
+                        feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+                        feature3Train.RemoveAt(0);
+                        feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                        break;
+                    case 1:
+                        ExerciseClass.EX_HipAbduction hipAbduction = new ExerciseClass.EX_HipAbduction();
+                        featureFrame = featureDefinition.GetFeatures(hipAbduction);
+                        feature1Train.RemoveAt(0);
+                        feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+                        feature2Train.RemoveAt(0);
+                        feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+                        feature3Train.RemoveAt(0);
+                        feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                        break;
+                    case 2:
+                        ExerciseClass.EX_ShoulderRaise shoulderRaise = new ExerciseClass.EX_ShoulderRaise();
+                        featureFrame = featureDefinition.GetFeatures(shoulderRaise);
+
+                        feature1Train.RemoveAt(0);
+                        feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+                        feature2Train.RemoveAt(0);
+                        feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+
+                        feature3Train.RemoveAt(0);
+                        feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[3]]);
+                        break;
+                    case 3:
+                        ExerciseClass.EX_LegRaise legRaise = new ExerciseClass.EX_LegRaise();
+                        featureFrame = featureDefinition.GetFeatures(legRaise);
+                        feature1Train.RemoveAt(0);
+                        feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+                        feature2Train.RemoveAt(0);
+                        feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+                        feature3Train.RemoveAt(0);
+                        feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                        break;
+                    case 4:
+                        ExerciseClass.EX_KneeBend kneeBend = new ExerciseClass.EX_KneeBend();
+                        featureFrame = featureDefinition.GetFeatures(kneeBend);
+                        feature1Train.RemoveAt(0);
+                        feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+                        feature2Train.RemoveAt(0);
+                        feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+                        feature3Train.RemoveAt(0);
+                        feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                        break;
+                    case 5:
+                        ExerciseClass.EX_ArmAbduction armAbduciton = new ExerciseClass.EX_ArmAbduction();
+                        featureFrame = featureDefinition.GetFeatures(armAbduciton);
+
+                        feature1Train.RemoveAt(0);
+                        feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+                        feature2Train.RemoveAt(0);
+                        feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+                        feature3Train.RemoveAt(0);
+                        feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                        break;
+                    default:
+                        armAbduciton = new ExerciseClass.EX_ArmAbduction();
+                        featureFrame = featureDefinition.GetFeatures(armAbduciton);
+                        feature1Train.RemoveAt(0);
+                        feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+                        feature2Train.RemoveAt(0);
+                        feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+                        feature3Train.RemoveAt(0);
+                        feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                        break;
+                }
+
+            }
             dr.Close();
             tableCounter = 1;
         }
