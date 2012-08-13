@@ -1581,6 +1581,5 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             this.sensor.ElevationAngle = (int)slider1.Value;
         }
-
     }
 }

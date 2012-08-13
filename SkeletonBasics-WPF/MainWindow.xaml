@@ -67,13 +67,16 @@
                 
             </Grid.ColumnDefinitions>
            
-            <Viewbox Width="40" Grid.Column="0" Stretch="UniformToFill" HorizontalAlignment="Left">
-                <StackPanel VerticalAlignment="Stretch">
+            <!--<Viewbox Width="40" Grid.Row="1" Grid.Column="0" Stretch="Fill" HorizontalAlignment="Left">-->
+                <StackPanel Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.RowSpan="1">
                     <TextBlock Text="{Binding ElementName=slider1, Path= Value}" Height="23" HorizontalAlignment="Left" Name="textBlock1" VerticalAlignment="Top" />
-                    <Slider Thumb.DragCompleted="slider1_DragCompleted" Minimum="-27" Maximum="27" Grid.Column="0" IsSnapToTickEnabled="True" Orientation="Vertical" Height="200" HorizontalAlignment="Left" Name="slider1" VerticalAlignment="Top" Width="23" MouseLeave="slider1_MouseLeave"/>
+                    <Slider Thumb.DragCompleted="slider1_DragCompleted" 
+                            Minimum="-27" Maximum="27" Grid.Column="0" IsSnapToTickEnabled="True" 
+                            Orientation="Vertical" HorizontalAlignment="Right" Name="slider1" VerticalAlignment="Top" MinHeight="250"
+                            Width="23" MouseLeave="slider1_MouseLeave"/>
                 </StackPanel>
-            </Viewbox>
-            <Viewbox Grid.Column="1" Stretch="Uniform" HorizontalAlignment="Center">
+            <!--</Viewbox>-->
+            <Viewbox Grid.Column="1" Stretch="Uniform" HorizontalAlignment="Left">
                 <Image Name="ColorImage" Width="200" Height="200"/>
             </Viewbox>
             
