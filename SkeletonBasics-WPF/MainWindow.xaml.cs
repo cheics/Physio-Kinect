@@ -33,7 +33,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using Coding4Fun;
     using MySql.Data.MySqlClient;
     //using AviFile;
-
+   // public class DragCompletedEventArgs : RoutedEventArgs { }
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -142,6 +142,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// </summary>
         private DrawingImage imageSource;
         private DrawingImage imageSource1;
+
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
@@ -253,7 +254,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
                 this.sensor.AllFramesReady += new System.EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
 
-
                 // Add an event handler to be called whenever there is new color frame data
                 this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
                 // Start the sensor!
@@ -265,6 +265,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 {
                     this.sensor = null;
                 }
+                
             }
 
             if (null == this.sensor)
@@ -352,6 +353,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 //GetCameraPoint(first, e); 
             }
             //throw new System.NotImplementedException();
+            
         }
 
         public KinectSensor KinectSensor
@@ -1113,7 +1115,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             drawingContext.DrawLine(drawPen, this.SkeletonPointToScreen(joint0.Position), this.SkeletonPointToScreen(joint1.Position));
         }
-
         /// <summary>
         /// Handles the checking or unchecking of the seated mode combo box
         /// </summary>
@@ -1318,7 +1319,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             F2Graph.LegendVisible = false;
             F1Graph.LegendVisible = false;
         }
-
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             Skeleton TrainSkel = new Skeleton();
@@ -1570,5 +1570,17 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             dr.Close();
             tableCounter = 1;
         }
+
+        private void slider1_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+
+            //this.sensor.ElevationAngle = (int)slider1.Value;
+        }
+
+        private void slider1_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            this.sensor.ElevationAngle = (int)slider1.Value;
+        }
+
     }
 }
