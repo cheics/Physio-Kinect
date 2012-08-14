@@ -1152,9 +1152,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 joint3train[ii] = Convert.ToDouble(feature3Train[(ii + graphCounter % 400) % 400]);
             }
 
-            calculatethreshold(feature1Train, 40, out min1, out max1);
-            calculatethreshold(feature2Train, 40, out min2, out max2);
-            calculatethreshold(feature3Train, 40, out min3, out max3);
+            calculatethreshold(feature1Train, feature2Train, feature3Train,
+                40, out min1, out max1, out min2, out max2, out min3, out max3);
 
             calculateAverage(Feature1Data, 10, out average1);
             calculateAverage(Feature2Data, 10, out average2);
@@ -1230,37 +1229,112 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             F2Graph.LegendVisible = false;
             F1Graph.LegendVisible = false;
         }
-        private void calculatethreshold(ArrayList featureData, int past, out double minP, out double maxP)
+        private void calculatethreshold(ArrayList feature1Data, ArrayList feature2Data, ArrayList feature3Data, int past, 
+            out double minP1, out double maxP1,out double minP2,
+            out double maxP2,out double minP3, out double maxP3)
         {
             double[] F1min = new double[past];
             double[] F1max = new double[past];
-            double avergaemin = 0;
-            double avergaemax = 0;
 
-            if (Convert.ToDouble(featureData[360]) != 0.0)
+            double[] F2min = new double[past];
+            double[] F2max = new double[past];
+
+            double[] F3min = new double[past];
+            double[] F3max = new double[past];
+
+            double std1min; double std1max;
+            double std2min; double std2max;
+            double std3min; double std3max;
+
+            ArrayList min1 = new ArrayList(feature1Data);
+            ArrayList min2 = new ArrayList(feature2Data);
+            ArrayList min3 = new ArrayList(feature3Data);
+            
+            min1.Sort();
+            min2.Sort();
+            min3.Sort();
+
+            for (int i = 0; i < past; i++)
             {
-                ArrayList min = new ArrayList(featureData);
-                min.Sort();
+                F1max[i] = Convert.ToDouble(min1[(i + 339)]);
+                F1min[i] = Convert.ToDouble(min1[i]);
 
-                for (int i = 0; i < past; i++)
-                {
-                    F1max[i] = Convert.ToDouble(min[(i + 339)]);
-                    F1min[i] = Convert.ToDouble(min[i]);
-                    avergaemax = avergaemax + F1max[i] / past;
-                    avergaemin = avergaemin + F1min[i] / past;
-                }
+                F2max[i] = Convert.ToDouble(min2[(i + 339)]);
+                F2min[i] = Convert.ToDouble(min2[i]);
 
-                minP = avergaemin;
-                maxP = avergaemax;
+                F3max[i] = Convert.ToDouble(min3[(i + 339)]);
+                F3min[i] = Convert.ToDouble(min3[i]);
+            }
 
+            calcualteStd(F1min, out std1min);
+            calcualteStd(F1max, out std1max);
+            calcualteStd(F2min, out std2min);
+            calcualteStd(F2max, out std2max);
+            calcualteStd(F3min, out std3min);
+            calcualteStd(F3max, out std3max);
+
+            switch (cmbExer.SelectedIndex)
+            {
+                case 0:
+                    minP1 = F1min.Average()+std1min;
+                    maxP1 = F1max.Average()+std1max;
+                    minP2 = F2min.Average()+std2min;
+                    maxP2 = F2max.Average()+std2max;
+                    minP3 = F3min.Average()+std3min;
+                    maxP3 = F3max.Average()+std3max;
+                    break;
+                case 1:
+                    minP1 = F1min.Average()+std1min;
+                    maxP1 = F1max.Average()+std1max;
+                    minP2 = F2min.Average()+std2min;
+                    maxP2 = F2max.Average()+std2max;
+                    minP3 = F3min.Average()+std3min;
+                    maxP3 = F3max.Average()+std3max;
+                    break;
+                case 2:
+                    minP1 = F1min.Average()+std1min;
+                    maxP1 = F1max.Average()+std1max;
+                    minP2 = F2min.Average()+std2min;
+                    maxP2 = F2max.Average()+std2max;
+                    minP3 = F3min.Average()+std3min;
+                    maxP3 = F3max.Average()+std3max;
+                    break;
+                case 3:
+                    minP1 = F1min.Average()+std1min;
+                    maxP1 = F1max.Average()+std1max;
+                    minP2 = F2min.Average()+std2min;
+                    maxP2 = F2max.Average()+std2max;
+                    minP3 = F3min.Average()+std3min;
+                    maxP3 = F3max.Average()+std3max;
+                    break;
+                case 4:
+                    minP1 = F1min.Average()+std1min;
+                    maxP1 = F1max.Average()+std1max;
+                    minP2 = F2min.Average()+std2min;
+                    maxP2 = F2max.Average()+std2max;
+                    minP3 = F3min.Average()+std3min;
+                    maxP3 = F3max.Average()+std3max;
+                    break;
+                case 5:
+                    minP1 = F1min.Average() - (std1min * 2);
+                    maxP1 = F1max.Average()+ (std1max * 2);
+                    minP2 = F2min.Average() - (std2min *2);
+                    maxP2 = F2max.Average() + (std2max * 10);
+                    minP3 = F3min.Average()+std3min;
+                    maxP3 = F3max.Average()+std3max;
+                    break;
+                default:
+                    minP1 = F1min.Average()+std1min;
+                    maxP1 = F1max.Average()+std1max;
+                    minP2 = F2min.Average()+std2min;
+                    maxP2 = F2max.Average()+std2max;
+                    minP3 = F3min.Average()+std3min;
+                    maxP3 = F3max.Average()+std3max;
+                    break;
+            }
                 //minP = F1min[0] - Math.Abs((F1min[past - 1] - F1min[0])/10);
-                //maxP = F1max[past - 1] + Math.Abs((F1max[past - 1] - F1max[0])/10);
-            }
-            else
-            {
-                minP = 0.0;
-                maxP = 0.0;
-            }
+                //maxP = F1max[past - 1] + Math.Abs((F1max[past - 1] - F1max[0])/
+ 
         }
         private void calculateAverage(ArrayList livefeature, int number, out double average)
         {
@@ -1269,6 +1343,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 average = average + Convert.ToDouble(livefeature[ii])/number;
             }
+        }
+        private void calcualteStd(double[] sample, out double Std)
+        {
+            //Compute the Average      
+            double avg = sample.Average();
+            //Perform the Sum of (value-avg)_2_2      
+            double sum = sample.Sum(d => Math.Pow(d - avg, 2));
+            //Put it all together      
+            Std = Math.Sqrt((sum) / (sample.Count() - 1));
+
         }
         private void setfeedbackcolor(double average, double minimum, double maximum, out Brush brush)
         {
