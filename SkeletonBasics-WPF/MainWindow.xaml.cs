@@ -1266,12 +1266,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 F3min[i] = Convert.ToDouble(min3[i]);
             }
 
-            calcualteStd(F1min, out std1min);
-            calcualteStd(F1max, out std1max);
-            calcualteStd(F2min, out std2min);
-            calcualteStd(F2max, out std2max);
-            calcualteStd(F3min, out std3min);
-            calcualteStd(F3max, out std3max);
+            calculateStd(F1min, out std1min);
+            calculateStd(F1max, out std1max);
+            calculateStd(F2min, out std2min);
+            calculateStd(F2max, out std2max);
+            calculateStd(F3min, out std3min);
+            calculateStd(F3max, out std3max);
 
             switch (cmbExer.SelectedIndex)
             {
@@ -1344,7 +1344,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 average = average + Convert.ToDouble(livefeature[ii])/number;
             }
         }
-        private void calcualteStd(double[] sample, out double Std)
+        private void calculateStd(double[] sample, out double Std)
         {
             //Compute the Average      
             double avg = sample.Average();
