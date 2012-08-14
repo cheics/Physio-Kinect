@@ -1197,9 +1197,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             double[] joint3train = new double[ArraySize];
             double[] joint3test = new double[ArraySize];
 
-            double[] F1min40 = new double[40];
-            double[] F1max40 = new double[40];
-
 
             TimeData.CopyTo(frameTest);
             TimeData.CopyTo(frameTrain);
@@ -1207,45 +1204,21 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             Feature1Data.CopyTo(joint1test);
             Feature2Data.CopyTo(joint2test);
             Feature3Data.CopyTo(joint3test);
-            
+
             for (int ii = 0; ii < ArraySize; ii++)
-            {  
-                joint1train[ii] = Convert.ToDouble(feature1Train[(ii +  graphCounter % 400) % 400]);
+            {
+                joint1train[ii] = Convert.ToDouble(feature1Train[(ii + graphCounter % 400) % 400]);
                 joint2train[ii] = Convert.ToDouble(feature2Train[(ii + graphCounter % 400) % 400]);
                 joint3train[ii] = Convert.ToDouble(feature3Train[(ii + graphCounter % 400) % 400]);
             }
 
-            double trainsum = 0.0;
+            double min1; double max1;
+            double min2; double max2;
+            double min3; double max3;
 
-            if (joint3test[360] != 0)
-            {
-                for (int kk = 399; kk > 300; kk--)
-                {
-                    trainsum = trainsum + Math.Abs((joint3train[kk] - joint3test[kk]));
-                }
-
-
-          
-            ArrayList min40 = new ArrayList(feature1Train);
-            min40.Sort();
-
-            for (int i = 0; i < 40; i++)
-            {
-                F1max40[i] = Convert.ToDouble(min40[(i + 339)]);
-                F1min40[i] = Convert.ToDouble(min40[i]);
-            }
-            double min;
-            double max;
-
-            min = F1min40[0] - Math.Abs((F1min40[39] - F1min40[0]));
-            max = F1max40[39] + Math.Abs((F1max40[39] - F1max40[0]));
-            //if (min < 10 && trainsum > 1)
-            //    F1Graph.Background = Brushes.Red;
-            //else
-            //    F1Graph.Background = Brushes.White;
-            }
-
-
+            calculatethreshold(Feature1Data, 40, out min1, out max1);
+            calculatethreshold(Feature1Data, 40, out min2, out max2);
+            calculatethreshold(Feature1Data, 40, out min3, out max3);
 
             ///feature1Train.CopyTo(joint1train);
             //feature2Train.CopyTo(joint2train);
@@ -1354,6 +1327,37 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             F2Graph.LegendVisible = false;
             F1Graph.LegendVisible = false;
         }
+
+        private void calculatethreshold(ArrayList featureData, int past, out double minP, out double maxP)
+        {
+            double[] F1min = new double[past];
+            double[] F1max = new double[past];
+
+            double[] jointTest = new double[featureData.Count];
+            featureData.CopyTo(jointTest);
+
+            if (jointTest[360] != 0)
+            {
+                ArrayList min = new ArrayList(feature1Train);
+                min.Sort();
+
+                for (int i = 0; i < past; i++)
+                {
+                    F1max[i] = Convert.ToDouble(min[(i + 339)]);
+                    F1min[i] = Convert.ToDouble(min[i]);
+                }
+
+                minP = F1min[0] - Math.Abs((F1min[past - 1] - F1min[0]));
+                maxP = F1max[past - 1] + Math.Abs((F1max[past - 1] - F1max[0]));
+
+            }
+            else
+            {
+                minP = 0.0;
+                maxP = 0.0;
+            }
+        }
+
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             Skeleton TrainSkel = new Skeleton();
