@@ -43,6 +43,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         int tableCounter = 1;
         int ArraySize = 400;
         int graphCounter = 0;
+
         ArrayList Feature1Data = new ArrayList();
         ArrayList Feature2Data = new ArrayList();
         ArrayList Feature3Data = new ArrayList();
@@ -52,8 +53,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         ArrayList feature3Train = new ArrayList();
 
         ArrayList TimeData = new ArrayList();
-
-        int differance1 = 0; 
 
         // Database connection strings
         private string selectedJoint;
@@ -66,14 +65,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         private FeatureDefinition featureDefinition = new FeatureDefinition();
         private Classification featurEvaluation = new Classification();
-
-        public static readonly DependencyProperty KinectSensorProperty =
-    DependencyProperty.Register(
-        "KinectSensor",
-        typeof(KinectSensor),
-        typeof(MainWindow),
-        new PropertyMetadata(null));
-
+    //    public static readonly DependencyProperty KinectSensorProperty =
+    //DependencyProperty.Register(
+    //    "KinectSensor",
+    //    typeof(KinectSensor),
+    //    typeof(MainWindow),
+    //    new PropertyMetadata(null));
         private Dictionary<string, int> jointMapping;
         private Dictionary<string, Joint> jointMapping1;
         private Dictionary<string, Joint> jointMapping2;
@@ -81,76 +78,61 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// Width of output drawing
         /// </summary>
         private const float RenderWidth = 640.0f;
-
-
         /// <summary>
         /// Height of our output drawing
         /// </summary>
         private const float RenderHeight = 480.0f;
-
         /// <summary>
         /// Thickness of drawn joint lines
         /// </summary>
         private const double JointThickness = 3;
-
         /// <summary>
         /// Thickness of body center ellipse
         /// </summary>
         private const double BodyCenterThickness = 10;
-
         /// <summary>
         /// Thickness of clip edge rectangles
         /// </summary>
         private const double ClipBoundsThickness = 10;
-
         /// <summary>
         /// Brush used to draw skeleton center point
         /// </summary>
         private readonly Brush centerPointBrush = Brushes.Blue;
-
         /// <summary>
         /// Brush used for drawing joints that are currently tracked
         /// </summary>
         private readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
-
         /// <summary>
         /// Brush used for drawing joints that are currently inferred
         /// </summary>        
         private readonly Brush inferredJointBrush = Brushes.Yellow;
-
         /// <summary>
         /// Pen used for drawing bones that are currently tracked
         /// </summary>
         private readonly Pen trackedBonePen = new Pen(Brushes.Green, 6);
-
         /// <summary>
         /// Pen used for drawing bones that are currently inferred
         /// </summary>        
         private readonly Pen inferredBonePen = new Pen(Brushes.Gray, 1);
-
         /// <summary>
         /// Active Kinect sensor
         /// </summary>
         private KinectSensor sensor;
-        public KinectSensor KinectSensor
-        {
-            get { return (KinectSensor)GetValue(KinectSensorProperty); }
-            set { SetValue(KinectSensorProperty, value); }
-        }
-
+        //public KinectSensor KinectSensor
+        //{
+        //    get { return (KinectSensor)GetValue(KinectSensorProperty); }
+        //    set { SetValue(KinectSensorProperty, value); }
+        //}
         /// <summary>
         /// Drawing group for skeleton rendering output
         /// </summary>
         private DrawingGroup drawingGroup;
         private DrawingGroup drawingGroup1;
-
         /// <summary>
         /// Drawing image that we will display
         /// </summary>
         private DrawingImage imageSource;
         private DrawingImage imageSource1;
-
-
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
@@ -166,7 +148,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
         const int skeletonCount = 6;
         Skeleton[] allSkeletons = new Skeleton[skeletonCount];
-
         /// <summary>
         /// Draws indicators to show which edges are clipping skeleton data
         /// </summary>
@@ -331,7 +312,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             dr.Close();
 
         }
-
         void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
@@ -380,7 +360,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 return first;
             }
         }
-
         //void GetCameraPoint(Skeleton first, AllFramesReadyEventArgs e)
         //{
         //    MySqlConnection connection = new MySqlConnection(MyConString);
@@ -591,7 +570,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         //    //Canvas.SetTop(element, scaledJoint.Position.Y);
 
         //}
-
         /// <summary>
         /// Execute shutdown tasks
         /// </summary>
@@ -604,7 +582,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.sensor.Stop();
             }
         }
-
         /// <summary>
         /// Event handler for Kinect sensor's SkeletonFrameReady event
         /// </summary>
@@ -891,7 +868,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
             }
         }
-
         private void DrawBonesAndJoints1(DrawingContext drawingContext)
         {
             SkeletonPoint sp = new SkeletonPoint();
@@ -991,7 +967,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 tableCounter = 1;
             }
         }
-
         /// <summary>
         /// Draws a skeleton's bones and joints
         /// </summary>
@@ -1071,13 +1046,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                                                              DepthImageFormat.Resolution640x480Fps30);
             return new Point(depthPoint.X, depthPoint.Y);
         }
-
         private void DrawBone1(DrawingContext drawingContext, Joint joint0, Joint joint1)
         {
             Pen drawPen = this.trackedBonePen;
             drawingContext.DrawLine(drawPen, this.SkeletonPointToScreen(joint0.Position), this.SkeletonPointToScreen(joint1.Position));
         }
-
         /// <summary>
         /// Draws a bone line between two joints
         /// </summary>
@@ -1164,7 +1137,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             double min3; double max3;
             double average1; double average2; double average3;
             Brush brush1; Brush brush2; Brush brush3;
-
 
             TimeData.CopyTo(frameTest);
             TimeData.CopyTo(frameTrain);
@@ -1258,11 +1230,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             F2Graph.LegendVisible = false;
             F1Graph.LegendVisible = false;
         }
-
         private void calculatethreshold(ArrayList featureData, int past, out double minP, out double maxP)
         {
             double[] F1min = new double[past];
             double[] F1max = new double[past];
+            double avergaemin = 0;
+            double avergaemax = 0;
 
             if (Convert.ToDouble(featureData[360]) != 0.0)
             {
@@ -1273,10 +1246,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 {
                     F1max[i] = Convert.ToDouble(min[(i + 339)]);
                     F1min[i] = Convert.ToDouble(min[i]);
+                    avergaemax = avergaemax + F1max[i] / past;
+                    avergaemin = avergaemin + F1min[i] / past;
                 }
 
-                minP = F1min[0] - Math.Abs((F1min[past - 1] - F1min[0]));
-                maxP = F1max[past - 1] + Math.Abs((F1max[past - 1] - F1max[0]));
+                minP = avergaemin;
+                maxP = avergaemax;
+
+                //minP = F1min[0] - Math.Abs((F1min[past - 1] - F1min[0])/10);
+                //maxP = F1max[past - 1] + Math.Abs((F1max[past - 1] - F1max[0])/10);
             }
             else
             {
@@ -1296,10 +1274,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             if (average < minimum || average > maximum)
             {
-                brush = Brushes.Red;
+                brush = Brushes.PaleVioletRed;
             }
             else {
-                brush = Brushes.White;
+                brush = Brushes.PaleGreen;
 
             }
         }
@@ -1427,6 +1405,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     
                     //jointMapping2.Add(entry.Key, joint);
                     //TrainSkel.Joints[joint.JointType] = joint;
+                    
 
                     switch (entry.Key)
                     {
