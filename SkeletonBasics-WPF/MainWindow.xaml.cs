@@ -1057,8 +1057,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 Z.Content = "Z: " + System.Math.Round(skeleton.Joints[key].Position.Z, 2).ToString();
             }
         }
-
-
         /// <summary>
         /// Maps a SkeletonPoint to lie within our render space and converts to Point
         /// </summary>
@@ -1140,49 +1138,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
         private void Make_Graph()
         {
-            // Clean the graphs
-
-            List<IPlotterElement> removeList1 = new List<IPlotterElement>();
-            List<IPlotterElement> removeList2 = new List<IPlotterElement>();
-            List<IPlotterElement> removeList3 = new List<IPlotterElement>();
-
-            foreach (var item in F1Graph.Children)
-            {
-                if (item is LineGraph || item is MarkerPointsGraph)
-                {
-                    removeList1.Add(item);
-                }
-            }
-
-            foreach (var item in removeList1)
-            {
-                F1Graph.Children.Remove(item);
-            }
-
-            foreach (var item in F2Graph.Children)
-            {
-                if (item is LineGraph || item is MarkerPointsGraph)
-                {
-                    removeList2.Add(item);
-                }
-            }
-            foreach (var item in removeList2)
-            {
-                F2Graph.Children.Remove(item);
-            }
-
-            foreach (var item in F3Graph.Children)
-            {
-                if (item is LineGraph || item is MarkerPointsGraph)
-                {
-                    removeList3.Add(item);
-                }
-            }
-            foreach (var item in removeList3)
-            {
-                F3Graph.Children.Remove(item);
-            }
-
+            cleanGraphs();
+            // set prameters for visible range of the graphs. This is defined manullay based
+            //observation
+            Rect visibleReact1 = new Rect();
+            Rect visibleReact2 = new Rect();
+            Rect visibleReact3 = new Rect();
 
             // sizes
             int[] frameTest = new int[ArraySize];
@@ -1196,6 +1157,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             double[] joint3train = new double[ArraySize];
             double[] joint3test = new double[ArraySize];
+
+            //these are used for user feedback
+            double min1; double max1;
+            double min2; double max2;
+            double min3; double max3;
+            double average1; double average2; double average3;
+            Brush brush1; Brush brush2; Brush brush3;
 
 
             TimeData.CopyTo(frameTest);
@@ -1212,18 +1180,21 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 joint3train[ii] = Convert.ToDouble(feature3Train[(ii + graphCounter % 400) % 400]);
             }
 
-            double min1; double max1;
-            double min2; double max2;
-            double min3; double max3;
+            calculatethreshold(feature1Train, 40, out min1, out max1);
+            calculatethreshold(feature2Train, 40, out min2, out max2);
+            calculatethreshold(feature3Train, 40, out min3, out max3);
 
-            calculatethreshold(Feature1Data, 40, out min1, out max1);
-            calculatethreshold(Feature1Data, 40, out min2, out max2);
-            calculatethreshold(Feature1Data, 40, out min3, out max3);
+            calculateAverage(Feature1Data, 10, out average1);
+            calculateAverage(Feature2Data, 10, out average2);
+            calculateAverage(Feature3Data, 10, out average3);
 
-            ///feature1Train.CopyTo(joint1train);
-            //feature2Train.CopyTo(joint2train);
-           // feature3Train.CopyTo(joint3train);
+            setfeedbackcolor(average1, min1, max1, out brush1);
+            setfeedbackcolor(average2, min2, max2, out brush2);
+            setfeedbackcolor(average3, min3, max3, out brush3);
 
+            F1Graph.Background = brush1;
+            F2Graph.Background = brush2;
+            F3Graph.Background = brush3;
 
             var FrameTestDataSource = new EnumerableDataSource<int>(frameTest);
             FrameTestDataSource.SetXMapping(x => x);
@@ -1267,57 +1238,17 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             CompositeDataSource compTrain3DataSource = new
               CompositeDataSource(FrameTrainDataSource, Joint3TrainDataSource);
 
-
             // assign graph visible window
-            Rect visibleReact1 = new Rect();
-            Rect visibleReact2 = new Rect();
-            Rect visibleReact3 = new Rect();
-
-            switch (cmbExer.SelectedIndex)
-            {
-                case 0:
-                    visibleReact1 = new Rect(0, -20, ArraySize, 120);
-                    visibleReact2 = new Rect(0, -10, ArraySize, 190);
-                    visibleReact3 = new Rect(0, -10, ArraySize, 190);
-                    break;
-                case 1:
-                    visibleReact1 = new Rect(0, 0, ArraySize, 60);
-                    visibleReact2 = new Rect(0, 0, ArraySize, 50);
-                    visibleReact3 = new Rect(0, -5, ArraySize, 75);
-                    break;
-                case 2:
-                    visibleReact1 = new Rect(0, -5, ArraySize, 105);
-                    visibleReact2 = new Rect(0, 20, ArraySize, 130);
-                    visibleReact3 = new Rect(0, 20, ArraySize, 130);
-                    break;
-                case 3:
-                    visibleReact1 = new Rect(0, -5, ArraySize, 105);
-                    visibleReact2 = new Rect(0, 0, ArraySize, 50);
-                    visibleReact3 = new Rect(0, 20, ArraySize, 40);
-                    break;
-                case 4:
-                    visibleReact1 = new Rect(0, 0, ArraySize, 30);
-                    visibleReact2 = new Rect(0, 0, ArraySize, 30);
-                    visibleReact3 = new Rect(0, 20, ArraySize, 40);
-                    break;
-                case 5:
-                    visibleReact1 = new Rect(0, 100, ArraySize, 80);
-                    visibleReact2 = new Rect(0, 0, ArraySize, 100);
-                    visibleReact3 = new Rect(0, -.5, ArraySize, 2);
-                    break;
-                default:
-                    break;
-            }
-
+            setgraphvisible(out visibleReact1, out visibleReact2, out visibleReact3);
 
             F1Graph.AddLineGraph(compTest1DataSource, Colors.Blue, 3, "live");
-            F1Graph.AddLineGraph(compTrain1DataSource, Colors.Aqua, 2, "Base");
+            F1Graph.AddLineGraph(compTrain1DataSource, Colors.Aqua, 3, "Base");
 
             F2Graph.AddLineGraph(compTest2DataSource, Colors.Blue, 3, "Live");
-            F2Graph.AddLineGraph(compTrain2DataSource, Colors.Aqua, 2, "Base");
+            F2Graph.AddLineGraph(compTrain2DataSource, Colors.Aqua, 3, "Base");
 
-            F3Graph.AddLineGraph(compTest3DataSource, Colors.Blue, 4, "Live");
-            F3Graph.AddLineGraph(compTrain3DataSource, Colors.Aqua, 2, "Base");
+            F3Graph.AddLineGraph(compTest3DataSource, Colors.Blue, 3, "Live");
+            F3Graph.AddLineGraph(compTrain3DataSource, Colors.Aqua, 3, "Base");
 
             F1Graph.Viewport.Visible = visibleReact1;
             F2Graph.Viewport.Visible = visibleReact2;
@@ -1333,12 +1264,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             double[] F1min = new double[past];
             double[] F1max = new double[past];
 
-            double[] jointTest = new double[featureData.Count];
-            featureData.CopyTo(jointTest);
-
-            if (jointTest[360] != 0)
+            if (Convert.ToDouble(featureData[360]) != 0.0)
             {
-                ArrayList min = new ArrayList(feature1Train);
+                ArrayList min = new ArrayList(featureData);
                 min.Sort();
 
                 for (int i = 0; i < past; i++)
@@ -1349,7 +1277,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                 minP = F1min[0] - Math.Abs((F1min[past - 1] - F1min[0]));
                 maxP = F1max[past - 1] + Math.Abs((F1max[past - 1] - F1max[0]));
-
             }
             else
             {
@@ -1357,7 +1284,109 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 maxP = 0.0;
             }
         }
+        private void calculateAverage(ArrayList livefeature, int number, out double average)
+        {
+            average = 0;
+            for (int ii = (livefeature.Count-1); ii > (livefeature.Count - number-1); ii--)
+            {
+                average = average + Convert.ToDouble(livefeature[ii])/number;
+            }
+        }
+        private void setfeedbackcolor(double average, double minimum, double maximum, out Brush brush)
+        {
+            if (average < minimum || average > maximum)
+            {
+                brush = Brushes.Red;
+            }
+            else {
+                brush = Brushes.White;
 
+            }
+        }
+        private void setgraphvisible(out Rect range1, out Rect range2,out Rect range3)
+        {
+            switch (cmbExer.SelectedIndex)
+            {
+                case 0:
+                    range1 = new Rect(0, -20, ArraySize, 120);
+                    range2 = new Rect(0, -10, ArraySize, 190);
+                    range3 = new Rect(0, -10, ArraySize, 190);
+                    break;
+                case 1:
+                    range1 = new Rect(0, 0, ArraySize, 60);
+                    range2 = new Rect(0, 0, ArraySize, 50);
+                    range3 = new Rect(0, -5, ArraySize, 75);
+                    break;
+                case 2:
+                    range1 = new Rect(0, -5, ArraySize, 105);
+                    range2 = new Rect(0, 20, ArraySize, 130);
+                    range3 = new Rect(0, 20, ArraySize, 130);
+                    break;
+                case 3:
+                    range1 = new Rect(0, -5, ArraySize, 105);
+                    range2 = new Rect(0, 0, ArraySize, 50);
+                    range3 = new Rect(0, 20, ArraySize, 40);
+                    break;
+                case 4:
+                    range1 = new Rect(0, 0, ArraySize, 30);
+                    range2 = new Rect(0, 0, ArraySize, 30);
+                    range3 = new Rect(0, 20, ArraySize, 40);
+                    break;
+                case 5:
+                    range1 = new Rect(0, 100, ArraySize, 80);
+                    range2 = new Rect(0, 0, ArraySize, 100);
+                    range3 = new Rect(0, -.5, ArraySize, 2);
+                    break;
+                default:
+                    range1 = new Rect(0, 0, ArraySize, 30);
+                    range2 = new Rect(0, 0, ArraySize, 30);
+                    range3 = new Rect(0, 20, ArraySize, 40);
+                    break;
+            }
+        }
+        private void cleanGraphs()
+        {
+            List<IPlotterElement> removeList1 = new List<IPlotterElement>();
+            List<IPlotterElement> removeList2 = new List<IPlotterElement>();
+            List<IPlotterElement> removeList3 = new List<IPlotterElement>();
+
+            foreach (var item in F1Graph.Children)
+            {
+                if (item is LineGraph || item is MarkerPointsGraph)
+                {
+                    removeList1.Add(item);
+                }
+            }
+
+            foreach (var item in removeList1)
+            {
+                F1Graph.Children.Remove(item);
+            }
+
+            foreach (var item in F2Graph.Children)
+            {
+                if (item is LineGraph || item is MarkerPointsGraph)
+                {
+                    removeList2.Add(item);
+                }
+            }
+            foreach (var item in removeList2)
+            {
+                F2Graph.Children.Remove(item);
+            }
+
+            foreach (var item in F3Graph.Children)
+            {
+                if (item is LineGraph || item is MarkerPointsGraph)
+                {
+                    removeList3.Add(item);
+                }
+            }
+            foreach (var item in removeList3)
+            {
+                F3Graph.Children.Remove(item);
+            }
+        }
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             Skeleton TrainSkel = new Skeleton();
@@ -1609,13 +1638,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             dr.Close();
             tableCounter = 1;
         }
-
         private void slider1_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
 
             //this.sensor.ElevationAngle = (int)slider1.Value;
         }
-
         private void slider1_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             this.sensor.ElevationAngle = (int)slider1.Value;
