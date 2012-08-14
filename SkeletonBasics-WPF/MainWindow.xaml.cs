@@ -1276,60 +1276,60 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             switch (cmbExer.SelectedIndex)
             {
                 case 0:
-                    minP1 = F1min.Average()+std1min;
-                    maxP1 = F1max.Average()+std1max;
-                    minP2 = F2min.Average()+std2min;
-                    maxP2 = F2max.Average()+std2max;
-                    minP3 = F3min.Average()+std3min;
-                    maxP3 = F3max.Average()+std3max;
+                    minP1 = F1min.Average() + (std1min * 3);
+                    maxP1 = F1max.Average() + (std1max * 3);
+                    minP2 = F2min.Average() + (std2min * 3);
+                    maxP2 = F2max.Average() + (std2max * 3);
+                    minP3 = F3min.Average() + (std3min * 3);
+                    maxP3 = F3max.Average() + (std3max * 3);
                     break;
                 case 1:
-                    minP1 = F1min.Average()+std1min;
-                    maxP1 = F1max.Average()+std1max;
-                    minP2 = F2min.Average()+std2min;
-                    maxP2 = F2max.Average()+std2max;
-                    minP3 = F3min.Average()+std3min;
-                    maxP3 = F3max.Average()+std3max;
+                    minP1 = F1min.Average() - (std1min * 3);
+                    maxP1 = F1max.Average() + (std1max * 3);
+                    minP2 = F2min.Average() - (std2min * 3);
+                    maxP2 = F2max.Average() + (std2max * 3);
+                    minP3 = F3min.Average() - (std3min * 3);
+                    maxP3 = F3max.Average() + (std3max * 3);
                     break;
                 case 2:
-                    minP1 = F1min.Average()+std1min;
-                    maxP1 = F1max.Average()+std1max;
-                    minP2 = F2min.Average()+std2min;
-                    maxP2 = F2max.Average()+std2max;
-                    minP3 = F3min.Average()+std3min;
-                    maxP3 = F3max.Average()+std3max;
+                    minP1 = F1min.Average() - (2 * std1min);
+                    maxP1 = F1max.Average() - (2 * std1max);
+                    minP2 = F2min.Average() - (2 * std2min);
+                    maxP2 = F2max.Average() - (2 * std2max);
+                    minP3 = F3min.Average() - (2 * std3min);
+                    maxP3 = F3max.Average() - (2 * std3max);
                     break;
                 case 3:
-                    minP1 = F1min.Average()+std1min;
-                    maxP1 = F1max.Average()+std1max;
-                    minP2 = F2min.Average()+std2min;
-                    maxP2 = F2max.Average()+std2max;
-                    minP3 = F3min.Average()+std3min;
-                    maxP3 = F3max.Average()+std3max;
+                    minP1 = F1min.Average() + (2 * std1min);
+                    maxP1 = F1max.Average() + (2 * std1max);
+                    minP2 = F2min.Average() + (2 * std2min);
+                    maxP2 = F2max.Average() + (2 * std2max);
+                    minP3 = F3min.Average() + (2 * std3min);
+                    maxP3 = F3max.Average() + (2 * std3max);
                     break;
                 case 4:
-                    minP1 = F1min.Average()+std1min;
-                    maxP1 = F1max.Average()+std1max;
-                    minP2 = F2min.Average()+std2min;
-                    maxP2 = F2max.Average()+std2max;
-                    minP3 = F3min.Average()+std3min;
-                    maxP3 = F3max.Average()+std3max;
+                    minP1 = F1min.Average() - std1min;
+                    maxP1 = F1max.Average() + std1max;
+                    minP2 = F2min.Average() - std2min;
+                    maxP2 = F2max.Average() + std2max;
+                    minP3 = F3min.Average() - std3min;
+                    maxP3 = F3max.Average() + std3max;
                     break;
                 case 5:
                     minP1 = F1min.Average() - (std1min * 2);
-                    maxP1 = F1max.Average()+ (std1max * 2);
-                    minP2 = F2min.Average() - (std2min *2);
-                    maxP2 = F2max.Average() + (std2max * 10);
-                    minP3 = F3min.Average()+std3min;
-                    maxP3 = F3max.Average()+std3max;
+                    maxP1 = F1max.Average() + (std1max * 2);
+                    minP2 = F2min.Average() - (std2min * 2);
+                    maxP2 = F2max.Average() + (std2max * 2);
+                    minP3 = F3min.Average() - (std3min * 2);
+                    maxP3 = F3max.Average() + (std3max * 2);
                     break;
                 default:
-                    minP1 = F1min.Average()+std1min;
-                    maxP1 = F1max.Average()+std1max;
-                    minP2 = F2min.Average()+std2min;
-                    maxP2 = F2max.Average()+std2max;
-                    minP3 = F3min.Average()+std3min;
-                    maxP3 = F3max.Average()+std3max;
+                    minP1 = F1min.Average() + std1min;
+                    maxP1 = F1max.Average() + std1max;
+                    minP2 = F2min.Average() + std2min;
+                    maxP2 = F2max.Average() + std2max;
+                    minP3 = F3min.Average() + std3min;
+                    maxP3 = F3max.Average() + std3max;
                     break;
             }
                 //minP = F1min[0] - Math.Abs((F1min[past - 1] - F1min[0])/10);
