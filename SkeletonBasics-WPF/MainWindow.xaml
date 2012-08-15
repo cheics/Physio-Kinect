@@ -94,7 +94,7 @@
                     <Label Name="Z" Grid.Row="2" Background="#505050" FontSize="24" Foreground="White" Margin="0 10 0 10">Z: N/A</Label>
                     <ComboBox Grid.Row="3" Background="White" FontSize="24" Margin="0 10 0 0" Name="Joints" SelectionChanged="Joints_SelectionChanged" />
                     <ComboBox Grid.Row="4" Name="cmbExer" Background="White" FontSize="24"  Margin="0,10,0,0" />
-                    <Button Height="40" Width="75"  Grid.Row="5" Background="#505050" FontSize="14" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Reload" Name="button1" Click="button1_Click" IsEnabled="True" IsDefault="False" IsCancel="False" OpacityMask="{x:Null}" IsHitTestVisible="True" IsTabStop="True" ClickMode="Hover" Focusable="False" />
+                    <Button Height="40" Width="75"  Grid.Row="5" Background="#505050" FontSize="14" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Reload" Name="button1" Click="button1_Click" IsEnabled="True" IsDefault="False" IsCancel="False" OpacityMask="{x:Null}" IsHitTestVisible="True" IsTabStop="True" ClickMode="Press" Focusable="False" />
                 </Grid>
             <Viewbox Grid.Column="3" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <Image Name="VBLiveSkeleton" Width="50" Height="50" VerticalAlignment="Center"/>

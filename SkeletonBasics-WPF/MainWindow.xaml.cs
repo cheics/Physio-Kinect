@@ -53,6 +53,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         ArrayList feature3Train = new ArrayList();
 
         ArrayList TimeData = new ArrayList();
+        // needed for thresholding calc
+
+        double min1; double max1;
+        double min2; double max2;
+        double min3; double max3;
 
         // Database connection strings
         private string selectedJoint;
@@ -1132,9 +1137,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             double[] joint3test = new double[ArraySize];
 
             //these are used for user feedback
-            double min1; double max1;
-            double min2; double max2;
-            double min3; double max3;
+
             double average1; double average2; double average3;
             Brush brush1; Brush brush2; Brush brush3;
 
@@ -1151,9 +1154,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 joint2train[ii] = Convert.ToDouble(feature2Train[(ii + graphCounter % 400) % 400]);
                 joint3train[ii] = Convert.ToDouble(feature3Train[(ii + graphCounter % 400) % 400]);
             }
-
-            calculatethreshold(feature1Train, feature2Train, feature3Train,
-                40, out min1, out max1, out min2, out max2, out min3, out max3);
 
             calculateAverage(Feature1Data, 10, out average1);
             calculateAverage(Feature2Data, 10, out average2);
@@ -1276,52 +1276,53 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             switch (cmbExer.SelectedIndex)
             {
                 case 0:
-                    minP1 = F1min.Average() + (std1min * 3);
+                    minP1 = F1min.Average() - (std1min * 2);
                     maxP1 = F1max.Average() + (std1max * 3);
-                    minP2 = F2min.Average() + (std2min * 3);
+                    minP2 = F2min.Average() - (std2min * 2);
                     maxP2 = F2max.Average() + (std2max * 3);
-                    minP3 = F3min.Average() + (std3min * 3);
+                    minP3 = F3min.Average() - (std3min * 2);
                     maxP3 = F3max.Average() + (std3max * 3);
                     break;
                 case 1:
-                    minP1 = F1min.Average() - (std1min * 3);
-                    maxP1 = F1max.Average() + (std1max * 3);
-                    minP2 = F2min.Average() - (std2min * 3);
+                    minP1 = F1min.Average() - (std1min * 2);
+                    maxP1 = F1max.Average() + (std1max * 15);
+                    minP2 = F2min.Average() - (std2min );
                     maxP2 = F2max.Average() + (std2max * 3);
-                    minP3 = F3min.Average() - (std3min * 3);
+                    minP3 = F3min.Average() - (std3min);
                     maxP3 = F3max.Average() + (std3max * 3);
                     break;
                 case 2:
                     minP1 = F1min.Average() - (2 * std1min);
-                    maxP1 = F1max.Average() - (2 * std1max);
+                    maxP1 = F1max.Average() + (2 * std1max);
                     minP2 = F2min.Average() - (2 * std2min);
-                    maxP2 = F2max.Average() - (2 * std2max);
+                    maxP2 = F2max.Average() + (15 * std2max);
                     minP3 = F3min.Average() - (2 * std3min);
-                    maxP3 = F3max.Average() - (2 * std3max);
+                    maxP3 = F3max.Average() + (15 * std3max);
                     break;
                 case 3:
-                    minP1 = F1min.Average() + (2 * std1min);
+                    minP1 = F1min.Average() - (std1min);
                     maxP1 = F1max.Average() + (2 * std1max);
-                    minP2 = F2min.Average() + (2 * std2min);
+                    minP2 = F2min.Average() - (2 * std2min);
                     maxP2 = F2max.Average() + (2 * std2max);
-                    minP3 = F3min.Average() + (2 * std3min);
-                    maxP3 = F3max.Average() + (2 * std3max);
+                    minP3 = F3min.Average() - (2 * std3min);
+                    maxP3 = F3max.Average() + (10 * std3max);
                     break;
                 case 4:
-                    minP1 = F1min.Average() - std1min;
-                    maxP1 = F1max.Average() + std1max;
-                    minP2 = F2min.Average() - std2min;
-                    maxP2 = F2max.Average() + std2max;
+                    minP1 = F1min.Average() - (2*std1min);
+                    maxP1 = F1max.Average() + (2*std1max);
+                    minP2 = F2min.Average() - (3* std2min);
+                    maxP2 = F2max.Average() + (20 * std2max);
                     minP3 = F3min.Average() - std3min;
                     maxP3 = F3max.Average() + std3max;
                     break;
                 case 5:
                     minP1 = F1min.Average() - (std1min * 2);
                     maxP1 = F1max.Average() + (std1max * 2);
-                    minP2 = F2min.Average() - (std2min * 2);
-                    maxP2 = F2max.Average() + (std2max * 2);
-                    minP3 = F3min.Average() - (std3min * 2);
-                    maxP3 = F3max.Average() + (std3max * 2);
+                    minP2 = F2min.Average() - (std2min *2);
+                    maxP2 = F2max.Average() + (std2max * 10);
+                    minP3 = F3min.Average() + std3min;
+                    maxP3 = F3max.Average() + std3max;
+
                     break;
                 default:
                     minP1 = F1min.Average() + std1min;
@@ -1332,9 +1333,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     maxP3 = F3max.Average() + std3max;
                     break;
             }
-                //minP = F1min[0] - Math.Abs((F1min[past - 1] - F1min[0])/10);
-                //maxP = F1max[past - 1] + Math.Abs((F1max[past - 1] - F1max[0])/
- 
+
         }
         private void calculateAverage(ArrayList livefeature, int number, out double average)
         {
@@ -1459,8 +1458,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             MySqlConnection con = new MySqlConnection(MyConString);
             MySqlCommand cmd = con.CreateCommand();
             cmd.CommandText = "select * from dbkinect.kinectdata where UserFirst = '" + firstName.Text.ToString() +
-                "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='1' and Exercise = '" + cmbExer.SelectedValue.ToString() + "' limit " + ArraySize.ToString();
-
+                "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='1' and Exercise = '" + cmbExer.SelectedValue.ToString()
+                + "' Order by Created_at DESC" + " limit " + ArraySize.ToString() ;
             con.Open();
             MySqlDataReader dr = cmd.ExecuteReader();
             dt.Clear();
@@ -1485,12 +1484,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                     Joint joint = new Joint();
                     joint = TrainSkel.Joints[JointType.Head];
-                    
-                    
-                    //jointMapping2.Add(entry.Key, joint);
-                    //TrainSkel.Joints[joint.JointType] = joint;
-                    
-
+  
                     switch (entry.Key)
                     {
                         case "Head":
@@ -1696,8 +1690,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
                         break;
                 }
-
             }
+            calculatethreshold(feature1Train, feature2Train, feature3Train,
+            40, out min1, out max1, out min2, out max2, out min3, out max3);
+
             dr.Close();
             tableCounter = 1;
         }
