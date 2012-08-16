@@ -73,6 +73,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         private FeatureDefinition featureDefinition = new FeatureDefinition();
         private Classification featurEvaluation = new Classification();
+
+		private PeakDetectionSimple peakDetector = new PeakDetectionSimple();
     //    public static readonly DependencyProperty KinectSensorProperty =
     //DependencyProperty.Register(
     //    "KinectSensor",
