@@ -39,6 +39,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     /// </summary>
     public partial class MainWindow : Window
     {
+        string insertCommand = "INSERT INTO dbkinect.kinectdata (Framenumber,Created_at,UserFirst, UserLast , Exercise ,Type,HipCenterX,HipCenterY,HipCenterZ,SpineX,SpineY,SpineZ,ShoulderCenterX,ShoulderCenterY,ShoulderCenterZ,HeadX,HeadY,HeadZ,ShoulderLeftX,ShoulderLeftY,ShoulderLeftZ,ElbowLeftX,ElbowLeftY,ElbowLeftZ,WristLeftX,WristLeftY,WristLeftZ,HandLeftX,HandLeftY,HandLeftZ,ShoulderRightX,ShoulderRightY,ShoulderRightZ,ElbowRightX,ElbowRightY,ElbowRightZ,WristRightX,WristRightY,WristRightZ,HandRightX,HandRightY,HandRightZ,HipLeftX,HipLeftY,HipLeftZ,KneeLeftX,KneeLeftY,KneeLeftZ,AnkleLeftX,AnkleLeftY,AnkleLeftZ,FootLeftX,FootLeftY,FootLeftZ,HipRightX,HipRightY,HipRightZ,KneeRightX,KneeRightY,KneeRightZ,AnkleRightX,AnkleRightY,AnkleRightZ,FootRightX,FootRightY,FootRightZ) VALUES ";
+        string insertValues = "";
+
         DataTable dt = new DataTable();
         int tableCounter = 1;
         int ArraySize = 400;
@@ -64,7 +67,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private string MyConString = "SERVER=localhost;" +
             "DATABASE=dbkinect;" +
             "UID=root;" +
-            "PASSWORD=Karamlou;";
+            "PASSWORD=base456;";
         private string activeDir = @"C:\testdir2";
         public string newPath = "test";
 
@@ -737,11 +740,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                         if (baseline.IsChecked == true)
                         {
-                            // SQL connection to record skeleton data
-                            MySqlConnection connection = new MySqlConnection(MyConString);
-                            MySqlCommand command = connection.CreateCommand();
-                            MySqlDataReader Reader;
-                            connection.Open();
+                            //// SQL connection to record skeleton data
+                            //MySqlConnection connection = new MySqlConnection(MyConString);
+                            //MySqlCommand command = connection.CreateCommand();
+                            //MySqlDataReader Reader;
+                            //connection.Open();
 
                             string testing = null;
                             foreach (string stringKey in featureFrame.featureValues.Keys)
@@ -752,10 +755,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             foreach (Joint joint in skel_1.Joints)
                             {
 
-                                command.CommandText = command.CommandText + "," +
-                                joint.JointType.ToString() + "X" + "," +
-                                joint.JointType.ToString() + "Y" + "," +
-                                joint.JointType.ToString() + "Z";
+                                //command.CommandText = command.CommandText + "," +
+                                //joint.JointType.ToString() + "X" + "," +
+                                //joint.JointType.ToString() + "Y" + "," +
+                                //joint.JointType.ToString() + "Z";
 
 
                                 values = values + "," +
@@ -794,12 +797,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 + firstName.Text.ToString() + "','" + lastName.Text.ToString() + "' , '"
                                 + SelectedItem + "'"
                                 + values;
-                            command.CommandText = "INSERT INTO dbkinect.kinectdata (Framenumber,Created_at,UserFirst, UserLast , Exercise ,Type " + command.CommandText + ") VALUE ("
-                               + values + ")";
 
-                            Reader = command.ExecuteReader();
-                            connection.Close();
-                            Reader.Close();
+                            insertValues = insertValues + ",(" + values + ")";
+
+                            //command.CommandText = "INSERT INTO dbkinect.kinectdata (Framenumber,Created_at,UserFirst, UserLast , Exercise ,Type " + command.CommandText + ") VALUE ("
+                            //   + values + ")";
+
+                            //Reader = command.ExecuteReader();
+                            //connection.Close();
+                            //Reader.Close();
                         }
                         if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 15) == 0)
                         {
@@ -823,7 +829,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                         if (skel.TrackingState == SkeletonTrackingState.Tracked)
                         {
-                            this.DrawBonesAndJoints1(dc);
+                            if(dt.Rows.Count>0 && baseline.IsChecked==false)
+                                this.DrawBonesAndJoints1(dc);
                             break;
                         }
                         else if (skel.TrackingState == SkeletonTrackingState.PositionOnly)
@@ -1450,6 +1457,27 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
         private void button1_Click(object sender, RoutedEventArgs e)
         {
+            if (insertValues != "")
+            {
+                // SQL connection to record skeleton data
+                MySqlConnection connection = new MySqlConnection(MyConString);
+                MySqlCommand command = connection.CreateCommand();
+                MySqlDataReader Reader;
+                connection.Open();
+
+                insertValues = insertValues.Substring(1);
+
+                command.CommandText = insertCommand + insertValues;
+
+                Reader = command.ExecuteReader();
+                connection.Close();
+                Reader.Close();
+
+                insertValues = "";
+            }
+
+            
+
             Skeleton TrainSkel = new Skeleton();
             SkeletonPoint sp = new SkeletonPoint();
             Dictionary<string, Joint> jointMappingFinal = new Dictionary<string, Joint>();
