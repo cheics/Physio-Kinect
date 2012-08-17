@@ -67,7 +67,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private string MyConString = "SERVER=localhost;" +
             "DATABASE=dbkinect;" +
             "UID=root;" +
-            "PASSWORD=base456;";
+            "PASSWORD=Karamlou;";
         private string activeDir = @"C:\testdir2";
         public string newPath = "test";
 

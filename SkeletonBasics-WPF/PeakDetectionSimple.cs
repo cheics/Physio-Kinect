@@ -23,6 +23,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 		public void AddDataPoint(int frameNumber, double dataPoint)
 		{
 			int xx=5;
+			int thresh = 10;
+
 			smoothing.Add(dataPoint);
 			smoothing_x.Add(frameNumber);
 
@@ -31,11 +33,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 				List<double>  sm1 =(List<double>) smoothing.Skip(0).Take(xx);
 				List<double> sm2 = (List<double>) smoothing.Skip(xx).Take(xx);
 				List<double> sm3 = (List<double>)smoothing.Skip(xx * 2).Take(xx);
-				if (sm1.Sum() > sm2.Sum() & sm3.Sum() > sm2.Sum())
+				int xTime = (int) smoothing_x[xx + xx / 2];
+				if (sm1.Sum() > sm2.Sum() & sm3.Sum() > sm2.Sum() & xTime - (int) valleys.Last() > thresh)
 				{
 					valleys.Add((int) smoothing_x[xx + xx / 2]);
 				}
-				else if (sm1.Sum() < sm2.Sum() & sm3.Sum() < sm2.Sum())
+				else if (sm1.Sum() < sm2.Sum() & sm3.Sum() < sm2.Sum() & xTime - (int) peaks.Last() > thresh)
 				{
 					peaks.Add((int)smoothing_x[xx + xx / 2]);
 				}

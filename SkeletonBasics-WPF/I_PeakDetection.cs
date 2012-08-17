@@ -7,10 +7,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
 	interface I_PeakDetection
 	{
-		void AddDataPoint(int frameNumber, int timeStamp);
+		void AddDataPoint(int frameNumber, double dataPoint);
 
-		int[] GetPeaks();
-		int[] GetValleys();
+		List<int> GetPeaks();
+		List<int> GetValleys();
 		
 	}
 }
