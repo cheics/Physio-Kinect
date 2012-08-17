@@ -46,6 +46,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         int tableCounter = 1;
         int ArraySize = 400;
         int graphCounter = 0;
+        int globalcounter = 0; 
 
         ArrayList Feature1Data = new ArrayList();
         ArrayList Feature2Data = new ArrayList();
@@ -74,7 +75,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private FeatureDefinition featureDefinition = new FeatureDefinition();
         private Classification featurEvaluation = new Classification();
 
-		private PeakDetectionSimple peakDetector = new PeakDetectionSimple();
+		//private PeakDetectionSimple peakDetector = new PeakDetectionSimple();
     //    public static readonly DependencyProperty KinectSensorProperty =
     //DependencyProperty.Register(
     //    "KinectSensor",
@@ -781,6 +782,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 + firstName.Text.ToString() + "','" + lastName.Text.ToString() + "' , '"
                                 + SelectedItem + "'"
                                 + values;
+                            globalcounter++;
 
                             insertValues = insertValues + ",(" + values + ")";
 
@@ -1307,12 +1309,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     maxP3 = F3max.Average() + std3max;
                     break;
                 case 5:
-                    minP1 = F1min.Average() - (std1min * 2);
-                    maxP1 = F1max.Average() + (std1max * 2);
+                    minP1 = F1min.Average() - (std1min * 3);
+                    maxP1 = F1max.Average() + (std1max * 25);
                     minP2 = F2min.Average() - (std2min *2);
                     maxP2 = F2max.Average() + (std2max * 10);
-                    minP3 = F3min.Average() + std3min;
-                    maxP3 = F3max.Average() + std3max;
+                    minP3 = F3min.Average() - std3min;
+                    maxP3 = F3max.Average() + 10*std3max;
 
                     break;
                 default:
@@ -1471,7 +1473,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             MySqlCommand cmd = con.CreateCommand();
             cmd.CommandText = "select * from dbkinect.kinectdata where UserFirst = '" + firstName.Text.ToString() +
                 "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='1' and Exercise = '" + cmbExer.SelectedValue.ToString()
-                + "' Order by Created_at DESC" + " limit " + ArraySize.ToString() ;
+                + "' Order by Framenumber DESC" + " limit " + ArraySize.ToString() ;
             con.Open();
             MySqlDataReader dr = cmd.ExecuteReader();
             dt.Clear();
