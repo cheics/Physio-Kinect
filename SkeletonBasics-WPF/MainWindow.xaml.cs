@@ -655,6 +655,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                                 Feature3Data.RemoveAt(0);
                                 Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
+						        G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
+						        G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                             case 2:
                                 ExerciseClass.EX_ShoulderRaise shoulderRaise = new ExerciseClass.EX_ShoulderRaise();
@@ -668,6 +671,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                                 Feature3Data.RemoveAt(0);
                                 Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[3]]);
+                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
+						        G2Vertical.Content = featureFrame.bestFeatures[2].ToString();
+						        G3Vertical.Content = featureFrame.bestFeatures[3].ToString();
                                 break;
                             case 3:
                                 ExerciseClass.EX_LegRaise legRaise = new ExerciseClass.EX_LegRaise();
@@ -680,6 +686,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                                 Feature3Data.RemoveAt(0);
                                 Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
+						        G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
+						        G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                             case 4:
                                 ExerciseClass.EX_KneeBend kneeBend = new ExerciseClass.EX_KneeBend();
@@ -692,6 +701,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                                 Feature3Data.RemoveAt(0);
                                 Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
+						        G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
+						        G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                             case 5:
                                 ExerciseClass.EX_ArmAbduction armAbduciton = new ExerciseClass.EX_ArmAbduction();
@@ -705,6 +717,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                                 Feature3Data.RemoveAt(0);
                                 Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
+						        G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
+						        G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                             default:
                                 armAbduciton = new ExerciseClass.EX_ArmAbduction();
@@ -717,11 +732,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                                 Feature3Data.RemoveAt(0);
                                 Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
+						        G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
+						        G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                         }
-						G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
-						G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
-						G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
+
 
                         if (baseline.IsChecked == true)
                         {
@@ -1159,6 +1175,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             F1Graph.Background = brush1;
             F2Graph.Background = brush2;
             F3Graph.Background = brush3;
+
+            if (cmbExer.SelectedIndex == 2)
+                F2Graph.Background = Brushes.LightCyan;
+
 
             var FrameTestDataSource = new EnumerableDataSource<int>(frameTest);
             FrameTestDataSource.SetXMapping(x => x);
