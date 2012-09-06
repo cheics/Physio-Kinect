@@ -58,10 +58,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         ArrayList TimeData = new ArrayList();
         // needed for thresholding calc
-
         double min1; double max1;
         double min2; double max2;
         double min3; double max3;
+
+		// Peak detection state storage
+		PeakDetectionSimple peakDetect = new PeakDetectionSimple();
 
         // Database connection strings
         private string selectedJoint;
@@ -564,6 +566,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             globalcounter++;
 
                             insertValues = insertValues + ",(" + values + ")";
+
+							// PEAK DETECTION
+							peakDetect.AddDataPoint(graphCounter, (Double)Feature1Data[Feature1Data.Capacity]);
+							//peakDetect.GetPeaks();
+							//peakDetect.GetValleys();
+							// -- can graph this shit as vertical lines at the frame numbers
 
                             //command.CommandText = "INSERT INTO dbkinect.kinectdata (Framenumber,Created_at,UserFirst, UserLast , Exercise ,Type " + command.CommandText + ") VALUE ("
                             //   + values + ")";
