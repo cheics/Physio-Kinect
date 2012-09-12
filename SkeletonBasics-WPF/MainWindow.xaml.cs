@@ -43,6 +43,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         string insertValues = "";
 
         DataTable dt = new DataTable();
+        DataTable skelData = new DataTable();
+
         int tableCounter = 1;
         int ArraySize = 400;
         int graphCounter = 0;
@@ -196,6 +198,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             this.drawingGroup = new DrawingGroup();
             this.drawingGroup1 = new DrawingGroup();
+            Skeleton skeleton = new Skeleton();
+
+            jointMapping = new Dictionary<string, int>();
+            jointMapping1 = new Dictionary<string, Joint>();
+            jointMapping2 = new Dictionary<string, Joint>();
+
+            int i = 0;
+
             //initialize
             for (int ii = 0; ii < ArraySize; ii++)
             {
@@ -210,8 +220,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 TimeData.Add(ii);
             }
 
-            this.drawingGroup = new DrawingGroup();
+            initializeDt(skelData);
 
+            this.drawingGroup = new DrawingGroup();
             // Create an image source that we can use in our image control
             this.imageSource = new DrawingImage(this.drawingGroup);
             this.imageSource1 = new DrawingImage(this.drawingGroup1);
@@ -221,8 +232,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             // Look through all sensors and start the first connected one.
             // This requires that a Kinect is connected at the time of app startup.
-            // To make your app robust against plug/unplug, 
-            // it is recommended to use KinectSensorChooser provided in Microsoft.Kinect.Toolkit
             foreach (var potentialSensor in KinectSensor.KinectSensors)
             {
                 if (potentialSensor.Status == KinectStatus.Connected)
@@ -240,9 +249,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.sensor.DepthStream.Enable();
                 this.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
                 this.sensor.AllFramesReady += new System.EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
-
-                // Add an event handler to be called whenever there is new color frame data
                 this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
+
                 // Start the sensor!
                 try
                 {
@@ -259,13 +267,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 this.statusBarText.Text = Properties.Resources.NoKinectReady;
             }
-
-            Skeleton skeleton = new Skeleton();
-
-            int i = 0;
-            jointMapping = new Dictionary<string, int>();
-            jointMapping1 = new Dictionary<string, Joint>();
-            jointMapping2 = new Dictionary<string, Joint>();
+            
 
             foreach (Joint joint in skeleton.Joints)
             {
@@ -517,7 +519,31 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 						        G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                         }
+                        ///////////////////////////////////////
+                        DataRow newRow = skelData.NewRow();
 
+                        newRow[0] = skeletonFrame.FrameNumber;
+                        newRow[1] = DateTime.Now;
+                        newRow[2] = firstName.Text.ToString();
+                        newRow[3] = lastName.Text.ToString();
+                        newRow[4] = baseline.IsChecked.Value;
+                        newRow[5] = cmbExer.SelectedItem.ToString();
+
+                        int jj = 6; 
+
+                        foreach (Joint joint in skel_1.Joints)
+                        {
+                            newRow[jj] = Convert.ToDecimal(joint.Position.X);
+                            jj++;
+                            newRow[jj] = Convert.ToDecimal(joint.Position.Y);
+                            jj++;
+                            newRow[jj] = Convert.ToDecimal(joint.Position.Z);
+                            jj++;
+                        }
+                        skelData.Rows.Add(newRow);
+
+
+                        ///////////////////////////////////////
 
                         if (baseline.IsChecked == true)
                         {
@@ -1242,7 +1268,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 MySqlDataReader Reader;
                 connection.Open();
 
-                //MySqlBulkLoader copyloader = new MySqlBulkLoader(connection);
+
+
                 
                 insertValues = insertValues.Substring(1);
 
@@ -1255,14 +1282,21 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 insertValues = "";
             }
 
-            
+            MySqlConnection con = new MySqlConnection(MyConString);
+            MySqlCommand comm = new MySqlCommand("Select * From kinectdata", con);
+
+            MySqlBulkLoader copyloader = new MySqlBulkLoader(con);
+            copyloader.TableName = "skelData";
+            MySqlDataAdapter test1 = new MySqlDataAdapter(comm);
+            test1.Update(skelData);
+
 
             Skeleton TrainSkel = new Skeleton();
             SkeletonPoint sp = new SkeletonPoint();
             Dictionary<string, Joint> jointMappingFinal = new Dictionary<string, Joint>();
 
             // get skeleton data from database
-            MySqlConnection con = new MySqlConnection(MyConString);
+            
             MySqlCommand cmd = con.CreateCommand();
             cmd.CommandText = "select * from dbkinect.kinectdata where UserFirst = '" + firstName.Text.ToString() +
                 "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='1' and Exercise = '" + cmbExer.SelectedValue.ToString()
@@ -1512,6 +1546,26 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void slider1_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             this.sensor.ElevationAngle = (int)slider1.Value;
+        }
+        private void initializeDt(DataTable table)
+        {
+            Skeleton skeleton = new Skeleton();
+            table.Columns.Add("Framenumber", typeof(int));
+            table.Columns.Add("Created_at",typeof(DateTime));
+            table.Columns.Add("UserFirst", typeof(string));
+            table.Columns.Add("UserLast",typeof(string));
+            table.Columns.Add("Type", typeof(int));
+            table.Columns.Add("Exercise", typeof(string));
+            
+            foreach (Joint joint in skeleton.Joints)
+            {
+                string name = joint.JointType.ToString();
+                table.Columns.Add(name + "X", typeof(Decimal));
+                table.Columns.Add(name + "Y", typeof(Decimal));
+                table.Columns.Add(name + "Z", typeof(Decimal));
+                name = Regex.Replace(name, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
+            }
+            return;
         }
     }
 }
