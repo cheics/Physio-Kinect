@@ -18,6 +18,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using System.Windows.Media.Imaging;
     using System.Windows.Controls;
     using System.Data;
+    using System.ComponentModel;
+    
 
     using System.Text.RegularExpressions;
     using System.Collections.Generic;
@@ -81,6 +83,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private Dictionary<string, int> jointMapping;
         private Dictionary<string, Joint> jointMapping1;
         private Dictionary<string, Joint> jointMapping2;
+        private System.ComponentModel.BackgroundWorker bgWorker = new BackgroundWorker();
+        
+        
         /// <summary>
         /// Width of output drawing
         /// </summary>
@@ -145,7 +150,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             System.IO.Directory.CreateDirectory(newPath);
             string newFileName = "colorStream.avi";
             newPath = System.IO.Path.Combine(newPath, newFileName);
+            //bgWorker.WorkerReportsProgress = true;
+            //bgWorker.WorkerSupportsCancellation = true;
 
+            InitializeBackgroundWorker();
             InitializeComponent();
         }
         const int skeletonCount = 6;
@@ -205,7 +213,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             jointMapping2 = new Dictionary<string, Joint>();
 
             int i = 0;
-
+            
             //initialize
             for (int ii = 0; ii < ArraySize; ii++)
             {
@@ -219,8 +227,17 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                 TimeData.Add(ii);
             }
+            ////////////
+            MySqlConnection con = new MySqlConnection(MyConString);
+            MySqlCommand comm = new MySqlCommand("Select * From kinectdata limit 0", con);
 
-            initializeDt(skelData);
+            MySqlDataAdapter myDA = new MySqlDataAdapter(comm);
+            MySqlCommandBuilder cmbilder = new MySqlCommandBuilder(myDA);
+            myDA.Fill(skelData);
+            ////////////
+
+            //initializeDt(skelData);
+
 
             this.drawingGroup = new DrawingGroup();
             // Create an image source that we can use in our image control
@@ -292,7 +309,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             cmbExer.SelectedIndex = 5;
 
             // get skeleton data from database
-            MySqlConnection con = new MySqlConnection(MyConString);
+            //MySqlConnection con = new MySqlConnection(MyConString);
             MySqlCommand cmd = con.CreateCommand();
             cmd.CommandText = "select * from dbkinect.kinectdata where UserFirst = '" + firstName.Text.ToString() +
                 "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='1' and Exercise = '" + cmbExer.SelectedValue.ToString() + "' limit 500";
@@ -522,14 +539,17 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         ///////////////////////////////////////
                         DataRow newRow = skelData.NewRow();
 
-                        newRow[0] = skeletonFrame.FrameNumber;
-                        newRow[1] = DateTime.Now;
-                        newRow[2] = firstName.Text.ToString();
-                        newRow[3] = lastName.Text.ToString();
-                        newRow[4] = baseline.IsChecked.Value;
-                        newRow[5] = cmbExer.SelectedItem.ToString();
+                        newRow[1] = skeletonFrame.FrameNumber;
+                        newRow[2] = DateTime.Now;
+                        newRow[3] = firstName.Text.ToString();
+                        newRow[4] = lastName.Text.ToString();
+                        if (baseline.IsChecked.Value == true)
+                            newRow[5] = 1;
+                        else
+                            newRow[5] = 0;
+                        newRow[6] = cmbExer.SelectedItem.ToString();
 
-                        int jj = 6; 
+                        int jj = 7; 
 
                         foreach (Joint joint in skel_1.Joints)
                         {
@@ -1260,35 +1280,39 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            if (insertValues != "")
+            if (bgWorker.IsBusy == !true)
             {
-                // SQL connection to record skeleton data
-                MySqlConnection connection = new MySqlConnection(MyConString);
-                MySqlCommand command = connection.CreateCommand();
-                MySqlDataReader Reader;
-                connection.Open();
+                bgWorker.RunWorkerAsync();
 
-
-
-                
-                insertValues = insertValues.Substring(1);
-
-                command.CommandText = insertCommand + insertValues;
-
-                Reader = command.ExecuteReader();
-                connection.Close();
-                Reader.Close();
-
-                insertValues = "";
             }
+            //if (insertValues != "")
+            //{
+            //    // SQL connection to record skeleton data
+            //    MySqlConnection connection = new MySqlConnection(MyConString);
+            //    MySqlCommand command = connection.CreateCommand();
+            //    MySqlDataReader Reader;
+            //    connection.Open();
+            //    insertValues = insertValues.Substring(1);
+
+            //    command.CommandText = insertCommand + insertValues;
+
+            //    Reader = command.ExecuteReader();
+            //    connection.Close();
+            //    Reader.Close();
+
+            //    insertValues = "";
+            //}
 
             MySqlConnection con = new MySqlConnection(MyConString);
-            MySqlCommand comm = new MySqlCommand("Select * From kinectdata", con);
+            //MySqlCommand comm = new MySqlCommand("Select * From kinectdata limit 0", con);
+            //MySqlDataAdapter myDA = new MySqlDataAdapter(comm);
+            //MySqlCommandBuilder cmbilder = new MySqlCommandBuilder(myDA);
 
-            MySqlBulkLoader copyloader = new MySqlBulkLoader(con);
-            copyloader.TableName = "skelData";
-            MySqlDataAdapter test1 = new MySqlDataAdapter(comm);
-            test1.Update(skelData);
+            con.Open();
+            //int skelrows = skelData.Rows.Count;
+            //myDA.Update(skelData);
+            
+            //skelrows = skelData.Rows.Count;
 
 
             Skeleton TrainSkel = new Skeleton();
@@ -1301,7 +1325,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             cmd.CommandText = "select * from dbkinect.kinectdata where UserFirst = '" + firstName.Text.ToString() +
                 "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='1' and Exercise = '" + cmbExer.SelectedValue.ToString()
                 + "' Order by Framenumber DESC" + " limit " + ArraySize.ToString() ;
-            con.Open();
+
             MySqlDataReader dr = cmd.ExecuteReader();
             dt.Clear();
 
@@ -1536,6 +1560,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             40, out min1, out max1, out min2, out max2, out min3, out max3);
 
             dr.Close();
+            con.Close();
             tableCounter = 1;
         }
         private void slider1_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
@@ -1566,6 +1591,52 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 name = Regex.Replace(name, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
             }
             return;
+        }
+        private void bgWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            MySqlConnection con = new MySqlConnection(MyConString);
+            MySqlCommand comm = new MySqlCommand("Select * From kinectdata limit 0", con);
+            MySqlDataAdapter myDA = new MySqlDataAdapter(comm);
+            MySqlCommandBuilder cmbilder = new MySqlCommandBuilder(myDA);
+
+            BackgroundWorker worker = sender as BackgroundWorker;
+            if (worker.CancellationPending == true)
+            {
+                e.Cancel = true;
+            }
+
+
+            con.Open();
+            int skelrows = skelData.Rows.Count;
+            myDA.Update(skelData);
+            skelData.Clear();
+        }
+        private void bgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled == true)
+            {
+                result.Text = "CAN!";
+            }
+            else if (e.Error != null)
+            {
+                result.Text = "Error!" + e.Error.Message;
+
+            }
+            else
+            {
+                result.Text = "Done";
+            }
+        }
+        private void InitializeBackgroundWorker()
+        {
+            bgWorker.DoWork +=
+                new DoWorkEventHandler(bgWorker_DoWork);
+            bgWorker.RunWorkerCompleted +=
+                new RunWorkerCompletedEventHandler(
+            bgWorker_RunWorkerCompleted);
+            //bgWorker.ProgressChanged +=
+            //    new ProgressChangedEventHandler(
+            //bgWorker_ProgressChanged);
         }
     }
 }
