@@ -86,7 +86,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			if(exType.exName.Equals(EX_Squat.defaultExName)) {
                 return new string[] { "Squat Depth", "Knee Angle Left", "Knee Angle Right" };
 			} else if(exType.exName.Equals(EX_ShoulderRaise.defaultExName)) {
-				return new string[] { "Elbow Angle Right", "Elbow Angle Left", "Shoulder Angle Right", "Shoulder Angle Left" };
+                return new string[] { "Elbow Angle Right", "Shoulder Angle Right", "Shoulder Angle Left", "Elbow Angle Left" };
 			} else if(exType.exName.Equals(EX_HipAbduction.defaultExName)) {
                 return new string[] { "Hip Angle Right", "Spine Angle Coronal", "Spine Angle Sagittal" };
 			} else if(exType.exName.Equals(EX_LegRaise.defaultExName)) {

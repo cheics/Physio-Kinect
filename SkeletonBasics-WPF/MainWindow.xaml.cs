@@ -50,7 +50,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         int tableCounter = 1;
         int ArraySize = 400;
         int graphCounter = 0;
-        int globalcounter = 0; 
+        int globalcounter = 0;
 
         ArrayList Feature1Data = new ArrayList();
         ArrayList Feature2Data = new ArrayList();
@@ -426,206 +426,125 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             case 0:
                                 ExerciseClass.EX_Squat squat = new ExerciseClass.EX_Squat();
                                 featureFrame = featureDefinition.GetFeatures(squat);
-
-                                Feature1Data.RemoveAt(0);
-                                Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-
-                                Feature2Data.RemoveAt(0);
-                                Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
-
-
-                                Feature3Data.RemoveAt(0);
-                                Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
-
-
-                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
-                                G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
-                                G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                             case 1:
                                 ExerciseClass.EX_HipAbduction hipAbduction = new ExerciseClass.EX_HipAbduction();
                                 featureFrame = featureDefinition.GetFeatures(hipAbduction);
-
-                                Feature1Data.RemoveAt(0);
-                                Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-
-                                Feature2Data.RemoveAt(0);
-                                Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
-
-                                Feature3Data.RemoveAt(0);
-                                Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
-                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
-						        G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
-						        G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                             case 2:
                                 ExerciseClass.EX_ShoulderRaise shoulderRaise = new ExerciseClass.EX_ShoulderRaise();
                                 featureFrame = featureDefinition.GetFeatures(shoulderRaise);
 
-                                Feature1Data.RemoveAt(0);
-                                Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-
-                                Feature2Data.RemoveAt(0);
-                                Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
-
-                                Feature3Data.RemoveAt(0);
-                                Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[3]]);
-                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
-						        G2Vertical.Content = featureFrame.bestFeatures[2].ToString();
-						        G3Vertical.Content = featureFrame.bestFeatures[3].ToString();
                                 break;
                             case 3:
                                 ExerciseClass.EX_LegRaise legRaise = new ExerciseClass.EX_LegRaise();
                                 featureFrame = featureDefinition.GetFeatures(legRaise);
-                                Feature1Data.RemoveAt(0);
-                                Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-
-                                Feature2Data.RemoveAt(0);
-                                Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
-
-                                Feature3Data.RemoveAt(0);
-                                Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
-                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
-						        G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
-						        G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                             case 4:
                                 ExerciseClass.EX_KneeBend kneeBend = new ExerciseClass.EX_KneeBend();
                                 featureFrame = featureDefinition.GetFeatures(kneeBend);
-                                Feature1Data.RemoveAt(0);
-                                Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-
-                                Feature2Data.RemoveAt(0);
-                                Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
-
-                                Feature3Data.RemoveAt(0);
-                                Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
-                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
-						        G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
-						        G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                             case 5:
                                 ExerciseClass.EX_ArmAbduction armAbduciton = new ExerciseClass.EX_ArmAbduction();
                                 featureFrame = featureDefinition.GetFeatures(armAbduciton);
-
-                                Feature1Data.RemoveAt(0);
-                                Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-
-                                Feature2Data.RemoveAt(0);
-                                Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
-
-                                Feature3Data.RemoveAt(0);
-                                Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
-                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
-						        G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
-						        G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                             default:
                                 armAbduciton = new ExerciseClass.EX_ArmAbduction();
                                 featureFrame = featureDefinition.GetFeatures(armAbduciton);
-                                Feature1Data.RemoveAt(0);
-                                Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-
-                                Feature2Data.RemoveAt(0);
-                                Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
-
-                                Feature3Data.RemoveAt(0);
-                                Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
-                                G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
-						        G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
-						        G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                                 break;
                         }
+
+                        Feature1Data.RemoveAt(0);
+                        Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+                        Feature2Data.RemoveAt(0);
+                        Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+                        Feature3Data.RemoveAt(0);
+                        Feature3Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
+                        G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
+                        G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
+                        G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
                         ///////////////////////////////////////
-                        DataRow newRow = skelData.NewRow();
+                        //DataRow newRow = skelData.NewRow();
 
-                        newRow[1] = skeletonFrame.FrameNumber;
-                        newRow[2] = DateTime.Now;
-                        newRow[3] = firstName.Text.ToString();
-                        newRow[4] = lastName.Text.ToString();
-                        if (baseline.IsChecked.Value == true)
-                            newRow[5] = 1;
-                        else
-                            newRow[5] = 0;
-                        newRow[6] = cmbExer.SelectedItem.ToString();
+                        //newRow[1] = skeletonFrame.FrameNumber;
+                        //newRow[2] = DateTime.Now;
+                        //newRow[3] = firstName.Text.ToString();
+                        //newRow[4] = lastName.Text.ToString();
+                        //if (baseline.IsChecked.Value == true)
+                        //    newRow[5] = 1;
+                        //else
+                        //    newRow[5] = 0;
+                        //newRow[6] = cmbExer.SelectedItem.ToString();
 
-                        int jj = 7; 
+                        //int jj = 7; 
 
+                        //foreach (Joint joint in skel_1.Joints)
+                        //{
+                        //    newRow[jj] = Convert.ToDecimal(joint.Position.X);
+                        //    jj++;
+                        //    newRow[jj] = Convert.ToDecimal(joint.Position.Y);
+                        //    jj++;
+                        //    newRow[jj] = Convert.ToDecimal(joint.Position.Z);
+                        //    jj++;
+                        //}
+                        //skelData.Rows.Add(newRow);
+
+                        ///////////////////////////////////////
                         foreach (Joint joint in skel_1.Joints)
                         {
-                            newRow[jj] = Convert.ToDecimal(joint.Position.X);
-                            jj++;
-                            newRow[jj] = Convert.ToDecimal(joint.Position.Y);
-                            jj++;
-                            newRow[jj] = Convert.ToDecimal(joint.Position.Z);
-                            jj++;
+                            values = values + "," +
+                                joint.Position.X.ToString() + "," +
+                                joint.Position.Y.ToString() + "," +
+                                joint.Position.Z.ToString();
                         }
-                        skelData.Rows.Add(newRow);
-
-
-                        ///////////////////////////////////////
-
+                        // Storing skeleton info into db
                         if (baseline.IsChecked == true)
                         {
-                            string testing = null;
-                            foreach (string stringKey in featureFrame.featureValues.Keys)
-                            {
-                                testing = "," + stringKey.ToString();
-                            }
-
-                            foreach (Joint joint in skel_1.Joints)
-                            {
-                                values = values + "," +
-                                    joint.Position.X.ToString() + "," +
-                                    joint.Position.Y.ToString() + "," +
-                                    joint.Position.Z.ToString();
-                            }
-                            // Storing skeleton info into db
-                            if (baseline.IsChecked == true)
-                            {
-                                values = ",1" + values;
-                            }
-                            else
-                            {
-                                values = ",0" + values;
-                            }
-                            DateTime now = DateTime.Now;
-
-                            string date = "'" + now.Year.ToString() + "-" + now.Month.ToString() + "-" + now.Day.ToString() + " " +
-                                now.Hour.ToString() + ":" +
-                                now.Minute.ToString() + ":" +
-                                now.Second.ToString() + "'";
-
-                            string SelectedItem = null;
-                            if (cmbExer.SelectedItem == null)
-                            {
-                                SelectedItem = "null";
-                            }
-                            else
-                                SelectedItem = cmbExer.SelectedItem.ToString();
-
-                            values = skeletonFrame.FrameNumber.ToString() + " ,"
-                                + date + ", '"
-                                + firstName.Text.ToString() + "','" + lastName.Text.ToString() + "' , '"
-                                + SelectedItem + "'"
-                                + values;
-                            globalcounter++;
-
-                            insertValues = insertValues + ",(" + values + ")";
-
-							// PEAK DETECTION
-							peakDetect.AddDataPoint(graphCounter, (Double)Feature1Data[Feature1Data.Capacity]);
-							//peakDetect.GetPeaks();
-							//peakDetect.GetValleys();
-							// -- can graph this shit as vertical lines at the frame numbers
-
-                            //command.CommandText = "INSERT INTO dbkinect.kinectdata (Framenumber,Created_at,UserFirst, UserLast , Exercise ,Type " + command.CommandText + ") VALUE ("
-                            //   + values + ")";
-
-                            //Reader = command.ExecuteReader();
-                            //connection.Close();
-                            //Reader.Close();
+                            values = ",1" + values;
                         }
+                        else
+                        {
+                            values = ",0" + values;
+                        }
+                        DateTime now = DateTime.Now;
+
+                        string date = "'" + now.Year.ToString() + "-" + now.Month.ToString() + "-" + now.Day.ToString() + " " +
+                            now.Hour.ToString() + ":" +
+                            now.Minute.ToString() + ":" +
+                            now.Second.ToString() + "'";
+
+                        string SelectedItem = null;
+                        if (cmbExer.SelectedItem == null)
+                        {
+                            SelectedItem = "null";
+                        }
+                        else
+                            SelectedItem = cmbExer.SelectedItem.ToString();
+
+                        values = skeletonFrame.FrameNumber.ToString() + " ,"
+                            + date + ", '"
+                            + firstName.Text.ToString() + "','" + lastName.Text.ToString() + "' , '"
+                            + SelectedItem + "'"
+                            + values;
+                        globalcounter++;
+                        insertValues = insertValues + ",(" + values + ")";
+                        if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 200) == 0)
+                        {
+                            if (bgWorker.IsBusy == !true)
+                            {
+                                bgWorker.RunWorkerAsync();
+                            }
+                        }
+
+
+						// PEAK DETECTION
+						//peakDetect.AddDataPoint(graphCounter, (Double)Feature1Data[Feature1Data.Capacity]);
+						//peakDetect.GetPeaks();
+						//peakDetect.GetValleys();
+						// -- can graph this shit as vertical lines at the frame numbers
+                        
                         if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 15) == 0)
                         {
                             Make_Graph();
@@ -1280,41 +1199,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            if (bgWorker.IsBusy == !true)
-            {
+            if (bgWorker.IsBusy != true)
                 bgWorker.RunWorkerAsync();
 
-            }
-            //if (insertValues != "")
-            //{
-            //    // SQL connection to record skeleton data
-            //    MySqlConnection connection = new MySqlConnection(MyConString);
-            //    MySqlCommand command = connection.CreateCommand();
-            //    MySqlDataReader Reader;
-            //    connection.Open();
-            //    insertValues = insertValues.Substring(1);
-
-            //    command.CommandText = insertCommand + insertValues;
-
-            //    Reader = command.ExecuteReader();
-            //    connection.Close();
-            //    Reader.Close();
-
-            //    insertValues = "";
-            //}
-
             MySqlConnection con = new MySqlConnection(MyConString);
-            //MySqlCommand comm = new MySqlCommand("Select * From kinectdata limit 0", con);
-            //MySqlDataAdapter myDA = new MySqlDataAdapter(comm);
-            //MySqlCommandBuilder cmbilder = new MySqlCommandBuilder(myDA);
-
             con.Open();
-            //int skelrows = skelData.Rows.Count;
-            //myDA.Update(skelData);
-            
-            //skelrows = skelData.Rows.Count;
-
-
             Skeleton TrainSkel = new Skeleton();
             SkeletonPoint sp = new SkeletonPoint();
             Dictionary<string, Joint> jointMappingFinal = new Dictionary<string, Joint>();
@@ -1471,90 +1360,40 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     case 0:
                         ExerciseClass.EX_Squat squat = new ExerciseClass.EX_Squat();
                         featureFrame = featureDefinition.GetFeatures(squat);
-                        feature1Train.RemoveAt(0);
-                        feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-
-                        feature2Train.RemoveAt(0);
-                        feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
-
-                        feature3Train.RemoveAt(0);
-                        feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
                         break;
                     case 1:
                         ExerciseClass.EX_HipAbduction hipAbduction = new ExerciseClass.EX_HipAbduction();
                         featureFrame = featureDefinition.GetFeatures(hipAbduction);
-                        feature1Train.RemoveAt(0);
-                        feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-
-                        feature2Train.RemoveAt(0);
-                        feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
-
-                        feature3Train.RemoveAt(0);
-                        feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
                         break;
                     case 2:
                         ExerciseClass.EX_ShoulderRaise shoulderRaise = new ExerciseClass.EX_ShoulderRaise();
                         featureFrame = featureDefinition.GetFeatures(shoulderRaise);
-
-                        feature1Train.RemoveAt(0);
-                        feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-
-                        feature2Train.RemoveAt(0);
-                        feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
-
-                        feature3Train.RemoveAt(0);
-                        feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[3]]);
                         break;
                     case 3:
                         ExerciseClass.EX_LegRaise legRaise = new ExerciseClass.EX_LegRaise();
                         featureFrame = featureDefinition.GetFeatures(legRaise);
-                        feature1Train.RemoveAt(0);
-                        feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-
-                        feature2Train.RemoveAt(0);
-                        feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
-
-                        feature3Train.RemoveAt(0);
-                        feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
                         break;
                     case 4:
                         ExerciseClass.EX_KneeBend kneeBend = new ExerciseClass.EX_KneeBend();
                         featureFrame = featureDefinition.GetFeatures(kneeBend);
-                        feature1Train.RemoveAt(0);
-                        feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-
-                        feature2Train.RemoveAt(0);
-                        feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
-
-                        feature3Train.RemoveAt(0);
-                        feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
                         break;
                     case 5:
                         ExerciseClass.EX_ArmAbduction armAbduciton = new ExerciseClass.EX_ArmAbduction();
                         featureFrame = featureDefinition.GetFeatures(armAbduciton);
-
-                        feature1Train.RemoveAt(0);
-                        feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-
-                        feature2Train.RemoveAt(0);
-                        feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
-
-                        feature3Train.RemoveAt(0);
-                        feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
                         break;
                     default:
                         armAbduciton = new ExerciseClass.EX_ArmAbduction();
                         featureFrame = featureDefinition.GetFeatures(armAbduciton);
-                        feature1Train.RemoveAt(0);
-                        feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
-
-                        feature2Train.RemoveAt(0);
-                        feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
-
-                        feature3Train.RemoveAt(0);
-                        feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
                         break;
                 }
+                feature1Train.RemoveAt(0);
+                feature1Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+                feature2Train.RemoveAt(0);
+                feature2Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
+
+                feature3Train.RemoveAt(0);
+                feature3Train.Add(featureFrame.featureValues[featureFrame.bestFeatures[2]]);
             }
             calculatethreshold(feature1Train, feature2Train, feature3Train,
             40, out min1, out max1, out min2, out max2, out min3, out max3);
@@ -1594,22 +1433,30 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
         private void bgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            MySqlConnection con = new MySqlConnection(MyConString);
-            MySqlCommand comm = new MySqlCommand("Select * From kinectdata limit 0", con);
-            MySqlDataAdapter myDA = new MySqlDataAdapter(comm);
-            MySqlCommandBuilder cmbilder = new MySqlCommandBuilder(myDA);
+            //MySqlConnection con = new MySqlConnection(MyConString);
+            //MySqlCommand comm = new MySqlCommand("Select * From kinectdata limit 0", con);
+            //MySqlDataAdapter myDA = new MySqlDataAdapter(comm);
+            //MySqlCommandBuilder cmbilder = new MySqlCommandBuilder(myDA);
 
             BackgroundWorker worker = sender as BackgroundWorker;
-            if (worker.CancellationPending == true)
+            if (insertValues != "")
             {
-                e.Cancel = true;
+                // SQL connection to record skeleton data
+                MySqlConnection connection = new MySqlConnection(MyConString);
+                MySqlCommand command = connection.CreateCommand();
+                MySqlDataReader Reader;
+                connection.Open();
+                insertValues = insertValues.Substring(1);
+
+                command.CommandText = insertCommand + insertValues;
+
+                Reader = command.ExecuteReader();
+                connection.Close();
+                Reader.Close();
+
+                insertValues = "";
             }
 
-
-            con.Open();
-            int skelrows = skelData.Rows.Count;
-            myDA.Update(skelData);
-            skelData.Clear();
         }
         private void bgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -1624,7 +1471,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
             else
             {
-                result.Text = "Done";
+                result.Text = "Save Completed";
             }
         }
         private void InitializeBackgroundWorker()

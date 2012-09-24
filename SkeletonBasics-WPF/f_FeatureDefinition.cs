@@ -150,8 +150,5 @@
             //Vector3D v_foreArm = GetJointData(JointType.HandLeft) - GetJointData(JointType.WristLeft);
             return v_Hand.X;
         }
-
     }
-
-
 }
