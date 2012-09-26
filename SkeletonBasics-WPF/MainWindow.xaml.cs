@@ -26,6 +26,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
     using Microsoft.Kinect;
+    using Microsoft.Kinect.Toolkit;
     using Microsoft.Samples.Kinect.WpfViewers;
     using Microsoft.Samples.Kinect.SkeletonBasics;
     using Microsoft.Research.DynamicDataDisplay.DataSources;
@@ -34,7 +35,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
     using Coding4Fun;
     using MySql.Data.MySqlClient;
-    using KinectExplorer;
+
+    
     
     //using AviFile;
    // public class DragCompletedEventArgs : RoutedEventArgs { }
@@ -194,6 +196,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="e">event arguments</param>
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
+            
+            KinectSensorChooser chooser1 = new KinectSensorChooser();
+            
             this.drawingGroup = new DrawingGroup();
             this.drawingGroup1 = new DrawingGroup();
             Skeleton skeleton = new Skeleton();
@@ -203,7 +208,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             jointMapping2 = new Dictionary<string, Joint>();
 
             int i = 0;
-            
+
             //initialize
             for (int ii = 0; ii < ArraySize; ii++)
             {
@@ -236,7 +241,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // Display the drawing using our image control
             VBLiveSkeleton.Source = this.imageSource;
             RecSkeleton.Source = this.imageSource1;
-            
+
 
             // Look through all sensors and start the first connected one.
             // This requires that a Kinect is connected at the time of app startup.
@@ -268,14 +273,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 {
                     this.sensor = null;
                 }
-                
+
             }
 
             if (null == this.sensor)
             {
                 this.statusBarText.Text = Properties.Resources.NoKinectReady;
             }
-            
+
 
             foreach (Joint joint in skeleton.Joints)
             {
@@ -307,7 +312,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             con.Open();
             MySqlDataReader dr = cmd.ExecuteReader();
-            
+
             while (dr.Read())
             {
                 DataRow newRow = dt.NewRow();
@@ -319,8 +324,27 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 dt.Rows.Add(newRow);
             }
             dr.Close();
-
+            //kinectSensorChooserUI1.KinectSensorChooser.KinectChanged += new EventHandler<KinectChangedEventArgs>(KinectSensorChooser_KinectChanged);
         }
+
+        void KinectSensorChooser_KinectChanged(object sender, KinectChangedEventArgs e)
+        {
+            KinectSensor oldSensor = (KinectSensor)e.OldSensor;
+            StopKinect(oldSensor);
+
+            KinectSensor newSensor = (KinectSensor)e.NewSensor;
+
+            newSensor.ColorStream.Enable();
+            newSensor.DepthStream.Enable();
+            newSensor.SkeletonStream.Enable();
+            newSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(newSensor_AllFramesReady);
+            newSensor.Start();
+        }
+        void newSensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
+        {
+            
+        }
+
         void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
@@ -1476,21 +1500,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             //    new ProgressChangedEventHandler(
             //bgWorker_ProgressChanged);
         }
+        void StopKinect(KinectSensor sensor)
+        {
+            if (sensor != null)
+            {
+                sensor.Stop();
+                sensor.AudioSource.Stop();
+            }
+        }
     }
-    //public class MainWindowViewModel : DependencyObject
-    //{
-    //    public static readonly DependencyProperty KinectSensorManagerProperty =
-    //        DependencyProperty.Register(
-    //            "KinectSensorManager",
-    //            typeof(KinectSensorManager),
-    //            typeof(MainWindowViewModel),
-    //            new PropertyMetadata(null));
-
-    //    public KinectSensorManager KinectSensorManager
-    //    {
-    //        get { return (KinectSensorManager)GetValue(KinectSensorManagerProperty); }
-    //        set { SetValue(KinectSensorManagerProperty, value); }
-    //    }
-    //}
-
 }

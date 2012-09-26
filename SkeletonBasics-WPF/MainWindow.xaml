@@ -3,8 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d3="http://research.microsoft.com/DynamicDataDisplay/1.0"
         xmlns:kt="clr-namespace:Microsoft.Samples.Kinect.WpfViewers;assembly=Microsoft.Samples.Kinect.WpfViewers"
-        xmlns:local="clr-namespace:Microsoft.Samples.Kinect.KinectExplorer;assembly=KinectExplorer"
-        Title="Demo" Height="735" Width="770" Loaded="WindowLoaded" Closing="WindowClosing" IsTabStop="False" Focusable="True" Background="#FFE3EBEE">
+        Title="Demo" Height="735" Width="770" Loaded="WindowLoaded" Closing="WindowClosing" IsTabStop="False" Focusable="True" Background="#FFE3EBEE" xmlns:my="clr-namespace:Microsoft.Kinect.Toolkit;assembly=Microsoft.Kinect.Toolkit">
 
     <Window.Resources>
         <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e"/>
@@ -80,7 +79,6 @@
             <Viewbox Grid.Column="1" Stretch="Uniform" HorizontalAlignment="Left" Focusable="False">
                 <Image Name="ColorImage" Width="200" Height="200"/>
             </Viewbox>
-
             <Grid Grid.Column="2" HorizontalAlignment="Center" Margin="0 0 0 0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -96,7 +94,7 @@
                     <ComboBox Grid.Row="3" Background="White" FontSize="24" Margin="0 10 0 0" Name="Joints" SelectionChanged="Joints_SelectionChanged" />
                     <ComboBox Grid.Row="4" Name="cmbExer" Background="White" FontSize="24"  Margin="0,10,0,0" />
                     <Button Height="40" Width="75"  Grid.Row="5" Background="#505050" FontSize="14" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Reload" Name="button1" Click="button1_Click" IsEnabled="True" IsDefault="False" IsCancel="False" OpacityMask="{x:Null}" IsHitTestVisible="True" IsTabStop="True" ClickMode="Press" Focusable="False" />
-                </Grid>
+            </Grid>
             <Viewbox Grid.Column="3" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <Image Name="VBLiveSkeleton" Width="50" Height="50" VerticalAlignment="Center"/>
             </Viewbox>
@@ -178,6 +176,5 @@
         <DockPanel Grid.Row="3">
 
         </DockPanel>
-
     </Grid>
 </Window>
