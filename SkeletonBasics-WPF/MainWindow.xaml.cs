@@ -34,6 +34,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
     using Coding4Fun;
     using MySql.Data.MySqlClient;
+    using KinectExplorer;
+    
     //using AviFile;
    // public class DragCompletedEventArgs : RoutedEventArgs { }
     /// <summary>
@@ -75,8 +77,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             "DATABASE=dbkinect;" +
             "UID=root;" +
             "PASSWORD=Karamlou;";
-        private string activeDir = @"C:\testdir2";
-        public string newPath = "test";
 
         private FeatureDefinition featureDefinition = new FeatureDefinition();
         private Classification featurEvaluation = new Classification();
@@ -84,8 +84,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private Dictionary<string, Joint> jointMapping1;
         private Dictionary<string, Joint> jointMapping2;
         private System.ComponentModel.BackgroundWorker bgWorker = new BackgroundWorker();
-        
-        
         /// <summary>
         /// Width of output drawing
         /// </summary>
@@ -145,14 +143,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// </summary>
         public MainWindow()
         {
-
-            newPath = System.IO.Path.Combine(activeDir, "mehrad");
-            System.IO.Directory.CreateDirectory(newPath);
-            string newFileName = "colorStream.avi";
-            newPath = System.IO.Path.Combine(newPath, newFileName);
-            //bgWorker.WorkerReportsProgress = true;
-            //bgWorker.WorkerSupportsCancellation = true;
-
             InitializeBackgroundWorker();
             InitializeComponent();
         }
@@ -228,12 +218,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 TimeData.Add(ii);
             }
             ////////////
-            MySqlConnection con = new MySqlConnection(MyConString);
-            MySqlCommand comm = new MySqlCommand("Select * From kinectdata limit 0", con);
+            //MySqlConnection con = new MySqlConnection(MyConString);
+            //MySqlCommand comm = new MySqlCommand("Select * From kinectdata limit 0", con);
 
-            MySqlDataAdapter myDA = new MySqlDataAdapter(comm);
-            MySqlCommandBuilder cmbilder = new MySqlCommandBuilder(myDA);
-            myDA.Fill(skelData);
+            //MySqlDataAdapter myDA = new MySqlDataAdapter(comm);
+            //MySqlCommandBuilder cmbilder = new MySqlCommandBuilder(myDA);
+            //myDA.Fill(skelData);
             ////////////
 
             //initializeDt(skelData);
@@ -246,6 +236,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // Display the drawing using our image control
             VBLiveSkeleton.Source = this.imageSource;
             RecSkeleton.Source = this.imageSource1;
+            
 
             // Look through all sensors and start the first connected one.
             // This requires that a Kinect is connected at the time of app startup.
@@ -309,7 +300,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             cmbExer.SelectedIndex = 5;
 
             // get skeleton data from database
-            //MySqlConnection con = new MySqlConnection(MyConString);
+            MySqlConnection con = new MySqlConnection(MyConString);
             MySqlCommand cmd = con.CreateCommand();
             cmd.CommandText = "select * from dbkinect.kinectdata where UserFirst = '" + firstName.Text.ToString() +
                 "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='1' and Exercise = '" + cmbExer.SelectedValue.ToString() + "' limit 500";
@@ -1437,7 +1428,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             //MySqlCommand comm = new MySqlCommand("Select * From kinectdata limit 0", con);
             //MySqlDataAdapter myDA = new MySqlDataAdapter(comm);
             //MySqlCommandBuilder cmbilder = new MySqlCommandBuilder(myDA);
-
+            
             BackgroundWorker worker = sender as BackgroundWorker;
             if (insertValues != "")
             {
@@ -1486,4 +1477,20 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             //bgWorker_ProgressChanged);
         }
     }
+    //public class MainWindowViewModel : DependencyObject
+    //{
+    //    public static readonly DependencyProperty KinectSensorManagerProperty =
+    //        DependencyProperty.Register(
+    //            "KinectSensorManager",
+    //            typeof(KinectSensorManager),
+    //            typeof(MainWindowViewModel),
+    //            new PropertyMetadata(null));
+
+    //    public KinectSensorManager KinectSensorManager
+    //    {
+    //        get { return (KinectSensorManager)GetValue(KinectSensorManagerProperty); }
+    //        set { SetValue(KinectSensorManagerProperty, value); }
+    //    }
+    //}
+
 }
