@@ -108,6 +108,7 @@
                     <Image Name="RecSkeleton" Width="50" Height="50" VerticalAlignment="Top"/>
             </Viewbox>
             </StackPanel>
+            <kt:KinectColorViewer Width="191" Height="83" Grid.Column="3" KinectSensorManager="{Binding KinectSensorManager}" HorizontalAlignment="Left" Margin="17,236,0,0" Name="kinectColorViewer1" VerticalAlignment="Top" />
         </Grid>
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>

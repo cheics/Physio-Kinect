@@ -35,11 +35,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
     using Coding4Fun;
     using MySql.Data.MySqlClient;
-
-    
-    
-    //using AviFile;
-   // public class DragCompletedEventArgs : RoutedEventArgs { }
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -47,7 +42,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     {
         string insertCommand = "INSERT INTO dbkinect.kinectdata (Framenumber,Created_at,UserFirst, UserLast , Exercise ,Type,HipCenterX,HipCenterY,HipCenterZ,SpineX,SpineY,SpineZ,ShoulderCenterX,ShoulderCenterY,ShoulderCenterZ,HeadX,HeadY,HeadZ,ShoulderLeftX,ShoulderLeftY,ShoulderLeftZ,ElbowLeftX,ElbowLeftY,ElbowLeftZ,WristLeftX,WristLeftY,WristLeftZ,HandLeftX,HandLeftY,HandLeftZ,ShoulderRightX,ShoulderRightY,ShoulderRightZ,ElbowRightX,ElbowRightY,ElbowRightZ,WristRightX,WristRightY,WristRightZ,HandRightX,HandRightY,HandRightZ,HipLeftX,HipLeftY,HipLeftZ,KneeLeftX,KneeLeftY,KneeLeftZ,AnkleLeftX,AnkleLeftY,AnkleLeftZ,FootLeftX,FootLeftY,FootLeftZ,HipRightX,HipRightY,HipRightZ,KneeRightX,KneeRightY,KneeRightZ,AnkleRightX,AnkleRightY,AnkleRightZ,FootRightX,FootRightY,FootRightZ) VALUES ";
         string insertValues = "";
-
+        
         DataTable dt = new DataTable();
         DataTable skelData = new DataTable();
 
@@ -65,6 +60,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         ArrayList feature3Train = new ArrayList();
 
         ArrayList TimeData = new ArrayList();
+        
         // needed for thresholding calc
         double min1; double max1;
         double min2; double max2;
@@ -86,6 +82,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private Dictionary<string, Joint> jointMapping1;
         private Dictionary<string, Joint> jointMapping2;
         private System.ComponentModel.BackgroundWorker bgWorker = new BackgroundWorker();
+
         /// <summary>
         /// Width of output drawing
         /// </summary>
@@ -143,10 +140,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
+        /// 
+        private readonly KinectSensorChooser sensorChooser = new KinectSensorChooser();
+        public KinectSensorManager KinectSensorManager { get; private set; }
+
         public MainWindow()
         {
             InitializeBackgroundWorker();
             InitializeComponent();
+
         }
         const int skeletonCount = 6;
         Skeleton[] allSkeletons = new Skeleton[skeletonCount];
@@ -196,153 +198,112 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="e">event arguments</param>
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
-            
-            KinectSensorChooser chooser1 = new KinectSensorChooser();
-            
+
+            InitializeArrayList();
+            InitializeCMB();
+
             this.drawingGroup = new DrawingGroup();
             this.drawingGroup1 = new DrawingGroup();
-            Skeleton skeleton = new Skeleton();
+            
 
             jointMapping = new Dictionary<string, int>();
             jointMapping1 = new Dictionary<string, Joint>();
             jointMapping2 = new Dictionary<string, Joint>();
 
-            int i = 0;
-
-            //initialize
-            for (int ii = 0; ii < ArraySize; ii++)
-            {
-                Feature1Data.Add(0.0);
-                Feature2Data.Add(0.0);
-                Feature3Data.Add(0.0);
-
-                feature3Train.Add(0.0);
-                feature2Train.Add(0.0);
-                feature1Train.Add(0.0);
-
-                TimeData.Add(ii);
-            }
-            ////////////
-            //MySqlConnection con = new MySqlConnection(MyConString);
-            //MySqlCommand comm = new MySqlCommand("Select * From kinectdata limit 0", con);
-
-            //MySqlDataAdapter myDA = new MySqlDataAdapter(comm);
-            //MySqlCommandBuilder cmbilder = new MySqlCommandBuilder(myDA);
-            //myDA.Fill(skelData);
-            ////////////
-
-            //initializeDt(skelData);
-
-
+            
             this.drawingGroup = new DrawingGroup();
             // Create an image source that we can use in our image control
             this.imageSource = new DrawingImage(this.drawingGroup);
             this.imageSource1 = new DrawingImage(this.drawingGroup1);
             // Display the drawing using our image control
             VBLiveSkeleton.Source = this.imageSource;
+
             RecSkeleton.Source = this.imageSource1;
 
-
+            KinectSensorManager = new KinectSensorManager();
+            KinectSensorManager.KinectSensorChanged += this.KinectSensorChanged;
+            sensorChooser.Start();
+            // bind chooser's sensor value to the local sensor manager
+            var kinectSensorBinding =
+                new Binding("Kinect") { Source = this.sensorChooser };
+            BindingOperations.SetBinding(
+                this.KinectSensorManager,
+                KinectSensorManager.KinectSensorProperty,
+                kinectSensorBinding);
+            DataContext = this;
+            InitializeDt(dt);
             // Look through all sensors and start the first connected one.
             // This requires that a Kinect is connected at the time of app startup.
-            foreach (var potentialSensor in KinectSensor.KinectSensors)
-            {
-                if (potentialSensor.Status == KinectStatus.Connected)
-                {
-                    this.sensor = potentialSensor;
-                    break;
-                }
-            }
+            //foreach (var potentialSensor in KinectSensor.KinectSensors)
+            //{
+            //    if (potentialSensor.Status == KinectStatus.Connected)
+            //    {
+            //        this.sensor = potentialSensor;
+            //        break;
+            //    }
+            //}
 
-            if (null != this.sensor)
-            {
-                // Turn on the skeleton stream to receive skeleton frames
+            //if (null != this.sensor)
+            //{
+            //    // Turn on the skeleton stream to receive skeleton frames
 
-                this.sensor.SkeletonStream.Enable();
-                this.sensor.DepthStream.Enable();
-                this.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
-                this.sensor.AllFramesReady += new System.EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
-                this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
+            //    this.sensor.SkeletonStream.Enable();
+            //    this.sensor.DepthStream.Enable();
+            //    this.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+            //    this.sensor.AllFramesReady += new System.EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
+            //    this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
 
-                // Start the sensor!
-                try
-                {
-                    this.sensor.Start();
-                }
-                catch (IOException)
-                {
-                    this.sensor = null;
-                }
+            //    // Start the sensor!
+            //    try
+            //    {
+            //        this.sensor.Start();
+            //    }
+            //    catch (IOException)
+            //    {
+            //        this.sensor = null;
+            //    }
 
-            }
+            //}
 
-            if (null == this.sensor)
-            {
-                this.statusBarText.Text = Properties.Resources.NoKinectReady;
-            }
-
-
-            foreach (Joint joint in skeleton.Joints)
-            {
-                Joint refJoint = new Joint();
-                string name = joint.JointType.ToString();
-                jointMapping1.Add(name, refJoint);
-                dt.Columns.Add(name + "X", typeof(Decimal));
-                dt.Columns.Add(name + "Y", typeof(Decimal));
-                dt.Columns.Add(name + "Z", typeof(Decimal));
-                name = Regex.Replace(name, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
-                this.Joints.Items.Add(name);
-                this.jointMapping.Add(name, i);
-                i++;
-            }
-
-            cmbExer.Items.Add("Squat");
-            cmbExer.Items.Add("Hip Abduction");
-            cmbExer.Items.Add("Arm Raise");
-            cmbExer.Items.Add("Leg Raise");
-            cmbExer.Items.Add("Knee Bend");
-            cmbExer.Items.Add("Arm Abduction");
-            cmbExer.SelectedIndex = 5;
-
-            // get skeleton data from database
-            MySqlConnection con = new MySqlConnection(MyConString);
-            MySqlCommand cmd = con.CreateCommand();
-            cmd.CommandText = "select * from dbkinect.kinectdata where UserFirst = '" + firstName.Text.ToString() +
-                "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='1' and Exercise = '" + cmbExer.SelectedValue.ToString() + "' limit 500";
-
-            con.Open();
-            MySqlDataReader dr = cmd.ExecuteReader();
-
-            while (dr.Read())
-            {
-                DataRow newRow = dt.NewRow();
-                for (int j = 0; j < dt.Columns.Count; j++)
-                {
-                    string columnName = dt.Columns[j].ColumnName;
-                    newRow[columnName] = Convert.ToDecimal(dr[columnName]);
-                }
-                dt.Rows.Add(newRow);
-            }
-            dr.Close();
-            //kinectSensorChooserUI1.KinectSensorChooser.KinectChanged += new EventHandler<KinectChangedEventArgs>(KinectSensorChooser_KinectChanged);
+            //if (null == this.sensor)
+            //{
+            //    this.statusBarText.Text = Properties.Resources.NoKinectReady;
+            //}
         }
-
-        void KinectSensorChooser_KinectChanged(object sender, KinectChangedEventArgs e)
+        private void KinectSensorChanged(object sender, KinectSensorManagerEventArgs<KinectSensor> args)
         {
-            KinectSensor oldSensor = (KinectSensor)e.OldSensor;
-            StopKinect(oldSensor);
+            if (null != args.OldValue)
+                UninitializeKinectServices(args.OldValue);
 
-            KinectSensor newSensor = (KinectSensor)e.NewSensor;
-
-            newSensor.ColorStream.Enable();
-            newSensor.DepthStream.Enable();
-            newSensor.SkeletonStream.Enable();
-            newSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(newSensor_AllFramesReady);
-            newSensor.Start();
+            if (null != args.NewValue)
+                InitializeKinectServices(KinectSensorManager, args.NewValue);
         }
-        void newSensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
+        private void InitializeKinectServices(KinectSensorManager kinectSensorManager, KinectSensor sensor)
         {
-            
+            kinectSensorManager.ColorFormat =
+                ColorImageFormat.RgbResolution640x480Fps30;
+
+            kinectSensorManager.ColorStreamEnabled = true;
+            kinectSensorManager.DepthStreamEnabled = true;
+            kinectSensorManager.SkeletonStreamEnabled = true;
+            kinectSensorManager.TransformSmoothParameters =
+            new TransformSmoothParameters
+            {
+                Smoothing = 0.5f,
+                Correction = 0.5f,
+                Prediction = 0.5f,
+                JitterRadius = 0.05f,
+                MaxDeviationRadius = 0.04f
+            };
+
+            // configure the skeleton stream
+            sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
+            kinectSensorManager.SkeletonStreamEnabled = true;
+            sensor.AllFramesReady+=new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
+        }
+        private void UninitializeKinectServices(KinectSensor sensor)
+        {
+            sensor.SkeletonFrameReady -= this.SensorSkeletonFrameReady;
         }
 
         void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
@@ -480,33 +441,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
                         G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
                         G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
-                        ///////////////////////////////////////
-                        //DataRow newRow = skelData.NewRow();
-
-                        //newRow[1] = skeletonFrame.FrameNumber;
-                        //newRow[2] = DateTime.Now;
-                        //newRow[3] = firstName.Text.ToString();
-                        //newRow[4] = lastName.Text.ToString();
-                        //if (baseline.IsChecked.Value == true)
-                        //    newRow[5] = 1;
-                        //else
-                        //    newRow[5] = 0;
-                        //newRow[6] = cmbExer.SelectedItem.ToString();
-
-                        //int jj = 7; 
-
-                        //foreach (Joint joint in skel_1.Joints)
-                        //{
-                        //    newRow[jj] = Convert.ToDecimal(joint.Position.X);
-                        //    jj++;
-                        //    newRow[jj] = Convert.ToDecimal(joint.Position.Y);
-                        //    jj++;
-                        //    newRow[jj] = Convert.ToDecimal(joint.Position.Z);
-                        //    jj++;
-                        //}
-                        //skelData.Rows.Add(newRow);
-
-                        ///////////////////////////////////////
+ 
                         foreach (Joint joint in skel_1.Joints)
                         {
                             values = values + "," +
@@ -545,6 +480,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             + values;
                         globalcounter++;
                         insertValues = insertValues + ",(" + values + ")";
+
                         if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 200) == 0)
                         {
                             if (bgWorker.IsBusy == !true)
@@ -602,36 +538,36 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.drawingGroup1.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
             }
 
-            using (DrawingContext dc = this.drawingGroup.Open())
-            {
-                // Draw a transparent background to set the render size
-                dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, RenderWidth, RenderHeight));
+            //using (DrawingContext dc = this.drawingGroup.Open())
+            //{
+            //    // Draw a transparent background to set the render size
+            //    dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, RenderWidth, RenderHeight));
 
-                if (skeletons.Length != 0)
-                {
-                    foreach (Skeleton skel in skeletons)
-                    {
-                        RenderClippedEdges(skel, dc);
+            //    if (skeletons.Length != 0)
+            //    {
+            //        foreach (Skeleton skel in skeletons)
+            //        {
+            //            RenderClippedEdges(skel, dc);
 
-                        if (skel.TrackingState == SkeletonTrackingState.Tracked)
-                        {
-                            this.DrawBonesAndJoints(skel, dc);
-                        }
-                        else if (skel.TrackingState == SkeletonTrackingState.PositionOnly)
-                        {
-                            dc.DrawEllipse(
-                            this.centerPointBrush,
-                            null,
-                            this.SkeletonPointToScreen(skel.Position),
-                            BodyCenterThickness,
-                            BodyCenterThickness);
-                        }
-                    }
-                }
+            //            if (skel.TrackingState == SkeletonTrackingState.Tracked)
+            //            {
+            //                this.DrawBonesAndJoints(skel, dc);
+            //            }
+            //            else if (skel.TrackingState == SkeletonTrackingState.PositionOnly)
+            //            {
+            //                dc.DrawEllipse(
+            //                this.centerPointBrush,
+            //                null,
+            //                this.SkeletonPointToScreen(skel.Position),
+            //                BodyCenterThickness,
+            //                BodyCenterThickness);
+            //            }
+            //        }
+            //    }
 
-                // prevent drawing outside of our render area
-                this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
-            }
+            //    // prevent drawing outside of our render area
+            //    this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
+            //}
         }
         private void DrawBonesAndJoints1(DrawingContext drawingContext)
         {
@@ -1426,26 +1362,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             this.sensor.ElevationAngle = (int)slider1.Value;
         }
-        private void initializeDt(DataTable table)
-        {
-            Skeleton skeleton = new Skeleton();
-            table.Columns.Add("Framenumber", typeof(int));
-            table.Columns.Add("Created_at",typeof(DateTime));
-            table.Columns.Add("UserFirst", typeof(string));
-            table.Columns.Add("UserLast",typeof(string));
-            table.Columns.Add("Type", typeof(int));
-            table.Columns.Add("Exercise", typeof(string));
-            
-            foreach (Joint joint in skeleton.Joints)
-            {
-                string name = joint.JointType.ToString();
-                table.Columns.Add(name + "X", typeof(Decimal));
-                table.Columns.Add(name + "Y", typeof(Decimal));
-                table.Columns.Add(name + "Z", typeof(Decimal));
-                name = Regex.Replace(name, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
-            }
-            return;
-        }
+
         private void bgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             //MySqlConnection con = new MySqlConnection(MyConString);
@@ -1499,6 +1416,70 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             //bgWorker.ProgressChanged +=
             //    new ProgressChangedEventHandler(
             //bgWorker_ProgressChanged);
+        }
+        private void InitializeDt(DataTable table)
+        {
+            int i = 0;
+            Skeleton skeleton = new Skeleton();
+
+            foreach (Joint joint in skeleton.Joints)
+            {
+                Joint refJoint = new Joint();
+                string name = joint.JointType.ToString();
+                jointMapping1.Add(name, refJoint);
+                dt.Columns.Add(name + "X", typeof(Decimal));
+                dt.Columns.Add(name + "Y", typeof(Decimal));
+                dt.Columns.Add(name + "Z", typeof(Decimal));
+                name = Regex.Replace(name, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
+                this.Joints.Items.Add(name);
+                this.jointMapping.Add(name, i);
+                i++;
+            }
+
+            // get skeleton data from database
+            MySqlConnection con = new MySqlConnection(MyConString);
+            con.Open();
+            MySqlCommand cmd = con.CreateCommand();
+            cmd.CommandText = "select * from dbkinect.kinectdata where UserFirst = '" + firstName.Text.ToString() +
+                "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='1' and Exercise = '" + cmbExer.SelectedValue.ToString() + "' limit 500";
+            MySqlDataReader datareader = cmd.ExecuteReader();
+            while (datareader.Read())
+            {
+                DataRow newRow = dt.NewRow();
+                for (int j = 0; j < dt.Columns.Count; j++)
+                {
+                    string columnName = dt.Columns[j].ColumnName;
+                    newRow[columnName] = Convert.ToDecimal(datareader[columnName]);
+                }
+                dt.Rows.Add(newRow);
+            }
+            datareader.Close();
+        }
+        private void InitializeArrayList()
+        {
+            //initialize
+            for (int ii = 0; ii < ArraySize; ii++)
+            {
+                Feature1Data.Add(0.0);
+                Feature2Data.Add(0.0);
+                Feature3Data.Add(0.0);
+
+                feature3Train.Add(0.0);
+                feature2Train.Add(0.0);
+                feature1Train.Add(0.0);
+
+                TimeData.Add(ii);
+            }
+        }
+        private void InitializeCMB()
+        {
+            cmbExer.Items.Add("Squat");
+            cmbExer.Items.Add("Hip Abduction");
+            cmbExer.Items.Add("Arm Raise");
+            cmbExer.Items.Add("Leg Raise");
+            cmbExer.Items.Add("Knee Bend");
+            cmbExer.Items.Add("Arm Abduction");
+            cmbExer.SelectedIndex = 5;
         }
         void StopKinect(KinectSensor sensor)
         {
