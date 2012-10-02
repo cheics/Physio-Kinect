@@ -9,6 +9,8 @@
         <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e"/>
         <SolidColorBrush x:Key="KinectPurpleBrush" Color="#ff52318f"/>
         <SolidColorBrush x:Key="KinectBlueBrush" Color="#ff00BCF2"/>
+        <kt:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        
         <Style TargetType="{x:Type Image}">
             <Setter Property="SnapsToDevicePixels" Value="True"/>
         </Style>
@@ -59,27 +61,37 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition MinWidth="40" Width="5*"/>
-                <ColumnDefinition  MinWidth="50" Width="50*"/>
-                <ColumnDefinition MinWidth="10" Width="10*"/>
-                <ColumnDefinition MinWidth="50" Width="50*"/>
-                <ColumnDefinition MinWidth="50" Width="50*"/>
-                
+                <ColumnDefinition MinWidth="50" Width="5*"/>
+                <ColumnDefinition  MinWidth="10" Width="10*"/>
+                <ColumnDefinition MinWidth="60" Width="60*"/>
+                <ColumnDefinition MinWidth="60" Width="60*"/>
             </Grid.ColumnDefinitions>
            
             <!--<Viewbox Width="40" Grid.Row="1" Grid.Column="0" Stretch="Fill" HorizontalAlignment="Left">-->
-                <StackPanel Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.RowSpan="1">
+                <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.RowSpan="1">
                     <TextBlock Text="{Binding ElementName=slider1, Path= Value}" Height="23" HorizontalAlignment="Left" Name="textBlock1" VerticalAlignment="Top" Background="{x:Null}" />
                     <Slider Thumb.DragCompleted="slider1_DragCompleted" 
-                            Minimum="-27" Maximum="27" Grid.Column="0" IsSnapToTickEnabled="True" 
+                            Minimum="-27" Maximum="27" IsSnapToTickEnabled="True" 
                             Orientation="Vertical" HorizontalAlignment="Right" Name="slider1" VerticalAlignment="Top" MinHeight="250"
                             Width="23" MouseLeave="slider1_MouseLeave" Background="#FF4CD4DB" TickPlacement="TopLeft" BorderThickness="1" ClipToBounds="True" />
                 </StackPanel>
             <!--</Viewbox>-->
-            <Viewbox Grid.Column="1" Stretch="Uniform" HorizontalAlignment="Left" Focusable="False">
-                <Image Name="ColorImage" Width="200" Height="200"/>
+
+                <!--<Image Name="ColorImage" Width="200" Height="200"/>-->
+            <Viewbox Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform">
+                <Grid>
+                    <kt:KinectColorViewer KinectSensorManager="{Binding KinectSensorManager}" x:Name="ColorViewer" CollectFrameRate="True" RetainImageOnSensorChange="True"  />
+                <Canvas>
+                    <kt:KinectSkeletonViewer
+                                    KinectSensorManager="{Binding KinectSensorManager}"
+                                    Visibility="{Binding KinectSensorManager.ColorStreamEnabled, Converter={StaticResource BoolToVisibilityConverter}}"
+                                    Width="{Binding ElementName=ColorViewer,Path=ActualWidth}"
+                                    Height="{Binding ElementName=ColorViewer,Path=ActualHeight}"
+                                    ImageType="Color" />
+                </Canvas>
+                </Grid>
             </Viewbox>
-            <Grid Grid.Column="2" HorizontalAlignment="Center" Margin="0 0 0 0">
+            <Grid Grid.Column="0" HorizontalAlignment="Left" Margin="0 0 0 0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -95,20 +107,16 @@
                     <ComboBox Grid.Row="4" Name="cmbExer" Background="White" FontSize="24"  Margin="0,10,0,0" />
                     <Button Height="40" Width="75"  Grid.Row="5" Background="#505050" FontSize="14" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Reload" Name="button1" Click="button1_Click" IsEnabled="True" IsDefault="False" IsCancel="False" OpacityMask="{x:Null}" IsHitTestVisible="True" IsTabStop="True" ClickMode="Press" Focusable="False" />
             </Grid>
-            <Viewbox Grid.Column="3" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Top">
-                <Image Name="VBLiveSkeleton" Width="50" Height="50" VerticalAlignment="Center"/>
-            </Viewbox>
-            <StackPanel Grid.Column="4" Orientation="Vertical">
-                <StatusBar HorizontalAlignment="Stretch" Name="statusBar" VerticalAlignment="Top" Background="#FFE3EBEE" Foreground="{StaticResource MediumGreyBrush}">
+            <StackPanel Grid.Row="2" Grid.Column="3" Orientation="Vertical">
+                <StatusBar HorizontalAlignment="Center" Name="statusBar" VerticalAlignment="Top" Background="#FFE3EBEE" Foreground="{StaticResource MediumGreyBrush}">
                     <StatusBarItem >
                         <TextBlock Name="statusBarText" Background="#FFE3EBEE">Click 'Seated' to change skeletal pipeline type!</TextBlock>
                     </StatusBarItem>
                 </StatusBar>
-                <Viewbox Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Top">
-                    <Image Name="RecSkeleton" Width="50" Height="50" VerticalAlignment="Top"/>
-            </Viewbox>
+                    <Image Name="RecSkeleton" Stretch="None"/>
+
             </StackPanel>
-            <kt:KinectColorViewer Width="191" Height="83" Grid.Column="3" KinectSensorManager="{Binding KinectSensorManager}" HorizontalAlignment="Left" Margin="17,236,0,0" Name="kinectColorViewer1" VerticalAlignment="Top" />
+            
         </Grid>
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
@@ -172,10 +180,6 @@
             <!--<Image DockPanel.Dock="Left" Source="Images\Logo.png" Stretch="None" Margin="0 10 0 5"/>-->
             <TextBlock DockPanel.Dock="Right" Margin="0 0 -1 0" VerticalAlignment="Bottom" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Segoe UI" FontSize="18">Waterloo Physio Team</TextBlock>
             <Image Grid.Column="1" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Left" Margin="0 0 0 5"/>
-        </DockPanel>
-
-        <DockPanel Grid.Row="3">
-
         </DockPanel>
     </Grid>
 </Window>

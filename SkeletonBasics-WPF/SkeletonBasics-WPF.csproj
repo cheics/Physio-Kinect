@@ -76,6 +76,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="GraphsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -89,6 +93,9 @@
     <Compile Include="f_FeatureDefinition.cs" />
     <Compile Include="FeatureHelper.cs" />
     <Compile Include="FeatureDefinition.cs" />
+    <Compile Include="GraphsWindow.xaml.cs">
+      <DependentUpon>GraphsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="I_PeakDetection.cs" />
     <Compile Include="kinect.designer.cs">
       <AutoGen>True</AutoGen>

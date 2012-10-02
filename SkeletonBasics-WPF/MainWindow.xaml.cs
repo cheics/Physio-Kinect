@@ -143,7 +143,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// 
         private readonly KinectSensorChooser sensorChooser = new KinectSensorChooser();
         public KinectSensorManager KinectSensorManager { get; private set; }
-
         public MainWindow()
         {
             InitializeBackgroundWorker();
@@ -213,10 +212,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             
             this.drawingGroup = new DrawingGroup();
             // Create an image source that we can use in our image control
-            this.imageSource = new DrawingImage(this.drawingGroup);
+           // this.imageSource = new DrawingImage(this.drawingGroup);
             this.imageSource1 = new DrawingImage(this.drawingGroup1);
             // Display the drawing using our image control
-            VBLiveSkeleton.Source = this.imageSource;
+            //VBLiveSkeleton.Source = this.imageSource;
 
             RecSkeleton.Source = this.imageSource1;
 
@@ -280,11 +279,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
         private void InitializeKinectServices(KinectSensorManager kinectSensorManager, KinectSensor sensor)
         {
-            kinectSensorManager.ColorFormat =
-                ColorImageFormat.RgbResolution640x480Fps30;
-
+            //kinectSensorManager.ColorFormat =
+            //    ColorImageFormat.RgbResolution640x480Fps30;
             kinectSensorManager.ColorStreamEnabled = true;
             kinectSensorManager.DepthStreamEnabled = true;
+            
             kinectSensorManager.SkeletonStreamEnabled = true;
             kinectSensorManager.TransformSmoothParameters =
             new TransformSmoothParameters
@@ -308,32 +307,32 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
-            using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
-            {
-                if (colorFrame == null)
-                {
-                    return;
-                }
+            //using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
+            //{
+            //    if (colorFrame == null)
+            //    {
+            //        return;
+            //    }
 
-                byte[] pixels = new byte[colorFrame.PixelDataLength];
-                colorFrame.CopyPixelDataTo(pixels);
+            //    byte[] pixels = new byte[colorFrame.PixelDataLength];
+            //    colorFrame.CopyPixelDataTo(pixels);
 
-                int stride = colorFrame.Width * 4;
-                ColorImage.Source = BitmapSource.Create(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
+            //    int stride = colorFrame.Width * 4;
+            //    ColorImage.Source = BitmapSource.Create(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
 
-            }
+            //}
 
-            Skeleton first = GetFirstSkeleton(e);
+            //Skeleton first = GetFirstSkeleton(e);
 
-            if (first == null)
-            {
-                return;
-            }
-            else
-            {
-                //GetCameraPoint(first, e); 
-            }
-            //throw new System.NotImplementedException();
+            //if (first == null)
+            //{
+            //    return;
+            //}
+            //else
+            //{
+            //    //GetCameraPoint(first, e); 
+            //}
+            ////throw new System.NotImplementedException();
             
         }
         Skeleton GetFirstSkeleton(AllFramesReadyEventArgs e)
@@ -508,7 +507,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             using (DrawingContext dc = this.drawingGroup1.Open())
             {
                 //Draw a transparent background to set the render size
-                dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, RenderWidth, RenderHeight));
+                dc.DrawRectangle(Brushes.Transparent, null, new Rect(0.0, 0.0, RenderWidth, RenderHeight));
 
                 if (skeletons.Length != 0)
                 {
@@ -742,9 +741,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             // Convert point to depth space.  
             // We are not using depth directly, but we do want the points in our 640x480 output resolution.
-            DepthImagePoint depthPoint = this.sensor.MapSkeletonPointToDepth(
-                                                                             skelpoint,
+            //DepthImagePoint depthPoint = this.sensor.MapSkeletonPointToDepth(
+            //                                                                 skelpoint,
+            //                                                                 DepthImageFormat.Resolution640x480Fps30);
+            DepthImagePoint depthPoint = this.KinectSensorManager.KinectSensor.MapSkeletonPointToDepth(skelpoint, 
                                                                              DepthImageFormat.Resolution640x480Fps30);
+                
             return new Point(depthPoint.X, depthPoint.Y);
         }
         private void DrawBone1(DrawingContext drawingContext, Joint joint0, Joint joint1)
@@ -1360,7 +1362,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
         private void slider1_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
-            this.sensor.ElevationAngle = (int)slider1.Value;
+            
+            this.KinectSensorManager.KinectSensor.ElevationAngle = (int)slider1.Value;
+            
         }
 
         private void bgWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -1441,7 +1445,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             con.Open();
             MySqlCommand cmd = con.CreateCommand();
             cmd.CommandText = "select * from dbkinect.kinectdata where UserFirst = '" + firstName.Text.ToString() +
-                "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='1' and Exercise = '" + cmbExer.SelectedValue.ToString() + "' limit 500";
+                "' and UserLast = '" + lastName.Text.ToString() + "' and Type ='1' and Exercise = '" + cmbExer.SelectedValue.ToString() + "' limit 400";
             MySqlDataReader datareader = cmd.ExecuteReader();
             while (datareader.Read())
             {
