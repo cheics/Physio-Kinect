@@ -195,9 +195,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// </summary>
         /// <param name="sender">object sending the event</param>
         /// <param name="e">event arguments</param>
+
+        private GraphsWindow window { get; set; }
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
-
+            
             InitializeArrayList();
             InitializeCMB();
 
@@ -210,6 +212,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             jointMapping2 = new Dictionary<string, Joint>();
 
             
+
             this.drawingGroup = new DrawingGroup();
             // Create an image source that we can use in our image control
            // this.imageSource = new DrawingImage(this.drawingGroup);
@@ -229,6 +232,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.KinectSensorManager,
                 KinectSensorManager.KinectSensorProperty,
                 kinectSensorBinding);
+            
             DataContext = this;
             InitializeDt(dt);
             // Look through all sensors and start the first connected one.
@@ -490,9 +494,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 						// PEAK DETECTION
-						//peakDetect.AddDataPoint(graphCounter, (Double)Feature1Data[Feature1Data.Capacity]);
-						//peakDetect.GetPeaks();
-						//peakDetect.GetValleys();
+                        //peakDetect.AddDataPoint(graphCounter, (Double)Feature1Data[Feature1Data.Capacity]);
+                        //peakDetect.GetPeaks();
+                        //peakDetect.GetValleys();
 						// -- can graph this shit as vertical lines at the frame numbers
                         
                         if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 15) == 0)
@@ -1492,6 +1496,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 sensor.Stop();
                 sensor.AudioSource.Stop();
             }
+        }
+
+        private void button2_Click(object sender, RoutedEventArgs e)
+        {
+            GraphsWindow window = new GraphsWindow();
+            //window.KinectSensor = this.KinectSensorManager.KinectSensor;
+            window.KinectSensorManager1 = this.KinectSensorManager;
+            window.Show();
         }
     }
 }
