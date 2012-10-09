@@ -6,5 +6,15 @@
         Title="GraphsWindow" Height="300" Width="300" Loaded="Window_Loaded" Closed="Window_Closed">
     <Grid>
         <kt:KinectColorViewer KinectSensorManager="{Binding KinectSensorManager1}" HorizontalAlignment="Left" Margin="128,72,0,0" Name="kinectColorViewer1" VerticalAlignment="Top" />
+        <d3:ChartPlotter Name="F1Graph" Margin="5,0,0,5" LegendVisible="False" BorderBrush="#FF000095" FontSize="10" Background="#FFE3EBEE">
+            <d3:ChartPlotter.HorizontalAxis>
+                <d3:HorizontalIntegerAxis Name="Time1"/>
+            </d3:ChartPlotter.HorizontalAxis>
+            <d3:ChartPlotter.VerticalAxis >
+                <d3:VerticalAxis Name="Feature11"/>
+            </d3:ChartPlotter.VerticalAxis>
+            <d3:VerticalAxisTitle FontFamily="Arial" Name="G1Vertical" FontSize="10"/>
+            <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="12"/>
+        </d3:ChartPlotter>
     </Grid>
 </Window>

@@ -78,9 +78,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         private FeatureDefinition featureDefinition = new FeatureDefinition();
         private Classification featurEvaluation = new Classification();
+
         private Dictionary<string, int> jointMapping;
         private Dictionary<string, Joint> jointMapping1;
         private Dictionary<string, Joint> jointMapping2;
+
         private System.ComponentModel.BackgroundWorker bgWorker = new BackgroundWorker();
 
         /// <summary>
@@ -195,8 +197,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// </summary>
         /// <param name="sender">object sending the event</param>
         /// <param name="e">event arguments</param>
+        
+        //public GraphsWindow window { get; set; }
+        public GraphsWindow window = new GraphsWindow();
 
-        private GraphsWindow window { get; set; }
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
             
@@ -501,8 +505,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         
                         if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 15) == 0)
                         {
-                            Make_Graph();
+                           // Make_Graph();
                         }
+
+                        window.KinectSensorManager1 = this.KinectSensorManager;
+                        window.Feature1 = this.Feature1Data;
                     }
                 }
 
@@ -868,10 +875,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             F1Graph.Background = brush1;
             F2Graph.Background = brush2;
             F3Graph.Background = brush3;
-
-            if (cmbExer.SelectedIndex == 2)
-                F2Graph.Background = Brushes.LightCyan;
-
 
             var FrameTestDataSource = new EnumerableDataSource<int>(frameTest);
             FrameTestDataSource.SetXMapping(x => x);
@@ -1500,8 +1503,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         private void button2_Click(object sender, RoutedEventArgs e)
         {
-            GraphsWindow window = new GraphsWindow();
+            //GraphsWindow window = new GraphsWindow();
             //window.KinectSensor = this.KinectSensorManager.KinectSensor;
+
+            window.TimeData = this.TimeData;
+            
             window.KinectSensorManager1 = this.KinectSensorManager;
             window.Show();
         }

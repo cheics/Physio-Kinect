@@ -35,6 +35,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     /// </summary>
     public partial class GraphsWindow : Window
     {
+
+        
+        private FeatureDefinition featureDefinition = new FeatureDefinition();
+        private Classification featurEvaluation = new Classification();
+
         public static readonly DependencyProperty KinectSensorProperty =
     DependencyProperty.Register(
         "KinectSensor",
@@ -44,6 +49,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         //private readonly KinectSensorChooser sensorChooser = new KinectSensorChooser();
         public KinectSensorManager KinectSensorManager1 { get; set; }
+
+        public ArrayList Feature1 { get; set; }
+        public ArrayList TimeData { get; set; }
+
         public KinectSensor KinectSensor
         {
             get { return (KinectSensor)GetValue(KinectSensorProperty); }
@@ -59,6 +68,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             //KinectSensorManager1 = new KinectSensorManager();
             //KinectSensorManager1.KinectSensor.Start();
+            int i = 1; 
+
+
 
             //sensorChooser.Start();
             //KinectSensorManager1.ColorStreamEnabled = true;
@@ -82,7 +94,26 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         void KinectSensor_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
-            int test = 0;
+            double[] feature1 = new double[400];
+            int[] time = new int[400];
+            using (SkeletonFrame skelframe = e.OpenSkeletonFrame())
+            {
+
+                    Feature1.CopyTo(feature1);
+                    TimeData.CopyTo(time);
+
+                    var FrameTestDataSource = new EnumerableDataSource<int>(time);
+                    FrameTestDataSource.SetXMapping(x => x);
+
+                    var Joint1TrainDataSource = new EnumerableDataSource<Double>(feature1);
+                    Joint1TrainDataSource.SetYMapping(y => y);
+
+                    CompositeDataSource compTest1DataSource = new
+                        CompositeDataSource(FrameTestDataSource, Joint1TrainDataSource);
+                    F1Graph.AddLineGraph(compTest1DataSource, Colors.Blue, 3, "live");
+ 
+            }
+            
         }
 
 
