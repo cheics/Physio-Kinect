@@ -8,8 +8,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 	class PeakDetectionSimple : I_PeakDetection 
 	{
 
-		private List<int> peaks;
-		private List<int> valleys;
+		private List<int> peaks = new List<int>();
+		private List<int> valleys=new List<int>();
 
 		List<double> smoothing = new List<double>();
 		List<double> smoothing_x = new List<double>();
@@ -25,23 +25,48 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 			int xx=5;
 			int thresh = 10;
 
-			smoothing.Add(dataPoint);
 			smoothing_x.Add(frameNumber);
+			smoothing.Add(dataPoint);
+			
 
 			if (smoothing.Count>xx*3){
-				smoothing.RemoveAt(0);
-				List<double>  sm1 =(List<double>) smoothing.Skip(0).Take(xx);
-				List<double> sm2 = (List<double>) smoothing.Skip(xx).Take(xx);
-				List<double> sm3 = (List<double>)smoothing.Skip(xx * 2).Take(xx);
+				//smoothing.RemoveAt(0);
+				List<double> sm1 = smoothing.GetRange(0, xx);
+				List<double> sm2 = smoothing.GetRange(xx, xx);
+				List<double> sm3 = smoothing.GetRange(xx * 2, xx);
+
 				int xTime = (int) smoothing_x[xx + xx / 2];
-				if (sm1.Sum() > sm2.Sum() & sm3.Sum() > sm2.Sum() & xTime - (int) valleys.Last() > thresh)
+
+
+				if (sm1.Sum() > sm2.Sum() & sm3.Sum() > sm2.Sum() )
 				{
-					valleys.Add((int) smoothing_x[xx + xx / 2]);
+
+
+					if (valleys.Count==0 ){
+						valleys.Add((int)smoothing_x[xx + xx / 2]);
+						smoothing_x.Clear();
+						smoothing.Clear();
+					}			
+					else if(xTime > (int)valleys.Last() + thresh){
+						valleys.Add((int)smoothing_x[xx + xx / 2]);
+						smoothing_x.Clear();
+						smoothing.Clear();
+					}
+
+					Console.WriteLine("XT");
+					Console.WriteLine(xTime);
+					Console.WriteLine("val");
+					Console.WriteLine((int)valleys.Last());
 				}
-				else if (sm1.Sum() < sm2.Sum() & sm3.Sum() < sm2.Sum() & xTime - (int) peaks.Last() > thresh)
-				{
-					peaks.Add((int)smoothing_x[xx + xx / 2]);
-				}
+
+
+				//else if (peaks.Count != 0 
+				//    & sm1.Sum() < sm2.Sum() 
+				//    & sm3.Sum() < sm2.Sum() 
+				//    & (peaks.Count==0 | xTime - (int)peaks.Last() > thresh))
+				//{
+				//    peaks.Add((int)smoothing_x[xx + xx / 2]);
+				//}
 
 			}
 		}
