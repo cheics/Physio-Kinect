@@ -46,6 +46,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         typeof(KinectSensor),
         typeof(GraphsWindow),
         new PropertyMetadata(null));
+        new KinectSensor sensor;
 
         //private readonly KinectSensorChooser sensorChooser = new KinectSensorChooser();
         public KinectSensorManager KinectSensorManager1 { get; set; }
@@ -68,7 +69,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             //KinectSensorManager1 = new KinectSensorManager();
             //KinectSensorManager1.KinectSensor.Start();
-            int i = 1; 
+            int i = 1;
+            //sensor.Start();
 
 
 

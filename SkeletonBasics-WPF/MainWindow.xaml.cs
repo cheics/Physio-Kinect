@@ -17,7 +17,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using System.Windows.Shapes;
     using System.Windows.Media.Imaging;
     using System.Windows.Controls;
+    using System.Windows.Threading;
     using System.Data;
+    using System.Threading;
     using System.ComponentModel;
     
 
@@ -84,6 +86,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private Dictionary<string, Joint> jointMapping2;
 
         private System.ComponentModel.BackgroundWorker bgWorker = new BackgroundWorker();
+
 
         /// <summary>
         /// Width of output drawing
@@ -199,7 +202,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="e">event arguments</param>
         
         //public GraphsWindow window { get; set; }
-        public GraphsWindow window = new GraphsWindow();
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
@@ -448,6 +450,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         G1Vertical.Content = featureFrame.bestFeatures[0].ToString();
                         G2Vertical.Content = featureFrame.bestFeatures[1].ToString();
                         G3Vertical.Content = featureFrame.bestFeatures[2].ToString();
+
+
  
                         foreach (Joint joint in skel_1.Joints)
                         {
@@ -505,11 +509,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         
                         if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 15) == 0)
                         {
+                            ThreadStartingPoint();
                            // Make_Graph();
                         }
-
-                        window.KinectSensorManager1 = this.KinectSensorManager;
-                        window.Feature1 = this.Feature1Data;
+                        
                     }
                 }
 
@@ -1500,16 +1503,32 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 sensor.AudioSource.Stop();
             }
         }
-
         private void button2_Click(object sender, RoutedEventArgs e)
         {
-            //GraphsWindow window = new GraphsWindow();
+            //
             //window.KinectSensor = this.KinectSensorManager.KinectSensor;
+            //Thread GraphsWindowThread = new Thread(new ThreadStart(ThreadStartingPoint));
+            //GraphsWindowThread.SetApartmentState(ApartmentState.STA);
+            //GraphsWindowThread.IsBackground = false;
+            //GraphsWindowThread.Start();
 
+
+
+
+            //window.TimeData = this.TimeData;
+
+            //window.KinectSensorManager1 = this.KinectSensorManager;
+            //window.Show();
+
+        }
+        private void ThreadStartingPoint()
+        {
+            GraphsWindow window = new GraphsWindow();
             window.TimeData = this.TimeData;
-            
+            window.Feature1 = this.Feature1Data;
             window.KinectSensorManager1 = this.KinectSensorManager;
             window.Show();
+
         }
     }
 }
