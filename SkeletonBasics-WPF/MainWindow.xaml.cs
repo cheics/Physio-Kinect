@@ -42,6 +42,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     /// </summary>
     public partial class MainWindow : Window
     {
+        int framecount1 = 0;
+        public GraphsWindow window = new GraphsWindow();
+
         string insertCommand = "INSERT INTO dbkinect.kinectdata (Framenumber,Created_at,UserFirst, UserLast , Exercise ,Type,HipCenterX,HipCenterY,HipCenterZ,SpineX,SpineY,SpineZ,ShoulderCenterX,ShoulderCenterY,ShoulderCenterZ,HeadX,HeadY,HeadZ,ShoulderLeftX,ShoulderLeftY,ShoulderLeftZ,ElbowLeftX,ElbowLeftY,ElbowLeftZ,WristLeftX,WristLeftY,WristLeftZ,HandLeftX,HandLeftY,HandLeftZ,ShoulderRightX,ShoulderRightY,ShoulderRightZ,ElbowRightX,ElbowRightY,ElbowRightZ,WristRightX,WristRightY,WristRightZ,HandRightX,HandRightY,HandRightZ,HipLeftX,HipLeftY,HipLeftZ,KneeLeftX,KneeLeftY,KneeLeftZ,AnkleLeftX,AnkleLeftY,AnkleLeftZ,FootLeftX,FootLeftY,FootLeftZ,HipRightX,HipRightY,HipRightZ,KneeRightX,KneeRightY,KneeRightZ,AnkleRightX,AnkleRightY,AnkleRightZ,FootRightX,FootRightY,FootRightZ) VALUES ";
         string insertValues = "";
         
@@ -387,6 +390,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
             {
+                framecount1++;
                 if (skeletonFrame != null)
                 {
 
@@ -441,6 +445,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                         Feature1Data.RemoveAt(0);
                         Feature1Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[0]]);
+
+                        
 
                         Feature2Data.RemoveAt(0);
                         Feature2Data.Add(featureFrame.featureValues[featureFrame.bestFeatures[1]]);
@@ -509,7 +515,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         
                         if ((Convert.ToInt32(skeletonFrame.FrameNumber) % 15) == 0)
                         {
-                            ThreadStartingPoint();
+                            window.feature1Live = this.Feature1Data;
+                            window.feature2Live = this.Feature2Data;
+                            window.feature3Live = this.Feature3Data;
+
                            // Make_Graph();
                         }
                         
@@ -1505,29 +1514,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
         private void button2_Click(object sender, RoutedEventArgs e)
         {
-            //
-            //window.KinectSensor = this.KinectSensorManager.KinectSensor;
-            //Thread GraphsWindowThread = new Thread(new ThreadStart(ThreadStartingPoint));
-            //GraphsWindowThread.SetApartmentState(ApartmentState.STA);
-            //GraphsWindowThread.IsBackground = false;
-            //GraphsWindowThread.Start();
-
-
-
-
-            //window.TimeData = this.TimeData;
-
-            //window.KinectSensorManager1 = this.KinectSensorManager;
-            //window.Show();
-
+            
+            window.time1 = this.TimeData;
+            //window.Feature1 = this.Feature1Data;
+            window.KinectSensorManager1 = this.KinectSensorManager;
+            window.Show();
         }
         private void ThreadStartingPoint()
         {
-            GraphsWindow window = new GraphsWindow();
-            window.TimeData = this.TimeData;
-            window.Feature1 = this.Feature1Data;
-            window.KinectSensorManager1 = this.KinectSensorManager;
-            window.Show();
+
 
         }
     }

@@ -3,10 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d3="http://research.microsoft.com/DynamicDataDisplay/1.0"
         xmlns:kt="clr-namespace:Microsoft.Samples.Kinect.WpfViewers;assembly=Microsoft.Samples.Kinect.WpfViewers"
-        Title="GraphsWindow" Height="300" Width="300" Loaded="Window_Loaded" Closed="Window_Closed">
+        Title="GraphsWindow" Height="735" Width="770" Loaded="Window_Loaded" Closed="Window_Closed">
     <Grid>
-        <kt:KinectColorViewer KinectSensorManager="{Binding KinectSensorManager1}" HorizontalAlignment="Left" Margin="128,72,0,0" Name="kinectColorViewer1" VerticalAlignment="Top" />
-        <d3:ChartPlotter Name="F1Graph" Margin="5,0,0,5" LegendVisible="False" BorderBrush="#FF000095" FontSize="10" Background="#FFE3EBEE">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition MinWidth="50" Width="50*"/>
+            <ColumnDefinition MinWidth="50" Width="50*"/>
+            <ColumnDefinition MinWidth="50" Width="50*"/>
+        </Grid.ColumnDefinitions>
+
+        <d3:ChartPlotter Grid.Column="0" Name="F1Graph" Margin="5,0,0,5" LegendVisible="False" BorderBrush="#FF000095" FontSize="10" Background="#FFE3EBEE">
             <d3:ChartPlotter.HorizontalAxis>
                 <d3:HorizontalIntegerAxis Name="Time1"/>
             </d3:ChartPlotter.HorizontalAxis>
@@ -14,6 +19,26 @@
                 <d3:VerticalAxis Name="Feature11"/>
             </d3:ChartPlotter.VerticalAxis>
             <d3:VerticalAxisTitle FontFamily="Arial" Name="G1Vertical" FontSize="10"/>
+            <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="12"/>
+        </d3:ChartPlotter>
+        <d3:ChartPlotter Grid.Column="1" Name="F2Graph" Margin="5,0,0,5" LegendVisible="False" BorderBrush="#FF000095" FontSize="10" Background="#FFE3EBEE">
+            <d3:ChartPlotter.HorizontalAxis>
+                <d3:HorizontalIntegerAxis Name="Time2"/>
+            </d3:ChartPlotter.HorizontalAxis>
+            <d3:ChartPlotter.VerticalAxis >
+                <d3:VerticalAxis Name="Feature2"/>
+            </d3:ChartPlotter.VerticalAxis>
+            <d3:VerticalAxisTitle FontFamily="Arial" Name="G2Vertical" FontSize="10"/>
+            <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="12"/>
+        </d3:ChartPlotter>
+        <d3:ChartPlotter Grid.Column="2" Name="F3Graph" Margin="5,0,0,5" LegendVisible="False" BorderBrush="#FF000095" FontSize="10" Background="#FFE3EBEE">
+            <d3:ChartPlotter.HorizontalAxis>
+                <d3:HorizontalIntegerAxis Name="Time3"/>
+            </d3:ChartPlotter.HorizontalAxis>
+            <d3:ChartPlotter.VerticalAxis >
+                <d3:VerticalAxis Name="Feature3"/>
+            </d3:ChartPlotter.VerticalAxis>
+            <d3:VerticalAxisTitle FontFamily="Arial" Name="G3Vertical" FontSize="10"/>
             <d3:HorizontalAxisTitle FontFamily="Arial" Content="Time" FontSize="12"/>
         </d3:ChartPlotter>
     </Grid>

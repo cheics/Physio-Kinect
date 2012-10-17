@@ -35,30 +35,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     /// </summary>
     public partial class GraphsWindow : Window
     {
+        int ArraySize = 400;
 
-        
-        private FeatureDefinition featureDefinition = new FeatureDefinition();
-        private Classification featurEvaluation = new Classification();
-
-        public static readonly DependencyProperty KinectSensorProperty =
-    DependencyProperty.Register(
-        "KinectSensor",
-        typeof(KinectSensor),
-        typeof(GraphsWindow),
-        new PropertyMetadata(null));
-        new KinectSensor sensor;
-
-        //private readonly KinectSensorChooser sensorChooser = new KinectSensorChooser();
         public KinectSensorManager KinectSensorManager1 { get; set; }
 
-        public ArrayList Feature1 { get; set; }
-        public ArrayList TimeData { get; set; }
+        public ArrayList feature1Live { get; set; }
+        public ArrayList feature2Live { get; set; }
+        public ArrayList feature3Live { get; set; }
 
-        public KinectSensor KinectSensor
-        {
-            get { return (KinectSensor)GetValue(KinectSensorProperty); }
-            set { SetValue(KinectSensorProperty, value); }
-        }
+        public ArrayList time1 { get; set; }
+
 
         public GraphsWindow()
         {
@@ -67,58 +53,101 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //KinectSensorManager1 = new KinectSensorManager();
-            //KinectSensorManager1.KinectSensor.Start();
             int i = 1;
-            //sensor.Start();
-
-
-
-            //sensorChooser.Start();
-            //KinectSensorManager1.ColorStreamEnabled = true;
-            //KinectSensorManager1.DepthStreamEnabled = true;
-            //var kinectSensorBinding =
-            //    new Binding("Kinect") { Source = KinectSensor };
-            //BindingOperations.SetBinding(
-            //    this.KinectSensorManager1,
-            //    KinectSensorManager.KinectSensorProperty,
-            //    kinectSensorBinding);
-            
-            DataContext = this;
             KinectSensorManager1.KinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(KinectSensor_SkeletonFrameReady);
-            KinectSensorManager1.KinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(KinectSensor_AllFramesReady);
         }
 
-        void KinectSensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
-        {
-            int test = 0;
-        }
 
         void KinectSensor_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
-            double[] feature1 = new double[400];
-            int[] time = new int[400];
+            int[] tLive = new int[ArraySize];
+
+            double[] f1Live = new double[ArraySize];
+            double[] f2Live = new double[ArraySize];
+            double[] f3Live = new double[ArraySize];
+
             using (SkeletonFrame skelframe = e.OpenSkeletonFrame())
             {
+                cleanGraphs();
 
-                    Feature1.CopyTo(feature1);
-                    TimeData.CopyTo(time);
+                feature1Live.CopyTo(f1Live);
+                feature2Live.CopyTo(f2Live);
+                feature3Live.CopyTo(f3Live);
 
-                    var FrameTestDataSource = new EnumerableDataSource<int>(time);
-                    FrameTestDataSource.SetXMapping(x => x);
+                time1.CopyTo(tLive);
 
-                    var Joint1TrainDataSource = new EnumerableDataSource<Double>(feature1);
-                    Joint1TrainDataSource.SetYMapping(y => y);
+                var FrameTestDataSource = new EnumerableDataSource<int>(tLive);
+                FrameTestDataSource.SetXMapping(x => x);
 
-                    CompositeDataSource compTest1DataSource = new
-                        CompositeDataSource(FrameTestDataSource, Joint1TrainDataSource);
-                    F1Graph.AddLineGraph(compTest1DataSource, Colors.Blue, 3, "live");
+                var f1LiveData = new EnumerableDataSource<Double>(f1Live);
+                f1LiveData.SetYMapping(y => y);
+
+                var f2LiveData = new EnumerableDataSource<Double>(f2Live);
+                f2LiveData.SetYMapping(y => y);
+
+                var f3LiveData = new EnumerableDataSource<Double>(f3Live);
+                f3LiveData.SetYMapping(y => y);
+
+                CompositeDataSource compf1LiveData = new
+                    CompositeDataSource(FrameTestDataSource, f1LiveData);
+
+                CompositeDataSource compf2LiveData = new
+                    CompositeDataSource(FrameTestDataSource, f2LiveData);
+
+                CompositeDataSource compf3LiveData = new
+                    CompositeDataSource(FrameTestDataSource, f3LiveData);
+
+                F1Graph.AddLineGraph(compf1LiveData, Colors.Blue, 3, "live");
+                F2Graph.AddLineGraph(compf2LiveData, Colors.Blue, 3, "live");
+                F3Graph.AddLineGraph(compf3LiveData, Colors.Blue, 3, "live");
  
             }
             
         }
+        private void cleanGraphs()
+        {
+            List<IPlotterElement> removeList1 = new List<IPlotterElement>();
+            List<IPlotterElement> removeList2 = new List<IPlotterElement>();
+            List<IPlotterElement> removeList3 = new List<IPlotterElement>();
 
+            foreach (var item in F1Graph.Children)
+            {
+                if (item is LineGraph || item is MarkerPointsGraph)
+                {
+                    removeList1.Add(item);
+                }
+            }
 
+            foreach (var item in removeList1)
+            {
+                F1Graph.Children.Remove(item);
+            }
+
+            foreach (var item in F2Graph.Children)
+            {
+                if (item is LineGraph || item is MarkerPointsGraph)
+                {
+                    removeList2.Add(item);
+                }
+            }
+            foreach (var item in removeList2)
+            {
+                F2Graph.Children.Remove(item);
+            }
+
+            foreach (var item in F3Graph.Children)
+            {
+                if (item is LineGraph || item is MarkerPointsGraph)
+                {
+                    removeList3.Add(item);
+                }
+            }
+            foreach (var item in removeList3)
+            {
+                F3Graph.Children.Remove(item);
+            }
+
+        }
 
         private void Window_Closed(object sender, EventArgs e)
         {
